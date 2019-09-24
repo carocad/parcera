@@ -196,14 +196,7 @@
     | '.'
     ;
 
-  (* Discard *)
-  (* -------------------------------------------------------------------- *)
-
-  WS : [ \n\r\t,] ;
-
-  COMMENT: ';' ~[\r\n]* ;
-
-  TRASH: ( WS | COMMENT ) -> channel(HIDDEN);")
+  COMMENT: ';' ~[\r\n]* ;")
 
 (def parser (instaparse/parser grammar :auto-whitespace :comma))
 
