@@ -127,24 +127,20 @@
       | '-'? 'NaN'
       ;
 
-  fragment
   FLOAT_TAIL
       : FLOAT_DECIMAL FLOAT_EXP
       | FLOAT_DECIMAL
       | FLOAT_EXP
       ;
 
-  fragment
   FLOAT_DECIMAL
       : '.' [0-9]+
       ;
 
-  fragment
   FLOAT_EXP
       : [eE] '-'? [0-9]+
       ;
 
-  fragment
   HEXD: [0-9a-fA-F] ;
 
   HEX: '0' [xX] HEXD+ ;
@@ -184,18 +180,16 @@
   (* Fragments *s)
   (* -------------------------------------------------------------------- *)
 
-  fragment
   NAME: SYMBOL_HEAD SYMBOL_REST* (':' SYMBOL_REST+)* ;
 
-  fragment
   SYMBOL_HEAD
       : ~('0' .. '9'
-          | '^' | '`' | '\\'' | '\"' | '#' | '~' | '@' | ':' | '/' | '%' | '(' | ')' | '[' | ']' | '{' | '}' // FIXME: could be one group
-          | [ \n\r\t,] // FIXME: could be WS
+          (* FIXME: could be one group *)
+          | '^' | '`' | '\\'' | '\"' | '#' | '~' | '@' | ':' | '/' | '%' | '(' | ')' | '[' | ']' | '{' | '}'
+          | [ \n\r\t,] (* FIXME: could be WS *)
           )
       ;
 
-  fragment
   SYMBOL_REST
     : SYMBOL_HEAD
     | '0'..'9'
@@ -205,14 +199,11 @@
   (* Discard *)
   (* -------------------------------------------------------------------- *)
 
-  fragment
   WS : [ \n\r\t,] ;
 
-  fragment
   COMMENT: ';' ~[\r\n]* ;
 
-  TRASH: ( WS | COMMENT ) -> channel(HIDDEN);
-  ")
+  TRASH: ( WS | COMMENT ) -> channel(HIDDEN);")
 
 (def parser (instaparse/parser grammar :auto-whitespace :comma))
 
