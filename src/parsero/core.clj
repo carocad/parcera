@@ -66,35 +66,34 @@
 
   dispatch: '#' symbol form;
 
-  regex: '#' string;
+  regex: '#' STRING;
 
   literal:
-        string
+        STRING
       | number
       | character
-      | nil
+      | NIL
       | BOOLEAN
       | keyword
       | symbol
       | param_name
       ;
 
-  string: STRING;
   hex: HEX;
   bin: BIN;
   bign: BIGN;
-  number:
-        FLOAT
+  number: #'\\d*'
+        (* FLOAT
       | hex
       | bin
       | bign
       | LONG
-      ;
+      *);
 
   character:
-        named_char
+        (* named_char
       | u_hex_quad
-      | any_char
+      | *) any_char
       ;
 
   named_char: CHAR_NAMED ;
@@ -103,10 +102,10 @@
 
   u_hex_quad: CHAR_U ;
 
-  nil: NIL;
-
   keyword: macro_keyword | simple_keyword;
+
   simple_keyword: ':' symbol;
+
   macro_keyword: ':' ':' symbol;
 
   symbol: ns_symbol | simple_sym;
@@ -118,7 +117,7 @@
   (* Lexers *)
   (* -------------------------------------------------------------------- *)
 
-  STRING : '\"' ( ~'\"' | '\\' '\"' )* '\"' ;
+  STRING : #'^\"[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*\"';
 
   (* FIXME: Doesn't deal with arbitrary read radixes, BigNums *)
   FLOAT
@@ -161,7 +160,7 @@
              | 'formfeed'
              | 'backspace' ) ;
 
-  CHAR_ANY: '\\' . ;
+  CHAR_ANY: #'\\\\.*';
 
   NIL : 'nil';
 
