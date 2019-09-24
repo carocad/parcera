@@ -44,7 +44,7 @@
 
 (def parser (instaparse/parser grammar :auto-whitespace :comma))
 
-(defn foo
-  "I don't do a whole lot."
-  [x]
-  (println x "Hello, World!"))
+(parser "(defn foo
+          \"I don't do a whole lot.\"
+          [x]
+          (println x \"Hello, World!\"))")
