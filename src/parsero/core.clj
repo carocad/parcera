@@ -39,6 +39,8 @@
       | gensym
       ;
 
+  PLACEHOLDER: #'.+';
+
   (* TJP added '&' (gather a variable number of arguments) *)
   quote: '\\'' form;
 
