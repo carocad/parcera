@@ -1,8 +1,11 @@
 (ns parsero.core
   (:require [instaparse.core :as instaparse]))
 
-(def grammar "
-")
+(def grammar
+  "S:={AB}  ;
+  AB ::= (A, B)
+  A : \"a\" + ;
+  B ='b' + ;")
 
 (def parser (instaparse/parser grammar))
 
