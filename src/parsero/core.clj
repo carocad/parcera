@@ -4,10 +4,8 @@
 (def grammar
   "file: form*;
 
-  PLACEHOLDER: #'.+';\n
-
-  form: PLACEHOLDER
-        (* literal *)
+  form:
+        literal
       | list
       | vector
       | map
@@ -24,7 +22,25 @@
 
   set: '#{' forms '}' ;
 
-  ")
+  literal:
+        STRING
+      (* | number *)
+      (* | character *)
+      | NIL
+      | BOOLEAN
+      (* | keyword *)
+      (* | symbol *)
+      (* | param_name *)
+      ;
+
+  (* Lexers *)
+  (* -------------------------------------------------------------------- *)
+
+  STRING : #'^\"[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*\"';
+
+  NIL : 'nil';
+
+  BOOLEAN : 'true' | 'false' ;")
 
 (def parser (instaparse/parser grammar :auto-whitespace :comma))
 
