@@ -238,7 +238,7 @@
   ;
   ")
 
-(def parser (instaparse/parser grammar))
+(def parser (instaparse/parser grammar :auto-whitespace :comma))
 
 (defn foo
   "I don't do a whole lot."
