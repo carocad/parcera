@@ -38,7 +38,7 @@
         | NIL
         | BOOLEAN
         | keyword
-        | COMMENT
+        | <COMMENT>
         (* | param_name *)
         ;
 
@@ -165,7 +165,7 @@
           [x]
           (println x 9.78 \"Hello, World!\"))")
 
-#_(parser (slurp "./src/parsero/core.clj"))
+(parser (slurp "./src/parsero/core.clj"))
 
 ;; TODO: is this a bug ?
 #_(def foo.bar "hello")
