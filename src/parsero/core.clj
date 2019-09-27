@@ -2,6 +2,9 @@
   (:require [instaparse.core :as instaparse]
             [clojure.core.strint :as strint]))
 
+;; NOTE: dots (.) are not allowed according to clojure reference.
+;; https://clojure.org/reference/reader#_symbols
+;; however the clojure reader allows it
 (def name-regex "(?![0-9])[\\w\\*\\+\\!\\-\\'\\?\\>\\<\\=\\.]+")
 (def namespaced-symbol-regex (strint/<< "(~{name-regex}\\/)?~{name-regex}"))
 
