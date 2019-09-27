@@ -5,7 +5,10 @@
 ;; NOTE: several characters are not allowed according to clojure reference.
 ;; https://clojure.org/reference/reader#_symbols
 ;; EDN reader says otherwise https://github.com/edn-format/edn#symbols
-(def name-regex "(?![0-9:#])[\\w.*+\\-!?$%&=<>\\':#]+|\\/")
+(def valid-characters "[\\w.*+\\-!?$%&=<>\\':#]+")
+;; symbols cannot start with number, :, #
+;; / is a valid symbol as long as it is not part of the name
+(def symbol-head "(?![0-9:#])")
 
 (def grammar
   (strint/<<
@@ -34,11 +37,13 @@
         (* | character *)
         | NIL
         | BOOLEAN
-        (* | keyword *)
+        | keyword
         (* | param_name *)
         ;
 
     symbol: NAMESPACED_SYMBOL | SIMPLE_SYMBOL;
+
+    keyword: MACRO_KEYWORD | SIMPLE_KEYWORD;
 
     number:
           DOUBLE
@@ -54,9 +59,13 @@
 
     BOOLEAN : 'true' | 'false' ;
 
-    SIMPLE_SYMBOL: #'~{name-regex}';
+    SIMPLE_SYMBOL: #'(~{symbol-head}~{valid-characters})|\\/';
 
-    NAMESPACED_SYMBOL: #'(~{name-regex}\\/)?~{name-regex}';
+    NAMESPACED_SYMBOL: #'(~{symbol-head}~{valid-characters}\\/)?~{valid-characters}';
+
+    SIMPLE_KEYWORD: #':~{valid-characters}\\/~{valid-characters}';
+
+    MACRO_KEYWORD: #'::~{valid-characters}';
 
     DOUBLE: #'([-+]?[0-9]+(\\.[0-9]*)?([eE][-+]?[0-9]+)?)(M)?'
 
@@ -127,12 +136,6 @@
     any_char: CHAR_ANY ;
 
     u_hex_quad: CHAR_U ;
-
-    keyword: macro_keyword | simple_keyword;
-
-    simple_keyword: ':' symbol;
-
-    macro_keyword: ':' ':' symbol;
 
     param_name: PARAM_NAME;
 
