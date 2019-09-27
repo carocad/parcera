@@ -1,8 +1,15 @@
 (ns parsero.core
-  (:require [instaparse.core :as instaparse]))
+  (:require [instaparse.core :as instaparse]
+            [clojure.core.strint :as strint]))
 
+(def name-regex "(?![0-9])[\\w\\*\\+\\!\\-\\'\\?\\>\\<\\=]+")
+(def namespace-regex (strint/<< "~{name-regex}(\\.~{name-regex})*"))
+(def namespaced-symbol-regex (strint/<< "(~{namespace-regex}\\/)?~{name-regex}"))
+
+parsero.core/namespace-regex
 (def grammar
-  "file: form*;
+  (strint/<<
+    "file: form*;
 
   form:
         literal
@@ -40,7 +47,15 @@
 
   NIL : 'nil';
 
-  BOOLEAN : 'true' | 'false' ;")
+    BOOLEAN : 'true' | 'false' ;
+
+    SIMPLE_SYMBOL: #'${name-regex}';
+
+    NAMESPACED_SYMBOL: #'~{namespaced-symbol-regex}';
+
+    PARAM_NAME: '%' ((('1'..'9')('0'..'9')*)|'&')? ;
+
+    COMMENT: ';' ~[\r\n]* ;"))
 
 (def parser (instaparse/parser grammar :auto-whitespace :comma))
 
