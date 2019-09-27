@@ -49,13 +49,13 @@ parsero.core/namespace-regex
 
     BOOLEAN : 'true' | 'false' ;
 
-    SIMPLE_SYMBOL: #'${name-regex}';
+    SIMPLE_SYMBOL: #'~{name-regex}';
 
     NAMESPACED_SYMBOL: #'~{namespaced-symbol-regex}';
 
     PARAM_NAME: '%' ((('1'..'9')('0'..'9')*)|'&')? ;
 
-    COMMENT: ';' ~[\r\n]* ;"))
+     (* COMMENT: ';' ~[\r\n]* ; *)"))
 
 (def parser (instaparse/parser grammar :auto-whitespace :comma))
 
