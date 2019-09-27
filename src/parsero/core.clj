@@ -2,11 +2,10 @@
   (:require [instaparse.core :as instaparse]
             [clojure.core.strint :as strint]))
 
-;; NOTE: dots (.) are not allowed according to clojure reference.
+;; NOTE: several characters are not allowed according to clojure reference.
 ;; https://clojure.org/reference/reader#_symbols
-;; however the clojure reader allows it
-(def name-regex "(?![0-9])[\\w\\*\\+\\!\\-\\'\\?\\>\\<\\=\\.]+")
-(def namespaced-symbol-regex (strint/<< "(~{name-regex}\\/)?~{name-regex}"))
+;; EDN reader says otherwise https://github.com/edn-format/edn#symbols
+(def name-regex "(?![0-9:#])[\\w.*+\\-!?$%&=<>\\':#]+|\\/")
 
 (def grammar
   (strint/<<
@@ -57,7 +56,7 @@
 
     SIMPLE_SYMBOL: #'~{name-regex}';
 
-    NAMESPACED_SYMBOL: #'~{namespaced-symbol-regex}';
+    NAMESPACED_SYMBOL: #'(~{name-regex}\\/)?~{name-regex}';
 
     DOUBLE: #'([-+]?[0-9]+(\\.[0-9]*)?([eE][-+]?[0-9]+)?)(M)?'
 
@@ -166,6 +165,11 @@
 
 ;; TODO: is this a bug ?
 #_(def foo.bar "hello")
+;; TODO: is this a bug ?
 #_(def . "hello")
-#_parsero.core/.
-#_.
+
+;; TODO: is this a bug ?
+#_(defn foo.bar [a.b]) ;; not valid ... why ?
+
+;; TODO: is this a bug ? ;; a keyword starting with a number
+;; :1hello.world
