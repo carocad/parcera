@@ -38,6 +38,7 @@
         | NIL
         | BOOLEAN
         | keyword
+        | COMMENT
         (* | param_name *)
         ;
 
@@ -72,6 +73,8 @@
     RATIO: #'([-+]?[0-9]+)/([0-9]+)'
 
     LONG: #'([-+]?)(?:(0)|([1-9][0-9]*)|0[xX]([0-9A-Fa-f]+)|0([0-7]+)|([1-9][0-9]?)[rR]([0-9A-Za-z]+)|0[0-9]+)(N)?'
+
+    COMMENT: #';.*';
 
 
     (* TODO ---------------------------------
@@ -122,8 +125,6 @@
     dispatch: '#' symbol form;
 
     regex: '#' STRING;
-
-    COMMENT: ';' ~[\r\n]* ;
 
     character:
           named_char
