@@ -14,8 +14,7 @@
 
     <forms>: form*;
 
-    <form>:
-          literal
+    <form>: (literal /  symbol)
         | list
         | vector
         | map
@@ -31,17 +30,22 @@
     set: <'#{'> forms <'}'> ;
 
     <literal>:
-          STRING
-        (* | number *)
+          number
+        | STRING
         (* | character *)
         | NIL
         | BOOLEAN
         (* | keyword *)
-        | symbol
         (* | param_name *)
         ;
 
     symbol: NAMESPACED_SYMBOL | SIMPLE_SYMBOL;
+
+    number:
+          DOUBLE
+        | RATIO
+        | LONG
+        ;
 
     (* Lexers -------------------------------------------------------------- *)
 
@@ -54,6 +58,13 @@
     SIMPLE_SYMBOL: #'~{name-regex}';
 
     NAMESPACED_SYMBOL: #'~{namespaced-symbol-regex}';
+
+    DOUBLE: #'([-+]?[0-9]+(\\.[0-9]*)?([eE][-+]?[0-9]+)?)(M)?'
+
+    RATIO: #'([-+]?[0-9]+)/([0-9]+)'
+
+    LONG: #'([-+]?)(?:(0)|([1-9][0-9]*)|0[xX]([0-9A-Fa-f]+)|0([0-7]+)|([1-9][0-9]?)[rR]([0-9A-Za-z]+)|0[0-9]+)(N)?'
+
 
     (* TODO ---------------------------------
 
@@ -106,17 +117,6 @@
 
     COMMENT: ';' ~[\r\n]* ;
 
-    hex: HEX;
-    bin: BIN;
-    bign: BIGN;
-    number:
-          FLOAT
-        | hex
-        | bin
-        | bign
-        | LONG
-        ;
-
     character:
           named_char
         | u_hex_quad
@@ -137,36 +137,7 @@
 
     param_name: PARAM_NAME;
 
-    (* FIXME: Doesn't deal with arbitrary read radixes, BigNums *)
-    FLOAT
-        : '-'? [0-9]+ FLOAT_TAIL
-        | '-'? 'Infinity'
-        | '-'? 'NaN'
-        ;
-
-    FLOAT_TAIL
-        : FLOAT_DECIMAL FLOAT_EXP
-        | FLOAT_DECIMAL
-        | FLOAT_EXP
-        ;
-
-    FLOAT_DECIMAL
-        : '.' [0-9]+
-        ;
-
-    FLOAT_EXP
-        : [eE] '-'? [0-9]+
-        ;
-
     HEXD: [0-9a-fA-F] ;
-
-    HEX: '0' [xX] HEXD+ ;
-
-    BIN: '0' [bB] [10]+ ;
-
-    LONG: '-'? [0-9]+[lL]?;
-
-    BIGN: '-'? [0-9]+[nN];
 
     CHAR_U: '\\' 'u'[0-9D-Fd-f] HEXD HEXD HEXD ;
 
@@ -189,7 +160,7 @@
 (parser "(defn foo
           \"I don't do a whole lot.\"
           [x]
-          (println x \"Hello, World!\"))")
+          (println x 9.78 \"Hello, World!\"))")
 
 #_(parser (slurp "./src/parsero/core.clj"))
 
