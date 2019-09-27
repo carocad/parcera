@@ -8,7 +8,9 @@
 
 (def grammar
   (strint/<<
-    "forms: form*;
+    "file: form*
+
+    <forms>: form*;
 
     <form>:
           literal
@@ -37,7 +39,7 @@
         (* | param_name *)
         ;
 
-    symbol: NAMESPACED_SYMBOL | SIMPLE_SYMBOL;
+    symbol: QUALIFIED_SYMBOL | SIMPLE_SYMBOL;
 
     (* Lexers -------------------------------------------------------------- *)
 
@@ -49,7 +51,7 @@
 
     SIMPLE_SYMBOL: #'~{name-regex}';
 
-    NAMESPACED_SYMBOL: #'~{namespaced-symbol-regex}';
+    QUALIFIED_SYMBOL: #'~{namespaced-symbol-regex}';
 
     (* TODO ---------------------------------
 
