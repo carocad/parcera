@@ -89,7 +89,7 @@
 
     regex: #'#~{string-regex}';
 
-    var_quote: <'\\''> symbol;
+    var_quote: <'#\\''> symbol;
 
     quote: <'\\''> form;
 
