@@ -19,7 +19,7 @@
     <forms>: form*;
 
     <form>:
-        ( literal /  symbol)
+        ( symbol / literal)
         | list
         | vector
         | map
