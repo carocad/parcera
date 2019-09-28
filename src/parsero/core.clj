@@ -63,6 +63,7 @@
     character:
           NAMED_CHAR
         | UNICODE_CHAR
+        | ANY_CHAR
         ;
 
     reader_macro:
@@ -133,7 +134,9 @@
 
     <UNICODE_CHAR>: #'\\\\u[0-9D-Fd-f]{4}';
 
-    <NAMED_CHAR>: #'\\\\(newline|return|space|tab|formfeed|backspace|c)';"))
+    <NAMED_CHAR>: #'\\\\(newline|return|space|tab|formfeed|backspace|c)';
+
+    <ANY_CHAR>: #'\\\\.'"))
 
 (def parser (instaparse/parser grammar :auto-whitespace :comma))
 
