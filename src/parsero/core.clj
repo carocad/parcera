@@ -12,7 +12,7 @@
 
 (def grammar
   (strint/<<
-    "file: form*
+    "file: forms
 
     <forms>: form*;
 
