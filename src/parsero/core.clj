@@ -37,17 +37,22 @@
 
     <literal>:
           number
-        | STRING
+        | string
         | character
-        | NIL
-        | BOOLEAN
+        | nil
+        | boolean
         | keyword
         | <COMMENT>
         ;
 
-    symbol: SIMPLE_SYMBOL | NAMESPACED_SYMBOL;
+    symbol:
+          SIMPLE_SYMBOL
+        | NAMESPACED_SYMBOL;
 
-    keyword: SIMPLE_KEYWORD | NAMESPACED_KEYWORD | MACRO_KEYWORD;
+    keyword:
+          SIMPLE_KEYWORD
+        | NAMESPACED_KEYWORD
+        | MACRO_KEYWORD;
 
     number:
           DOUBLE
@@ -76,11 +81,11 @@
 
     lambda: '#(' form* ')';
 
-    metadata: <'^'> (map_metadata  | shorthand_metadata);
+    metadata: <'^'> ( map_metadata | shorthand_metadata );
 
     <map_metadata>: map form
 
-    <shorthand_metadata>: (symbol | STRING | keyword ) form
+    <shorthand_metadata>: ( symbol | string | keyword ) form;
 
     regex: #'#~{string-regex}';
 
@@ -100,13 +105,13 @@
 
     tag: <'#'> symbol form;
 
+    string : #'~{string-regex}';
+
+    nil : 'nil';
+
+    boolean : 'true' | 'false' ;
+
     (* Lexers -------------------------------------------------------------- *)
-
-    STRING : #'~{string-regex}';
-
-    NIL : 'nil';
-
-    BOOLEAN : 'true' | 'false' ;
 
     <SIMPLE_SYMBOL>: #'(~{symbol-head}~{valid-characters})|\\/';
 
