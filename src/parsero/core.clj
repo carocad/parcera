@@ -142,11 +142,11 @@
     <ANY_CHAR>: #'\\\\.'"))
 
 (def parser (instaparse/parser grammar :auto-whitespace :comma))
-
-(parser "(defn foo
-          \"I don't do a whole lot.\"
-          [x]
-          (println x 9.78 \"Hello, World!\"))")
+parser
+(instaparse/parses parser (str '(defn foo
+                                  "I don't do a whole lot."
+                                  [x]
+                                  (println x 9.78 "Hello, World!"))))
 
 (parser (slurp "./src/parsero/core.clj"))
 
@@ -167,4 +167,14 @@
 
 (meta ^String [1 2 3])
 
-(meta ^"String" [1 2 3])
+'(meta ^"String" [1 2 3])
+
+#"hellow|wprld"
+
+nil
+true
+;(time (parser (time (slurp "./src/parsero/clojure.clj"))))
+#'parser []
+
+\-
+(parser (str '(defn hello? [x] (if (nil? x) ::tap-nil x))))
