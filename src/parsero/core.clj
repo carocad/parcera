@@ -84,7 +84,7 @@
 
     var_quote: '#\\'' symbol;
 
-    quote: ''' form;
+    quote: '\\'' form;
 
     backtick: '`' form;
 
