@@ -42,9 +42,9 @@
         (* | param_name *)
         ;
 
-    symbol: NAMESPACED_SYMBOL | SIMPLE_SYMBOL;
+    symbol: SIMPLE_SYMBOL | NAMESPACED_SYMBOL;
 
-    keyword: MACRO_KEYWORD | SIMPLE_KEYWORD;
+    keyword: SIMPLE_KEYWORD | NAMESPACED_KEYWORD | MACRO_KEYWORD;
 
     number:
           DOUBLE
@@ -71,9 +71,11 @@
 
     SIMPLE_SYMBOL: #'(~{symbol-head}~{valid-characters})|\\/';
 
-    NAMESPACED_SYMBOL: #'(~{symbol-head}~{valid-characters}\\/)?~{valid-characters}';
+    NAMESPACED_SYMBOL: #'~{symbol-head}~{valid-characters}\\/~{valid-characters}';
 
-    SIMPLE_KEYWORD: #':~{valid-characters}\\/~{valid-characters}';
+    SIMPLE_KEYWORD: #':~{valid-characters}';
+
+    NAMESPACED_KEYWORD: #':~{valid-characters}\\/~{valid-characters}';
 
     MACRO_KEYWORD: #'::~{valid-characters}';
 
@@ -160,3 +162,5 @@
 
 ;; TODO: is this a bug ? ;; a keyword starting with a number
 ;; :1hello.world
+
+(def hello #(println %1))
