@@ -57,10 +57,6 @@
         | UNICODE_CHAR
         ;
 
-    UNICODE_CHAR: #'\\\\u[0-9D-Fd-f]{4}';
-
-    NAMED_CHAR: #'\\\\(newline|return|space|tab|formfeed|backspace|c)';
-
     (* Lexers -------------------------------------------------------------- *)
 
     STRING : #'^\"[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*\"';
@@ -87,6 +83,9 @@
 
     COMMENT: #';.*';
 
+    UNICODE_CHAR: #'\\\\u[0-9D-Fd-f]{4}';
+
+    NAMED_CHAR: #'\\\\(newline|return|space|tab|formfeed|backspace|c)';
 
     (* TODO ---------------------------------
 
