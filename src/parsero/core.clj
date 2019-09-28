@@ -41,7 +41,6 @@
         | BOOLEAN
         | keyword
         | <COMMENT>
-        (* | param_name *)
         ;
 
     symbol: SIMPLE_SYMBOL | NAMESPACED_SYMBOL;
