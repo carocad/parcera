@@ -34,7 +34,7 @@
     <literal>:
           number
         | STRING
-        (* | character *)
+        | character
         | NIL
         | BOOLEAN
         | keyword
@@ -51,6 +51,15 @@
         | RATIO
         | LONG
         ;
+
+    character:
+          NAMED_CHAR
+        | UNICODE_CHAR
+        ;
+
+    UNICODE_CHAR: #'\\\\u[0-9D-Fd-f]{4}';
+
+    NAMED_CHAR: #'\\\\(newline|return|space|tab|formfeed|backspace|c)';
 
     (* Lexers -------------------------------------------------------------- *)
 
@@ -126,33 +135,7 @@
 
     regex: '#' STRING;
 
-    character:
-          named_char
-        | u_hex_quad
-        | any_char
-        ;
-
-    named_char: CHAR_NAMED ;
-
-    any_char: CHAR_ANY ;
-
-    u_hex_quad: CHAR_U ;
-
     param_name: PARAM_NAME;
-
-    HEXD: [0-9a-fA-F] ;
-
-    CHAR_U: '\\' 'u'[0-9D-Fd-f] HEXD HEXD HEXD ;
-
-    CHAR_NAMED:
-                '\\' ( 'newline'
-               | 'return'
-               | 'space'
-               | 'tab'
-               | 'formfeed'
-               | 'backspace' ) ;
-
-    CHAR_ANY: #'\\\\.*';
 
     *)"))
 
