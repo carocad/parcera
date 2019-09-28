@@ -8,7 +8,10 @@
 (def valid-characters "[\\w.*+\\-!?$%&=<>\\':#]+")
 ;; symbols cannot start with number, :, #
 ;; / is a valid symbol as long as it is not part of the name
-(def symbol-head "(?![0-9:#])")
+;; note: added ' as invalid first character due to ambiguity in #'hello
+;; -> [:tag [:symbol "'hello"]]
+;; -> [:var_quote [:symbol "hello"]]
+(def symbol-head "(?![0-9:#\\'])")
 
 (def string-regex "\"[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*\"")
 
