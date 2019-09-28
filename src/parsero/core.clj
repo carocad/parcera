@@ -16,11 +16,13 @@
 
     <forms>: form*;
 
-    <form>: (literal /  symbol)
+    <form>:
+        ( literal /  symbol)
         | list
         | vector
         | map
-        (* | reader_macro *)
+        | set
+        | reader_macro
         ;
 
     list: <'('> forms <')'> ;
@@ -57,6 +59,46 @@
         | UNICODE_CHAR
         ;
 
+    reader_macro:
+          lambda
+        | metadata
+        | regex
+        | var_quote
+        | discard
+        | tag
+        | deref
+        | quote
+        | backtick
+        | unquote
+        | unquote_splicing
+        ;
+
+    lambda: '#(' form* ')';
+
+    metadata: '^' (map_metadata  | shorthand_metadata);
+
+    map_metadata: map form
+
+    shorthand_metadata: (symbol | STRING | keyword ) form
+
+    regex: '#' STRING;
+
+    var_quote: '#\\'' symbol;
+
+    quote: ''' form;
+
+    backtick: '`' form;
+
+    unquote: '~' form;
+
+    unquote_splicing: '~@' form;
+
+    deref: '@' form;
+
+    discard: '#_' form;
+
+    tag: '#' symbol form;
+
     (* Lexers -------------------------------------------------------------- *)
 
     STRING : #'^\"[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*\"';
@@ -85,62 +127,7 @@
 
     UNICODE_CHAR: #'\\\\u[0-9D-Fd-f]{4}';
 
-    NAMED_CHAR: #'\\\\(newline|return|space|tab|formfeed|backspace|c)';
-
-    (* TODO ---------------------------------
-
-     reader_macro:
-          lambda
-        | meta_data
-        | regex
-        | var_quote
-        | host_expr
-        | set
-        | tag
-        | discard
-        | dispatch
-        | deref
-        | quote
-        | backtick
-        | unquote
-        | unquote_splicing
-        | gensym
-        ;
-
-    (* TJP added '&' (gather a variable number of arguments) *)
-    quote: '\\'' form;
-
-    backtick: '`' form;
-
-    unquote: '~' form;
-
-    unquote_splicing: '~@' form;
-
-    tag: '^' form form;
-
-    deref: '@' form;
-
-    gensym: SYMBOL '#';
-
-    lambda: '#(' form* ')';
-
-    meta_data: '#^' (map form | form);
-
-    var_quote: '#\\'' symbol;
-
-    host_expr: '#+' form form;
-
-    discard: '#_' form;
-
-    dispatch: '#' symbol form;
-
-    regex: '#' STRING;
-
-    param_name: PARAM_NAME;
-
-    *)"))
-
-;; TODO: PARAM_NAME: '%' ((('1'..'9')('0'..'9')*) | '&')?;
+    NAMED_CHAR: #'\\\\(newline|return|space|tab|formfeed|backspace|c)';"))
 
 (def parser (instaparse/parser grammar :auto-whitespace :comma))
 
@@ -162,4 +149,10 @@
 ;; TODO: is this a bug ? ;; a keyword starting with a number
 ;; :1hello.world
 
-(def hello #(println %1))
+;; todo: https://clojure.org/reference/reader#_character
+
+(meta ^{:a 1 :b 2} [1 2 3])
+
+(meta ^String [1 2 3])
+
+(meta ^"String" [1 2 3])
