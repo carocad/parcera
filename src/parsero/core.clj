@@ -1,6 +1,7 @@
 (ns parsero.core
   (:require [instaparse.core :as instaparse]
-            [clojure.core.strint :as strint]))
+            [clojure.core.strint :as strint]
+            [clojure.data :as data]))
 
 ;; NOTE: several characters are not allowed according to clojure reference.
 ;; https://clojure.org/reference/reader#_symbols
@@ -50,18 +51,11 @@
         | <COMMENT>
         ;
 
-    symbol: SIMPLE_SYMBOL | NAMESPACED_SYMBOL;
+    symbol: (SIMPLE_SYMBOL | NAMESPACED_SYMBOL) !'/';
 
-    keyword:
-          SIMPLE_KEYWORD
-        | NAMESPACED_KEYWORD
-        | MACRO_KEYWORD;
+    keyword: (SIMPLE_KEYWORD | NAMESPACED_KEYWORD | MACRO_KEYWORD) !'/';
 
-    number:
-          DOUBLE
-        | RATIO
-        | LONG
-        ;
+    number: (DOUBLE | RATIO | LONG) !symbol;
 
     character:
           NAMED_CHAR
@@ -113,7 +107,7 @@
 
     (* Lexers -------------------------------------------------------------- *)
 
-    <SIMPLE_SYMBOL>: #'(~{symbol-head}~{valid-characters})|\\/';
+    <SIMPLE_SYMBOL>: #'(~{symbol-head}~{valid-characters})' | '/';
 
     <NAMESPACED_SYMBOL>: #'~{symbol-head}~{valid-characters}\\/~{valid-characters}';
 
@@ -144,7 +138,10 @@ parser
                                   [x]
                                   (println x 9.78 "Hello, World!"))))
 
-(parser (slurp "./src/parsero/core.clj"))
+(data/diff (first (instaparse/parses parser (slurp "./src/parsero/core.clj")))
+           (second (instaparse/parses parser (slurp "./src/parsero/core.clj"))))
+
+(count (instaparse/parses parser (slurp "./src/parsero/core.clj")))
 
 ;; TODO: is this a bug ?
 #_(def foo.bar "hello")
