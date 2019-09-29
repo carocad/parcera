@@ -41,3 +41,5 @@ true
 #_(def 9.7 "hello world")
 
 '(#_(defn hello? [x] (if (nil? x) ::tap-nil x)))
+
+{:a 1 :b "2" :c 'hello}

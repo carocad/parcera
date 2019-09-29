@@ -1,7 +1,6 @@
 (ns parsero.core
   (:require [instaparse.core :as instaparse]
-            [clojure.data :as data]))
-
+            [clojure.edn :as edn]))
 
 (def grammar
     "file: forms
@@ -52,7 +51,7 @@
         | unquote_splicing
         ;
 
-    dispatch: <'#'> ( function | regex | var_quote | discard | tag)
+    <dispatch>: <'#'> ( function | regex | var_quote | <discard> | tag)
 
     function: list;
 
@@ -139,4 +138,45 @@
 ;(time (clojure (slurp "./src/parsero/core.clj") :unhide :all))
 
 ;(dotimes [n 100])
-(time (clojure (slurp "./src/parsero/core.clj")))
+;(time (clojure (slurp "./src/parsero/core.clj")))
+
+;(time (instaparse.core/parses clojure (slurp "./resources/test_cases.clj")))
+
+(defn edn
+  [ast]
+  (case (first ast)
+    (:file :list)
+    (map edn (rest ast))
+
+    :vector
+    (into [] (map edn) (rest ast))
+
+    :string
+    (second ast)
+
+    :symbol
+    (apply symbol (rest ast))
+
+    :number
+    (edn/read-string (second ast))
+
+    :character
+    (if (= 1 (count (second ast)))
+      (first (second ast))
+      (. (second ast) (toCharArray))) ;; todo: do I need to support cljs here ?
+
+    :keyword
+    (edn (second ast))
+
+    :SIMPLE_KEYWORD
+    (apply keyword (rest ast))
+
+    :map
+    (apply hash-map (map edn (rest ast)))
+
+    ast))
+
+;(edn (clojure (slurp "./src/parsero/core.clj")))
+
+;(edn (clojure (slurp "./resources/test_cases.clj")))
+;(clojure (slurp "./resources/test_cases.clj"))
