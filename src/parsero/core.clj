@@ -38,7 +38,7 @@
 
     keyword: SIMPLE_KEYWORD | MACRO_KEYWORD;
 
-    number: ('-' | '+')? DOUBLE | RATIO | LONG;
+    number: DOUBLE | RATIO | LONG;
 
     character: <'\\\\'> ( SIMPLE_CHAR | UNICODE_CHAR );
 
@@ -90,16 +90,16 @@
 
     MACRO_KEYWORD: <'::'> VALID_CHARACTERS;
 
-    <DOUBLE>: #'([0-9]+(\\.[0-9]*)?([eE][-+]?[0-9]+)?)(M)?'
+    <DOUBLE>: #'[-+]?(\\d+(\\.\\d*)?([eE][-+]?\\d+)?)(M)?'
 
-    <RATIO>: #'([0-9]+)/([0-9]+)'
+    <RATIO>: #'[-+]?(\\d+)/(\\d+)'
 
-    <LONG>: #'(?:(0)|([1-9][0-9]*)|0[xX]([0-9A-Fa-f]+)|0([0-7]+)|([1-9][0-9]?)[rR]([0-9A-Za-z]+)|0[0-9]+)(N)?'
+    <LONG>: #'[-+]?(?:(0)|([1-9]\\d*)|0[xX]([\\dA-Fa-f]+)|0([0-7]+)|([1-9]\\d?)[rR]([\\d\\w]+)|0\\d+)(N)?'
             !'.';
 
-    COMMENT: ';' #'.*';
+    COMMENT: <';'> #'.*';
 
-    <UNICODE_CHAR>: 'u' #'[0-9D-Fd-f]{4}';
+    <UNICODE_CHAR>: <'u'> #'[\\dD-Fd-f]{4}';
 
     <SIMPLE_CHAR>:
           'newline'
@@ -180,4 +180,4 @@ true
 (clojure (str '(nil)))
 (set! *print-length* 30)
 
-(def 9.7 "hello world")
+#_(def 9.7 "hello world")
