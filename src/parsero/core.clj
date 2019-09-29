@@ -38,19 +38,15 @@
 
     symbol: SIMPLE_SYMBOL | NAMESPACED_SYMBOL;
 
-    keyword: SIMPLE_KEYWORD | NAMESPACED_KEYWORD | MACRO_KEYWORD;
+    keyword: SIMPLE_KEYWORD | MACRO_KEYWORD;
 
     number: DOUBLE | RATIO | LONG;
 
     character: <'\\\\'> ( SIMPLE_CHAR | UNICODE_CHAR );
 
-    reader_macro:
-          lambda
+    <reader_macro>:
+          dispatch
         | metadata
-        | regex
-        | var_quote
-        | discard
-        | tag
         | deref
         | quote
         | backtick
@@ -58,7 +54,9 @@
         | unquote_splicing
         ;
 
-    lambda: '#(' forms ')';
+    dispatch: <'#'> ( function | regex | var_quote | discard | tag)
+
+    function: list;
 
     metadata: <'^'> ( map_metadata | shorthand_metadata );
 
@@ -66,9 +64,9 @@
 
     <shorthand_metadata>: ( symbol | string | keyword ) form;
 
-    regex: <'#'> string;
+    regex: string;
 
-    var_quote: <'#\\''> symbol;
+    var_quote: <'\\''> symbol;
 
     quote: <'\\''> form;
 
@@ -80,9 +78,9 @@
 
     deref: <'@'> form;
 
-    discard: <'#_'> form;
+    discard: <'_'> form;
 
-    tag: <'#'> !'_' symbol form;
+    tag: !'_' symbol form;
 
     string : #'\"[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*\"';
 
@@ -92,11 +90,9 @@
 
     <NAMESPACED_SYMBOL>: !SYMBOL_HEAD (VALID_CHARACTERS <'/'> VALID_CHARACTERS);
 
-    <SIMPLE_KEYWORD>: <':'> !':' VALID_CHARACTERS !'/';
+    SIMPLE_KEYWORD: <':'> !':' (VALID_CHARACTERS <'/'>)? VALID_CHARACTERS !'/';
 
-    <NAMESPACED_KEYWORD>: <':'> VALID_CHARACTERS <'/'> VALID_CHARACTERS;
-
-    <MACRO_KEYWORD>: <'::'> VALID_CHARACTERS;
+    MACRO_KEYWORD: <'::'> VALID_CHARACTERS;
 
     <DOUBLE>: #'([-+]?[0-9]+(\\.[0-9]*)?([eE][-+]?[0-9]+)?)(M)?'
 
