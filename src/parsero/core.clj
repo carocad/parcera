@@ -46,8 +46,6 @@
           number
         | string
         | character
-        | nil
-        | boolean
         | keyword
         | <COMMENT>
         ;
