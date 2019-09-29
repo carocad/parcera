@@ -35,9 +35,9 @@
         | <COMMENT>
         ;
 
-    symbol: (SIMPLE_SYMBOL | NAMESPACED_SYMBOL) !'/';
+    symbol: SIMPLE_SYMBOL | NAMESPACED_SYMBOL;
 
-    keyword: (SIMPLE_KEYWORD | NAMESPACED_KEYWORD | MACRO_KEYWORD);
+    keyword: SIMPLE_KEYWORD | NAMESPACED_KEYWORD | MACRO_KEYWORD;
 
     number: (DOUBLE | RATIO | LONG) !'.';
 
@@ -68,7 +68,7 @@
 
     <shorthand_metadata>: ( symbol | string | keyword ) form;
 
-    regex: '#' string;
+    regex: <'#'> string;
 
     var_quote: <'#\\''> symbol;
 
@@ -90,11 +90,11 @@
 
     (* Lexers -------------------------------------------------------------- *)
 
-    <SIMPLE_SYMBOL>: !symbol-head (valid-characters | '/');
+    <SIMPLE_SYMBOL>: !symbol-head (valid-characters | '/') !'/';
 
     <NAMESPACED_SYMBOL>: !symbol-head (valid-characters <'/'> valid-characters);
 
-    <SIMPLE_KEYWORD>: !'::' <':'> valid-characters;
+    <SIMPLE_KEYWORD>: !'::' (<':'> valid-characters !'/');
 
     <NAMESPACED_KEYWORD>: <':'> valid-characters <'/'> valid-characters;
 
@@ -151,7 +151,7 @@ parser
 ;(count (instaparse/parses parser (slurp "./src/parsero/core.clj")))
 
 ;(time (parser (slurp "./src/parsero/core.clj") :unhide :all))
-;(time (parser (slurp "./src/parsero/core.clj")))
+(time (parser (slurp "./src/parsero/core.clj")))
 
 ;; TODO: is this a bug ?
 #_(def foo.bar "hello")
