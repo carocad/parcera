@@ -38,7 +38,7 @@
 
     keyword: SIMPLE_KEYWORD | MACRO_KEYWORD;
 
-    number: DOUBLE | RATIO | LONG;
+    number: ('-' | '+')? DOUBLE | RATIO | LONG;
 
     character: <'\\\\'> ( SIMPLE_CHAR | UNICODE_CHAR );
 
@@ -90,11 +90,11 @@
 
     MACRO_KEYWORD: <'::'> VALID_CHARACTERS;
 
-    <DOUBLE>: #'([-+]?[0-9]+(\\.[0-9]*)?([eE][-+]?[0-9]+)?)(M)?'
+    <DOUBLE>: #'([0-9]+(\\.[0-9]*)?([eE][-+]?[0-9]+)?)(M)?'
 
-    <RATIO>: #'([-+]?[0-9]+)/([0-9]+)'
+    <RATIO>: #'([0-9]+)/([0-9]+)'
 
-    <LONG>: #'([-+]?)(?:(0)|([1-9][0-9]*)|0[xX]([0-9A-Fa-f]+)|0([0-7]+)|([1-9][0-9]?)[rR]([0-9A-Za-z]+)|0[0-9]+)(N)?'
+    <LONG>: #'(?:(0)|([1-9][0-9]*)|0[xX]([0-9A-Fa-f]+)|0([0-7]+)|([1-9][0-9]?)[rR]([0-9A-Za-z]+)|0[0-9]+)(N)?'
             !'.';
 
     COMMENT: ';' #'.*';
@@ -118,7 +118,7 @@
     ;; -> [:tag [:symbol hello]]
     ;; -> [:var_quote [:symbol hello]]
     *)
-    SYMBOL_HEAD: #'[0-9:#\\']'
+    SYMBOL_HEAD: number | ':' | '#' | '\\''
 
     (*
     ;; NOTE: several characters are not allowed according to clojure reference.
@@ -134,7 +134,8 @@ clojure
 (instaparse.core/parses clojure (str '(defn foo
                                         "I don't do a whole lot."
                                         [x]
-                                        (println x 9.78 "Hello, World!"))))
+                                        (println x -9.78 "Hello, World!")))
+                        :unhide :all)
 
 #_(data/diff (first (instaparse/parses clojure (slurp "./src/parsero/core.clj")))
              (second (instaparse/parses clojure (slurp "./src/parsero/core.clj"))))
@@ -143,7 +144,7 @@ clojure
 
 ;(time (clojure (slurp "./src/parsero/core.clj") :unhide :all))
 ;(dotimes [n 100])
-(time (clojure (slurp "./src/parsero/core.clj")))
+;(time (clojure (slurp "./src/parsero/core.clj")))
 
 ;; TODO: is this a bug ?
 #_(def foo.bar "hello")
@@ -178,3 +179,5 @@ true
 
 (clojure (str '(nil)))
 (set! *print-length* 30)
+
+(def 9.7 "hello world")
