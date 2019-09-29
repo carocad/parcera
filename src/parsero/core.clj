@@ -138,10 +138,12 @@ parser
                                   [x]
                                   (println x 9.78 "Hello, World!"))))
 
-(data/diff (first (instaparse/parses parser (slurp "./src/parsero/core.clj")))
-           (second (instaparse/parses parser (slurp "./src/parsero/core.clj"))))
+#_(data/diff (first (instaparse/parses parser (slurp "./src/parsero/core.clj")))
+             (second (instaparse/parses parser (slurp "./src/parsero/core.clj"))))
 
-(count (instaparse/parses parser (slurp "./src/parsero/core.clj")))
+#_(count (instaparse/parses parser (slurp "./src/parsero/core.clj")))
+
+;(time (parser (slurp "./src/parsero/core.clj")))
 
 ;; TODO: is this a bug ?
 #_(def foo.bar "hello")
