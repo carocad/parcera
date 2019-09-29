@@ -3,23 +3,7 @@
             [clojure.core.strint :as strint]
             [clojure.data :as data]))
 
-;; NOTE: several characters are not allowed according to clojure reference.
-;; https://clojure.org/reference/reader#_symbols
-;; EDN reader says otherwise https://github.com/edn-format/edn#symbols
-;; nil, true, false are actually symbols with special meaning ... not grammar rules
-;; on their own
-(def valid-characters "[\\w.*+\\-!?$%&=<>\\':#]+")
-;; symbols cannot start with number, :, #
-;; / is a valid symbol as long as it is not part of the name
-;; note: added ' as invalid first character due to ambiguity in #'hello
-;; -> [:tag [:symbol "'hello"]]
-;; -> [:var_quote [:symbol "hello"]]
-(def symbol-head "(?![0-9:#\\'])")
-
-(def string-regex "\"[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*\"")
-
 (def grammar
-  (strint/<<
     "file: forms <whitespace>?
 
     whitespace = #'[,\\s]+'
@@ -53,14 +37,13 @@
 
     symbol: (SIMPLE_SYMBOL | NAMESPACED_SYMBOL) !'/';
 
-    keyword: (SIMPLE_KEYWORD | NAMESPACED_KEYWORD | MACRO_KEYWORD) !'/';
+    keyword: (SIMPLE_KEYWORD | NAMESPACED_KEYWORD | MACRO_KEYWORD);
 
-    number: (DOUBLE | RATIO | LONG) !symbol;
+    number: (DOUBLE | RATIO | LONG) !'.';
 
     character:
-          NAMED_CHAR
+          SIMPLE_CHAR
         | UNICODE_CHAR
-        | ANY_CHAR
         ;
 
     reader_macro:
@@ -85,7 +68,7 @@
 
     <shorthand_metadata>: ( symbol | string | keyword ) form;
 
-    regex: #'#~{string-regex}';
+    regex: '#' string;
 
     var_quote: <'#\\''> symbol;
 
@@ -103,19 +86,19 @@
 
     tag: <'#'> !'_' symbol form;
 
-    string : #'~{string-regex}';
+    string : #'\"[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*\"';
 
     (* Lexers -------------------------------------------------------------- *)
 
-    <SIMPLE_SYMBOL>: #'(~{symbol-head}~{valid-characters})' | '/';
+    <SIMPLE_SYMBOL>: !symbol-head (valid-characters | '/');
 
-    <NAMESPACED_SYMBOL>: #'~{symbol-head}~{valid-characters}\\/~{valid-characters}';
+    <NAMESPACED_SYMBOL>: !symbol-head (valid-characters '/' valid-characters);
 
-    <SIMPLE_KEYWORD>: #':~{valid-characters}';
+    <SIMPLE_KEYWORD>: !'::' <':'> valid-characters;
 
-    <NAMESPACED_KEYWORD>: #':~{valid-characters}\\/~{valid-characters}';
+    <NAMESPACED_KEYWORD>: <':'> valid-characters '/' valid-characters;
 
-    <MACRO_KEYWORD>: #'::~{valid-characters}';
+    <MACRO_KEYWORD>: <'::'> valid-characters;
 
     <DOUBLE>: #'([-+]?[0-9]+(\\.[0-9]*)?([eE][-+]?[0-9]+)?)(M)?'
 
@@ -127,9 +110,33 @@
 
     <UNICODE_CHAR>: #'\\\\u[0-9D-Fd-f]{4}';
 
-    <NAMED_CHAR>: #'\\\\(newline|return|space|tab|formfeed|backspace|c)';
+    <SIMPLE_CHAR>: <'\\\\'>  ( 'newline'
+                             | 'return'
+                             | 'space'
+                             | 'tab'
+                             | 'formfeed'
+                             | 'backspace'
+                             | 'c'
+                             | #'.' );
 
-    <ANY_CHAR>: #'\\\\.'"))
+    (* fragments *)
+    (*
+    ;; symbols cannot start with number, :, #
+    ;; / is a valid symbol as long as it is not part of the name
+    ;; note: added ' as invalid first character due to ambiguity in #'hello
+    ;; -> [:tag [:symbol hello]]
+    ;; -> [:var_quote [:symbol hello]]
+    *)
+    symbol-head: #'[0-9:#\\']'
+
+    (*
+    ;; NOTE: several characters are not allowed according to clojure reference.
+    ;; https://clojure.org/reference/reader#_symbols
+    ;; EDN reader says otherwise https://github.com/edn-format/edn#symbols
+    ;; nil, true, false are actually symbols with special meaning ... not grammar rules
+    ;; on their own
+    *)
+    <valid-characters>: #'[\\w.*+\\-!?$%&=<>\\':#]+'")
 
 (def parser (instaparse/parser grammar))
 parser
@@ -141,8 +148,9 @@ parser
 #_(data/diff (first (instaparse/parses parser (slurp "./src/parsero/core.clj")))
              (second (instaparse/parses parser (slurp "./src/parsero/core.clj"))))
 
-#_(count (instaparse/parses parser (slurp "./src/parsero/core.clj")))
+;(count (instaparse/parses parser (slurp "./src/parsero/core.clj")))
 
+;(time (parser (slurp "./src/parsero/core.clj") :unhide :all))
 ;(time (parser (slurp "./src/parsero/core.clj")))
 
 ;; TODO: is this a bug ?
