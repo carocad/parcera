@@ -36,8 +36,6 @@
         | <COMMENT>
         ;
 
-    symbol: SIMPLE_SYMBOL | NAMESPACED_SYMBOL;
-
     keyword: SIMPLE_KEYWORD | MACRO_KEYWORD;
 
     number: DOUBLE | RATIO | LONG;
@@ -84,11 +82,9 @@
 
     string : #'\"[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*\"';
 
+    symbol: !SYMBOL_HEAD (VALID_CHARACTERS <'/'>)? (VALID_CHARACTERS | '/') !'/';
+
     (* Lexers -------------------------------------------------------------- *)
-
-    <SIMPLE_SYMBOL>: !SYMBOL_HEAD (VALID_CHARACTERS | '/') !'/';
-
-    <NAMESPACED_SYMBOL>: !SYMBOL_HEAD (VALID_CHARACTERS <'/'> VALID_CHARACTERS);
 
     SIMPLE_KEYWORD: <':'> !':' (VALID_CHARACTERS <'/'>)? VALID_CHARACTERS !'/';
 
@@ -135,10 +131,10 @@
 
 (def clojure (instaparse/parser grammar))
 clojure
-(instaparse/parses clojure (str '(defn foo
-                                   "I don't do a whole lot."
-                                   [x]
-                                   (println x 9.78 "Hello, World!"))))
+(instaparse.core/parses clojure (str '(defn foo
+                                        "I don't do a whole lot."
+                                        [x]
+                                        (println x 9.78 "Hello, World!"))))
 
 #_(data/diff (first (instaparse/parses clojure (slurp "./src/parsero/core.clj")))
              (second (instaparse/parses clojure (slurp "./src/parsero/core.clj"))))
@@ -147,7 +143,7 @@ clojure
 
 ;(time (clojure (slurp "./src/parsero/core.clj") :unhide :all))
 ;(dotimes [n 100])
-;(time (clojure (slurp "./src/parsero/core.clj")))
+(time (clojure (slurp "./src/parsero/core.clj")))
 
 ;; TODO: is this a bug ?
 #_(def foo.bar "hello")
