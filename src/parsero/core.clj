@@ -5,6 +5,8 @@
 ;; NOTE: several characters are not allowed according to clojure reference.
 ;; https://clojure.org/reference/reader#_symbols
 ;; EDN reader says otherwise https://github.com/edn-format/edn#symbols
+;; nil, true, false are actually symbols with special meaning ... not grammar rules
+;; on their own
 (def valid-characters "[\\w.*+\\-!?$%&=<>\\':#]+")
 ;; symbols cannot start with number, :, #
 ;; / is a valid symbol as long as it is not part of the name
@@ -21,10 +23,10 @@
 
     whitespace = #'[,\\s]+'
 
-    <forms>: form*;
+    <forms>: form* ;
 
-    <form>: <whitespace>? ( symbol
-                          | literal
+    <form>: <whitespace>? ( literal
+                          | symbol
                           | list
                           | vector
                           | map
@@ -50,9 +52,7 @@
         | <COMMENT>
         ;
 
-    symbol:
-          SIMPLE_SYMBOL
-        | NAMESPACED_SYMBOL;
+    symbol: SIMPLE_SYMBOL | NAMESPACED_SYMBOL;
 
     keyword:
           SIMPLE_KEYWORD
@@ -112,10 +112,6 @@
     tag: <'#'> symbol form;
 
     string : #'~{string-regex}';
-
-    nil : 'nil';
-
-    boolean : 'true' | 'false' ;
 
     (* Lexers -------------------------------------------------------------- *)
 
@@ -179,4 +175,8 @@ true
 #'parser []
 
 \-
+;; todo: the following shows that we have ambigous grammar :/
+(instaparse/parses parser (str '(defn hello? [x] (if (nil? x) nil ::tap-nil x))))
 (parser (str '(defn hello? [x] (if (nil? x) ::tap-nil x))))
+
+(parser (str '(nil)))
