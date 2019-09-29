@@ -80,7 +80,7 @@
 
     tag: !'_' symbol form;
 
-    string : #'\"[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*\"';
+    string : <'\"'> #'[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*' <'\"'>;
 
     symbol: !SYMBOL_HEAD (VALID_CHARACTERS <'/'>)? (VALID_CHARACTERS | '/') !'/';
 
