@@ -130,12 +130,6 @@
     <VALID_CHARACTERS>: #'[\\w.*+\\-!?$%&=<>\\':#]+'")
 
 (def clojure (instaparse/parser grammar))
-clojure
-(instaparse.core/parses clojure (str '(defn foo
-                                        "I don't do a whole lot."
-                                        [x]
-                                        (println x -9.78 "Hello, World!")))
-                        :unhide :all)
 
 #_(data/diff (first (instaparse/parses clojure (slurp "./src/parsero/core.clj")))
              (second (instaparse/parses clojure (slurp "./src/parsero/core.clj"))))
@@ -143,41 +137,6 @@ clojure
 ;(count (instaparse/parses clojure (slurp "./src/parsero/core.clj")))
 
 ;(time (clojure (slurp "./src/parsero/core.clj") :unhide :all))
+
 ;(dotimes [n 100])
-;(time (clojure (slurp "./src/parsero/core.clj")))
-
-;; TODO: is this a bug ?
-#_(def foo.bar "hello")
-;; TODO: is this a bug ?
-#_(def . "hello")
-
-;; TODO: is this a bug ?
-#_(defn foo.bar [a.b]) ;; not valid ... why ?
-
-;; TODO: is this a bug ? ;; a keyword starting with a number
-;; :1hello.world
-
-;; todo: https://clojure.org/reference/reader#_character
-
-(meta ^{:a 1 :b 2} [1.2 2.3 0x12])
-
-(meta ^String [1 2 3])
-
-'(meta ^"String" [1 2 3])
-
-#"hellow|wprld"
-
-nil
-true
-;(time (count (instaparse/parses clojure (slurp "./src/parsero/clojure.clj"))))
-#'clojure []
-
-\-
-;; todo: the following shows that we have ambigous grammar :/
-(instaparse/parses clojure (str '(defn hello? [x] (if (nil? x) nil ::tap-nil x))))
-(clojure (str '(defn hello? [x] (if (nil? x) ::tap-nil x))))
-
-(clojure (str '(nil)))
-(set! *print-length* 30)
-
-#_(def 9.7 "hello world")
+(time (clojure (slurp "./src/parsero/core.clj")))
