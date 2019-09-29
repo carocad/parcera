@@ -1,23 +1,24 @@
 (ns parsero.core
   (:require [instaparse.core :as instaparse]
-            [clojure.core.strint :as strint]
             [clojure.data :as data]))
 
-(def grammar
-    "file: forms <whitespace>?
 
-    whitespace = #'[,\\s]+'
+(def grammar
+    "file: forms
+
+    whitespace = #'[,\\s]*'
 
     <forms>: form* ;
 
-    <form>: <whitespace>? ( literal
+    <form>: <whitespace> ( literal
                           | symbol
                           | list
                           | vector
                           | map
                           | set
                           | reader_macro
-                          );
+                          )
+            <whitespace>;
 
     list: <'('> forms <')'> ;
 
@@ -39,7 +40,7 @@
 
     keyword: SIMPLE_KEYWORD | NAMESPACED_KEYWORD | MACRO_KEYWORD;
 
-    number: (DOUBLE | RATIO | LONG) !'.';
+    number: DOUBLE | RATIO | LONG;
 
     character:
           SIMPLE_CHAR
@@ -94,7 +95,7 @@
 
     <NAMESPACED_SYMBOL>: !symbol-head (valid-characters <'/'> valid-characters);
 
-    <SIMPLE_KEYWORD>: !'::' (<':'> valid-characters !'/');
+    <SIMPLE_KEYWORD>: <':'> !':' valid-characters !'/';
 
     <NAMESPACED_KEYWORD>: <':'> valid-characters <'/'> valid-characters;
 
@@ -105,6 +106,7 @@
     <RATIO>: #'([-+]?[0-9]+)/([0-9]+)'
 
     <LONG>: #'([-+]?)(?:(0)|([1-9][0-9]*)|0[xX]([0-9A-Fa-f]+)|0([0-7]+)|([1-9][0-9]?)[rR]([0-9A-Za-z]+)|0[0-9]+)(N)?'
+            !'.';
 
     COMMENT: #';.*';
 
@@ -138,20 +140,20 @@
     *)
     <valid-characters>: #'[\\w.*+\\-!?$%&=<>\\':#]+'")
 
-(def parser (instaparse/parser grammar))
-parser
-(instaparse/parses parser (str '(defn foo
-                                  "I don't do a whole lot."
-                                  [x]
-                                  (println x 9.78 "Hello, World!"))))
+(def clojure (instaparse/parser grammar))
+clojure
+(instaparse/parses clojure (str '(defn foo
+                                   "I don't do a whole lot."
+                                   [x]
+                                   (println x 9.78 "Hello, World!"))))
 
-#_(data/diff (first (instaparse/parses parser (slurp "./src/parsero/core.clj")))
-             (second (instaparse/parses parser (slurp "./src/parsero/core.clj"))))
+#_(data/diff (first (instaparse/parses clojure (slurp "./src/parsero/core.clj")))
+             (second (instaparse/parses clojure (slurp "./src/parsero/core.clj"))))
 
-;(count (instaparse/parses parser (slurp "./src/parsero/core.clj")))
+;(count (instaparse/parses clojure (slurp "./src/parsero/core.clj")))
 
-;(time (parser (slurp "./src/parsero/core.clj") :unhide :all))
-(time (parser (slurp "./src/parsero/core.clj")))
+;(time (clojure (slurp "./src/parsero/core.clj") :unhide :all))
+;(time (clojure (slurp "./src/parsero/core.clj")))
 
 ;; TODO: is this a bug ?
 #_(def foo.bar "hello")
@@ -166,7 +168,7 @@ parser
 
 ;; todo: https://clojure.org/reference/reader#_character
 
-(meta ^{:a 1 :b 2} [1 2 3])
+(meta ^{:a 1 :b 2} [1.2 2.3 0x12])
 
 (meta ^String [1 2 3])
 
@@ -176,12 +178,13 @@ parser
 
 nil
 true
-;(time (parser (time (slurp "./src/parsero/clojure.clj"))))
-#'parser []
+;(time (count (instaparse/parses clojure (slurp "./src/parsero/clojure.clj"))))
+#'clojure []
 
 \-
 ;; todo: the following shows that we have ambigous grammar :/
-(instaparse/parses parser (str '(defn hello? [x] (if (nil? x) nil ::tap-nil x))))
-(parser (str '(defn hello? [x] (if (nil? x) ::tap-nil x))))
+(instaparse/parses clojure (str '(defn hello? [x] (if (nil? x) nil ::tap-nil x))))
+(clojure (str '(defn hello? [x] (if (nil? x) ::tap-nil x))))
 
-(parser (str '(nil)))
+(clojure (str '(nil)))
+(set! *print-length* 30)
