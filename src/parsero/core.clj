@@ -17,18 +17,20 @@
 
 (def grammar
   (strint/<<
-    "file: forms
+    "file: forms <whitespace>?
+
+    whitespace = #'[,\\s]+'
 
     <forms>: form*;
 
-    <form>:
-        ( symbol / literal)
-        | list
-        | vector
-        | map
-        | set
-        | reader_macro
-        ;
+    <form>: <whitespace>? ( symbol
+                          | literal
+                          | list
+                          | vector
+                          | map
+                          | set
+                          | reader_macro
+                          );
 
     list: <'('> forms <')'> ;
 
@@ -83,7 +85,7 @@
         | unquote_splicing
         ;
 
-    lambda: '#(' form* ')';
+    lambda: '#(' forms ')';
 
     metadata: <'^'> ( map_metadata | shorthand_metadata );
 
@@ -141,7 +143,7 @@
 
     <ANY_CHAR>: #'\\\\.'"))
 
-(def parser (instaparse/parser grammar :auto-whitespace :comma))
+(def parser (instaparse/parser grammar))
 parser
 (instaparse/parses parser (str '(defn foo
                                   "I don't do a whole lot."
