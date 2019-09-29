@@ -42,10 +42,7 @@
 
     number: DOUBLE | RATIO | LONG;
 
-    character:
-          SIMPLE_CHAR
-        | UNICODE_CHAR
-        ;
+    character: <'\\\\'> ( SIMPLE_CHAR | UNICODE_CHAR );
 
     reader_macro:
           lambda
@@ -91,15 +88,15 @@
 
     (* Lexers -------------------------------------------------------------- *)
 
-    <SIMPLE_SYMBOL>: !symbol-head (valid-characters | '/') !'/';
+    <SIMPLE_SYMBOL>: !SYMBOL_HEAD (VALID_CHARACTERS | '/') !'/';
 
-    <NAMESPACED_SYMBOL>: !symbol-head (valid-characters <'/'> valid-characters);
+    <NAMESPACED_SYMBOL>: !SYMBOL_HEAD (VALID_CHARACTERS <'/'> VALID_CHARACTERS);
 
-    <SIMPLE_KEYWORD>: <':'> !':' valid-characters !'/';
+    <SIMPLE_KEYWORD>: <':'> !':' VALID_CHARACTERS !'/';
 
-    <NAMESPACED_KEYWORD>: <':'> valid-characters <'/'> valid-characters;
+    <NAMESPACED_KEYWORD>: <':'> VALID_CHARACTERS <'/'> VALID_CHARACTERS;
 
-    <MACRO_KEYWORD>: <'::'> valid-characters;
+    <MACRO_KEYWORD>: <'::'> VALID_CHARACTERS;
 
     <DOUBLE>: #'([-+]?[0-9]+(\\.[0-9]*)?([eE][-+]?[0-9]+)?)(M)?'
 
@@ -108,18 +105,18 @@
     <LONG>: #'([-+]?)(?:(0)|([1-9][0-9]*)|0[xX]([0-9A-Fa-f]+)|0([0-7]+)|([1-9][0-9]?)[rR]([0-9A-Za-z]+)|0[0-9]+)(N)?'
             !'.';
 
-    COMMENT: #';.*';
+    COMMENT: ';' #'.*';
 
-    <UNICODE_CHAR>: #'\\\\u[0-9D-Fd-f]{4}';
+    <UNICODE_CHAR>: 'u' #'[0-9D-Fd-f]{4}';
 
-    <SIMPLE_CHAR>: <'\\\\'>  ( 'newline'
-                             | 'return'
-                             | 'space'
-                             | 'tab'
-                             | 'formfeed'
-                             | 'backspace'
-                             | 'c'
-                             | #'.' );
+    <SIMPLE_CHAR>:
+          'newline'
+        | 'return'
+        | 'space'
+        | 'tab'
+        | 'formfeed'
+        | 'backspace'
+        | #'.';
 
     (* fragments *)
     (*
@@ -129,7 +126,7 @@
     ;; -> [:tag [:symbol hello]]
     ;; -> [:var_quote [:symbol hello]]
     *)
-    symbol-head: #'[0-9:#\\']'
+    SYMBOL_HEAD: #'[0-9:#\\']'
 
     (*
     ;; NOTE: several characters are not allowed according to clojure reference.
@@ -138,7 +135,7 @@
     ;; nil, true, false are actually symbols with special meaning ... not grammar rules
     ;; on their own
     *)
-    <valid-characters>: #'[\\w.*+\\-!?$%&=<>\\':#]+'")
+    <VALID_CHARACTERS>: #'[\\w.*+\\-!?$%&=<>\\':#]+'")
 
 (def clojure (instaparse/parser grammar))
 clojure
@@ -153,6 +150,7 @@ clojure
 ;(count (instaparse/parses clojure (slurp "./src/parsero/core.clj")))
 
 ;(time (clojure (slurp "./src/parsero/core.clj") :unhide :all))
+;(dotimes [n 100])
 ;(time (clojure (slurp "./src/parsero/core.clj")))
 
 ;; TODO: is this a bug ?
