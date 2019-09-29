@@ -101,7 +101,7 @@
 
     discard: <'#_'> form;
 
-    tag: <'#'> symbol form;
+    tag: <'#'> !'_' symbol form;
 
     string : #'~{string-regex}';
 
