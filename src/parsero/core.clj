@@ -92,11 +92,11 @@
 
     <SIMPLE_SYMBOL>: !symbol-head (valid-characters | '/');
 
-    <NAMESPACED_SYMBOL>: !symbol-head (valid-characters '/' valid-characters);
+    <NAMESPACED_SYMBOL>: !symbol-head (valid-characters <'/'> valid-characters);
 
     <SIMPLE_KEYWORD>: !'::' <':'> valid-characters;
 
-    <NAMESPACED_KEYWORD>: <':'> valid-characters '/' valid-characters;
+    <NAMESPACED_KEYWORD>: <':'> valid-characters <'/'> valid-characters;
 
     <MACRO_KEYWORD>: <'::'> valid-characters;
 
