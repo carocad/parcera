@@ -183,11 +183,10 @@
     (str "^" (str/join (map code (rest ast))))
 
     :quote
-    ast
-    ;(str "'" (str/join (map code ast)))
+    (str "'" (str/join (map code (rest ast))))
 
     :regex
-    (str "#\"" (code (second ast)) "\"")
+    (str "#" (code (second ast)))
 
     :var_quote
     (str "#'" (code (second ast)))
