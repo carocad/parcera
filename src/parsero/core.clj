@@ -3,21 +3,19 @@
             [clojure.edn :as edn]))
 
 (def grammar
-    "file: forms
+    "<forms>: form*;
+
+    <form>: whitespace ( literal
+                        | symbol
+                        | list
+                        | vector
+                        | map
+                        | set
+                        | reader_macro
+                        )
+            whitespace;
 
     whitespace = #'[,\\s]*'
-
-    <forms>: form* ;
-
-    <form>: <whitespace> ( literal
-                          | symbol
-                          | list
-                          | vector
-                          | map
-                          | set
-                          | reader_macro
-                          )
-            <whitespace>;
 
     list: <'('> forms <')'> ;
 
@@ -32,10 +30,8 @@
         | string
         | character
         | keyword
-        | <COMMENT>
+        | COMMENT
         ;
-
-    keyword: SIMPLE_KEYWORD | MACRO_KEYWORD;
 
     number: DOUBLE | RATIO | LONG;
 
@@ -83,11 +79,13 @@
 
     symbol: !SYMBOL_HEAD (VALID_CHARACTERS <'/'>)? (VALID_CHARACTERS | '/') !'/';
 
+    <keyword>: simple_keyword | macro_keyword
+
+    simple_keyword: <':'> !':' (VALID_CHARACTERS <'/'>)? VALID_CHARACTERS !'/';
+
+    macro_keyword: <'::'> VALID_CHARACTERS;
+
     (* Lexers -------------------------------------------------------------- *)
-
-    SIMPLE_KEYWORD: <':'> !':' (VALID_CHARACTERS <'/'>)? VALID_CHARACTERS !'/';
-
-    MACRO_KEYWORD: <'::'> VALID_CHARACTERS;
 
     <DOUBLE>: #'[-+]?(\\d+(\\.\\d*)?([eE][-+]?\\d+)?)(M)?'
 
@@ -135,7 +133,9 @@
 
 ;(count (instaparse/parses clojure (slurp "./src/parsero/core.clj")))
 
-;(time (clojure (slurp "./src/parsero/core.clj") :unhide :all))
+;(time (clojure (slurp "./src/parsero/core.clj")))
+
+;(time (clojure (slurp "./src/parsero/clojure.clj")))
 
 ;(dotimes [n 100])
 ;(time (clojure (slurp "./src/parsero/core.clj")))
