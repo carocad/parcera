@@ -1,9 +1,10 @@
 (ns parsero.core
   (:require [instaparse.core :as instaparse]
-            [clojure.edn :as edn]))
+            [clojure.data :as data]
+            [clojure.string :as str]))
 
 (def grammar
-    "<forms>: form*;
+    "code: form*;
 
     <form>: whitespace ( literal
                         | symbol
@@ -17,20 +18,20 @@
 
     whitespace = #'[,\\s]*'
 
-    list: <'('> forms <')'> ;
+    list: <'('> form* <')'> ;
 
-    vector: <'['> forms <']'> ;
+    vector: <'['> form* <']'> ;
 
     map: <'{'> (form form)* <'}'> ;
 
-    set: <'#{'> forms <'}'> ;
+    set: <'#{'> form* <'}'> ;
 
     <literal>:
           number
         | string
         | character
         | keyword
-        | COMMENT
+        | comment
         ;
 
     number: DOUBLE | RATIO | LONG;
@@ -47,7 +48,7 @@
         | unquote_splicing
         ;
 
-    <dispatch>: <'#'> ( function | regex | var_quote | <discard> | tag)
+    <dispatch>: <'#'> ( function | regex | var_quote | discard | tag)
 
     function: list;
 
@@ -85,6 +86,8 @@
 
     macro_keyword: <'::'> VALID_CHARACTERS;
 
+    comment: <';'> #'.*';
+
     (* Lexers -------------------------------------------------------------- *)
 
     <DOUBLE>: #'[-+]?(\\d+(\\.\\d*)?([eE][-+]?\\d+)?)(M)?'
@@ -93,8 +96,6 @@
 
     <LONG>: #'[-+]?(?:(0)|([1-9]\\d*)|0[xX]([\\dA-Fa-f]+)|0([0-7]+)|([1-9]\\d?)[rR]([\\d\\w]+)|0\\d+)(N)?'
             !'.';
-
-    COMMENT: <';'> #'.*';
 
     <UNICODE_CHAR>: <'u'> #'[\\dD-Fd-f]{4}';
 
@@ -142,41 +143,64 @@
 
 ;(time (instaparse.core/parses clojure (slurp "./resources/test_cases.clj")))
 
-(defn edn
+(defn code
   [ast]
   (case (first ast)
-    (:file :list)
-    (map edn (rest ast))
+    (:code)
+    (str/join "" (map code (rest ast)))
+
+    :list
+    (str "(" (str/join (map code (rest ast))) ")")
 
     :vector
-    (into [] (map edn) (rest ast))
+    (str "[" (str/join (map code (rest ast))) "]")
 
-    :string
+    (:number :whitespace)
     (second ast)
 
-    :symbol
-    (apply symbol (rest ast))
+    :string
+    (str "\"" (second ast) "\"")
 
-    :number
-    (edn/read-string (second ast))
+    :symbol
+    (str/join "/" (rest ast))
 
     :character
-    (if (= 1 (count (second ast)))
-      (first (second ast))
-      (. (second ast) (toCharArray))) ;; todo: do I need to support cljs here ?
+    (str "\\" (second ast))
 
-    :keyword
-    (edn (second ast))
+    :simple_keyword
+    (str ":" (str/join "/" (rest ast)))
 
-    :SIMPLE_KEYWORD
-    (apply keyword (rest ast))
+    :macro_keyword
+    (str "::" (second ast))
 
     :map
-    (apply hash-map (map edn (rest ast)))
+    (str "{" (str/join (map code (rest ast))) "}")
 
+    :comment
+    (str ";" (second ast))
+
+    :metadata
+    (str "^" (str/join (map code (rest ast))))
+
+    :quote
+    ast
+    ;(str "'" (str/join (map code ast)))
+
+    :regex
+    (str "#\"" (code (second ast)) "\"")
+
+    :var_quote
+    (str "#'" (code (second ast)))
+
+    :discard
+    (str "#_" (str/join (map code (rest ast))))
     ast))
 
-;(edn (clojure (slurp "./src/parsero/core.clj")))
+;(code (clojure (slurp "./src/parsero/core.clj")))
+;(code (clojure (slurp "./resources/test_cases.clj")))
 
-;(edn (clojure (slurp "./resources/test_cases.clj")))
+#_(spit "resources/output.clj"
+        (code (clojure (slurp "./resources/test_cases.clj"))))
+
+;(clojure (slurp "./resources/test_cases.clj"))
 ;(clojure (slurp "./resources/test_cases.clj"))
