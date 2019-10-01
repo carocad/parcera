@@ -22,7 +22,11 @@
 
     vector: <'['> form* <']'> ;
 
-    map: <'{'> (form form)* <'}'> ;
+    map: map-namespace? <'{'> map-content <'}'> ;
+
+    map-namespace: <'#'> keyword ;
+
+    map-content: (form form)*
 
     set: <'#{'> form* <'}'> ;
 
@@ -159,6 +163,12 @@
     (str "[" (str/join (map code (rest ast))) "]")
 
     :map
+    (str/join (map code (rest ast)))
+
+    :map-namespace
+    (str "#" (code (second ast)))
+
+    :map-content
     (str "{" (str/join (map code (rest ast))) "}")
 
     :set
