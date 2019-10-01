@@ -82,9 +82,9 @@
 
     <keyword>: simple_keyword | macro_keyword
 
-    simple_keyword: <':'> !':' (VALID_CHARACTERS <'/'>)? VALID_CHARACTERS !'/';
+    simple_keyword: <':'> !':' (VALID_CHARACTERS <'/'>)? (VALID_CHARACTERS | '/') !'/';
 
-    macro_keyword: <'::'> VALID_CHARACTERS;
+    macro_keyword: <'::'> !':' VALID_CHARACTERS;
 
     comment: <';'> #'.*';
 
@@ -97,7 +97,7 @@
     <LONG>: #'[-+]?(?:(0)|([1-9]\\d*)|0[xX]([\\dA-Fa-f]+)|0([0-7]+)|([1-9]\\d?)[rR]([\\d\\w]+)|0\\d+)(N)?'
             !'.';
 
-    <UNICODE_CHAR>: <'u'> #'[\\dD-Fd-f]{4}';
+    <UNICODE_CHAR>: #'u[\\dD-Fd-f]{4}';
 
     <SIMPLE_CHAR>:
           'newline'
