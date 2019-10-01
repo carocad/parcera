@@ -196,6 +196,9 @@
 
     :discard
     (str "#_" (str/join (map code (rest ast))))
+
+    :tag
+    (str "#" (str/join (map code (rest ast))))
     ast))
 
 ;(code (clojure (slurp "./src/parsero/core.clj")))
