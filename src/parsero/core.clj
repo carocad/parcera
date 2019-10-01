@@ -32,7 +32,10 @@
         | character
         | keyword
         | comment
+        | symbolic
         ;
+
+    symbolic: #'##(Inf|-Inf|NaN)'
 
     number: DOUBLE | RATIO | LONG;
 
@@ -161,7 +164,7 @@
     :set
     (str "#{" (str/join (map code (rest ast))) "}")
 
-    (:number :whitespace)
+    (:number :whitespace :symbolic)
     (second ast)
 
     :string
@@ -199,6 +202,7 @@
 
     :tag
     (str "#" (str/join (map code (rest ast))))
+
     ast))
 
 ;(code (clojure (slurp "./src/parsero/core.clj")))
