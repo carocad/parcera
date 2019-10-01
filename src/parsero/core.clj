@@ -155,6 +155,12 @@
     :vector
     (str "[" (str/join (map code (rest ast))) "]")
 
+    :map
+    (str "{" (str/join (map code (rest ast))) "}")
+
+    :set
+    (str "#{" (str/join (map code (rest ast))) "}")
+
     (:number :whitespace)
     (second ast)
 
@@ -172,9 +178,6 @@
 
     :macro_keyword
     (str "::" (second ast))
-
-    :map
-    (str "{" (str/join (map code (rest ast))) "}")
 
     :comment
     (str ";" (second ast))
