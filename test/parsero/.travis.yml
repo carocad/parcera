@@ -1,0 +1,34 @@
+language: clojure
+jdk:
+  - oraclejdk8
+
+jobs:
+  include:
+    - stage: Tests
+      script:
+        - lein do clean, compile, check, eastwood, test
+
+    - stage: Benchmark
+      if: branch = master
+      env:
+        - LEIN_JVM_OPTS="" # disable tiered compilation
+      script:
+        - lein trampoline test :benchmark
+
+#    - stage: Release
+#      if: tag IS present
+#      script: lein with-profile release uberjar
+#      deploy:
+#        - provider: releases
+#          file_glob: true
+#          file: target/kamal.jar
+#          skip_cleanup: true
+#          api_key:
+#            secure: lsXO5yrJEwt8NLYcpKjyxsPnx9m1bQ68lOFo15LhO5+BdBBOjqTU1/bgwOGfoTpFCaJ6F2jaC9oxqhDohHYSs8X70oNWK+quuNmbu237EOZrPm2pV5YE7H2PMcVuR+DpgPRc53AaJ+uEo/VEyuXA8d+p11kI+jXHf5rrRgMQI5pFUuXMKRl8bjGb7MB2P9DCn/LWIlXeRc8qI5SX7VjeK9oSJc6Pgbq61cN9s8mrookr8fIK/mJmc+SObv9QQHCWA1Xb+tV+iHRwomGj252mBwuzeRnkU91ObQ50vH1XCLN4HgU3pvt4stYWXtQl1N7CdmDx0liP7023RM2g7YAzNzU+oK8tav4HV+RjBWAKSNonPKgY3iD7h8JqJxLAdHcirD0UDp3bqiV4RiwMyu3b9mq5K9i69EgX3Lvy4l2ThYhwXAsqmnjzfCotm6qOJVpBwXmei01TL07xa+/Bu8SQaMdnte0T5macA5gZdEPDhNExbxDcjlOW1XedfQNW27R0Ja5vPz3nNQC4R7iE6Sa9WZ6nx8v0Vdgrv0U5hTVRHmDDhXmswLQekrko6TxuRGG0P+80fImjQafcccPO55e/7sNO+v/gBBpcXzTsNcdTgHUVhdH1wQItIGpSOGC3O4784NAtDnScMGfp7yFSmAHaoWm2fU1qFBqVGEaKGb3Fkfo=
+#          on:
+#            tags: true
+#        - provider: script
+#          script: lein deploy
+#          skip_cleanup: true
+#          on:
+#            tags: true
