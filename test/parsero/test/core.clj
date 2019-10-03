@@ -43,7 +43,7 @@
 
   (testing "very little ambiguity"
     (let [result (tc/quick-check 100 little-ambiguity)]
-      (is (and (:pass? result))
+      (is (:pass? result)
           (str "high ambiguity case found. Please check the grammar to ensure "
                "high accuracy\n"
                (with-out-str (pprint/pprint result)))))))
