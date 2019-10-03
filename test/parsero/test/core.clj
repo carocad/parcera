@@ -41,12 +41,12 @@
           (str "read <-> write process yield different result. Failed at\n"
                (with-out-str (pprint/pprint result))))))
 
-  #_(testing "very little ambiguity"
-      (let [result (tc/quick-check 100 little-ambiguity)]
-        (is (:pass? result)
-            (str "high ambiguity case found. Please check the grammar to ensure "
-                 "high accuracy\n"
-                 (with-out-str (pprint/pprint result)))))))
+  (testing "very little ambiguity"
+    (let [result (tc/quick-check 100 little-ambiguity)]
+      (is (:pass? result)
+          (str "high ambiguity case found. Please check the grammar to ensure "
+               "high accuracy\n"
+               (with-out-str (pprint/pprint result)))))))
 
 
 ;(instaparse/parses parsero/clojure "[0N 0N]")
