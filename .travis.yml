@@ -1,6 +1,6 @@
 language: clojure
 jdk:
-  - oraclejdk11
+  - openjdk8
 
 jobs:
   include:
@@ -10,8 +10,6 @@ jobs:
 
     - stage: Benchmark
       if: branch = master
-      env:
-        - LEIN_JVM_OPTS="" # disable tiered compilation
       script:
         - lein trampoline test :benchmark
 
