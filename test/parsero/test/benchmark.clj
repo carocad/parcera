@@ -6,10 +6,10 @@
 
 (deftest ^:benchmark parsing
   (println "Benchmark: Time parsing Clojure values ⌛")
-  (c/quick-bench (tc/quick-check 100 pt/validity
-                            :os :runtime :verbose)))
+  (c/quick-bench (tc/quick-check 100 pt/validity)
+                 :os :runtime :verbose))
 
 (deftest ^:benchmark roundtrip
   (println "Benchmark: Round trip of Clojure values 🚀")
-  (c/quick-bench (tc/quick-check 100 pt/symmetric
-                                 :os :runtime :verbose)))
+  (c/quick-bench (tc/quick-check 100 pt/symmetric)
+                 :os :runtime :verbose))
