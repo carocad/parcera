@@ -1,6 +1,5 @@
 (ns parsero.core
   (:require [instaparse.core :as instaparse]
-            [clojure.data :as data]
             [clojure.string :as str]))
 
 (def grammar

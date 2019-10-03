@@ -7,6 +7,12 @@
             [parsero.core :as parsero]
             [instaparse.core :as instaparse]))
 
+(def validity
+  "The grammar definition of parsero is valid for any clojure value. Meaning
+  that for any clojure value, parsero can create an AST for it"
+  (prop/for-all [input (gen/fmap pr-str gen/any)]
+    (= false (instaparse/failure? (parsero/clojure input)))))
+
 (def symmetric
   "The read <-> write process of parsero MUST be symmetrical. Meaning
   that the AST and the text representation are equivalent"
@@ -23,6 +29,11 @@
 
 
 (deftest parsero
+  (testing "grammar definitions"
+    (let [result (tc/quick-check 100 validity)]
+      (is (:pass? result)
+          (str "read process failed at\n"
+               (with-out-str (pprint/pprint result))))))
 
   (testing "clojure values"
     (let [result (tc/quick-check 100 symmetric)]
