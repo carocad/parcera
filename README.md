@@ -1,5 +1,7 @@
 # parsero
 
+[![Build Status](https://travis-ci.com/carocad/parsero.svg?branch=master)](https://travis-ci.com/carocad/parsero)
+
 A Clojure library designed to ... well, that part is up to you.
 
 ## Usage
