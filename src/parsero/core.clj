@@ -99,9 +99,12 @@
     <DOUBLE>: #'[-+]?(\\d+(\\.\\d*)?([eE][-+]?\\d+)?)(M)?'
 
     <RATIO>: #'[-+]?(\\d+)/(\\d+)'
+             !'/'; (* remove ambiguity with symbols 1/5
+                     1 -> number, / -> symbol, 5 -> number *)
 
     <LONG>: #'[-+]?(?:(0)|([1-9]\\d*)|0[xX]([\\dA-Fa-f]+)|0([0-7]+)|([1-9]\\d?)[rR]([\\d\\w]+)|0\\d+)(N)?'
-            !'.';
+            !'.'; (* remove ambiguity with symbols 1.5
+                     1 -> number, . -> symbol, 5 -> number *)
 
     <UNICODE_CHAR>: #'u[\\dD-Fd-f]{4}';
 
