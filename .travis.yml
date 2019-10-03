@@ -1,6 +1,6 @@
 language: clojure
 jdk:
-  -  openjdk8
+  - oraclejdk11
 
 jobs:
   include:
