@@ -120,7 +120,7 @@
     ;; symbols cannot start with number, :, #
     ;; / is a valid symbol as long as it is not part of the name
     ;; note: added ' as invalid first character due to ambiguity in #'hello
-    ;; -> [:tag [:symbol hello]]
+    ;; -> [:tag [:symbol 'hello]]
     ;; -> [:var_quote [:symbol hello]]
     *)
     SYMBOL_HEAD: number | ':' | '#' | '\\''
