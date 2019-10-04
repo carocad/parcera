@@ -213,9 +213,7 @@
     (str "#_" (str/join (map code (rest ast))))
 
     :tag
-    (str "#" (str/join (map code (rest ast))))
-
-    ast))
+    (str "#" (str/join (map code (rest ast))))))
 
 ;(code (clojure (slurp "./src/parsero/core.clj")))
 ;(code (clojure (slurp "./resources/test_cases.clj")))
