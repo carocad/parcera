@@ -98,26 +98,6 @@
 
     comment: <';'> #'.*';
 
-    (* Lexers -------------------------------------------------------------- *)
-
-    <DOUBLE>: #'[-+]?(\\d+(\\.\\d*)?([eE][-+]?\\d+)?)(M)?'
-
-    <RATIO>: #'[-+]?(\\d+)/(\\d+)';
-
-    <LONG>: #'[-+]?(?:(0)|([1-9]\\d*)|0[xX]([\\dA-Fa-f]+)|0([0-7]+)|([1-9]\\d?)[rR]([\\d\\w]+)|0\\d+)(N)?';
-
-    <UNICODE-CHAR>: #'u[\\dD-Fd-f]{4}';
-
-    <SIMPLE-CHAR>:
-          'newline'
-        | 'return'
-        | 'space'
-        | 'tab'
-        | 'formfeed'
-        | 'backspace'
-        | #'\\P{M}\\p{M}*+'; (* https://www.regular-expressions.info/unicode.html *)
-
-    (* fragments *)
     (*
     ;; symbols cannot start with number, :, #
     ;; / is a valid symbol as long as it is not part of the name
@@ -134,7 +114,26 @@
     ;; nil, true, false are actually symbols with special meaning ... not grammar rules
     ;; on their own
     *)
-    <VALID-CHARACTERS>: #'[\\w.*+\\-!?$%&=<>\\':#]+'")
+    <VALID-CHARACTERS>: #'[\\w.*+\\-!?$%&=<>\\':#]+'
+
+    (* HIDDEN PARSERS ------------------------------------------------------ *)
+
+    <DOUBLE>: #'[-+]?(\\d+(\\.\\d*)?([eE][-+]?\\d+)?)(M)?'
+
+    <RATIO>: #'[-+]?(\\d+)/(\\d+)';
+
+    <LONG>: #'[-+]?(?:(0)|([1-9]\\d*)|0[xX]([\\dA-Fa-f]+)|0([0-7]+)|([1-9]\\d?)[rR]([\\d\\w]+)|0\\d+)(N)?';
+
+    <UNICODE-CHAR>: #'u[\\dD-Fd-f]{4}';
+
+    <SIMPLE-CHAR>:
+          'newline'
+        | 'return'
+        | 'space'
+        | 'tab'
+        | 'formfeed'
+        | 'backspace'
+        | #'\\P{M}\\p{M}*+'; (* https://www.regular-expressions.info/unicode.html *)")
 
 (def clojure (instaparse/parser grammar))
 
