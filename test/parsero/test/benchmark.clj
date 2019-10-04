@@ -10,6 +10,7 @@
                          :os :runtime :verbose))
 
 (newline)
+(newline)
 
 (deftest ^:benchmark roundtrip
   (println "Benchmark: Round trip of Clojure values 🚀")
