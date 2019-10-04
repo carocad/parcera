@@ -1,4 +1,4 @@
-# parsero
+# parcero
 
 [![Build Status](https://travis-ci.com/carocad/parsero.svg?branch=master)](https://travis-ci.com/carocad/parsero)
 

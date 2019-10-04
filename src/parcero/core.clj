@@ -1,4 +1,4 @@
-(ns parsero.core
+(ns parcero.core
   (:require [instaparse.core :as instaparse]
             [clojure.string :as str]))
 

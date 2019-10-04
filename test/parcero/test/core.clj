@@ -1,4 +1,4 @@
-(ns parsero.test.core
+(ns parcero.test.core
   (:require [clojure.pprint :as pprint]
             [clojure.test :refer [deftest is testing]]
             [clojure.test.check.generators :as gen]
