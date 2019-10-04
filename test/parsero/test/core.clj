@@ -25,24 +25,24 @@
   that any input should (but must not) only have 1 AST representation ... however
   I have found this is not always possible"
   (prop/for-all [input (gen/fmap pr-str gen/any)]
-    (>= 2 (count (instaparse/parses parsero/clojure input)))))
+    (= 1 (count (instaparse/parses parsero/clojure input)))))
 
 
 (deftest data-structures
   (testing "grammar definitions"
-    (let [result (tc/quick-check 100 validity)]
+    (let [result (tc/quick-check 200 validity)]
       (is (:pass? result)
           (str "read process failed at\n"
                (with-out-str (pprint/pprint result))))))
 
   (testing "clojure values"
-    (let [result (tc/quick-check 100 symmetric)]
+    (let [result (tc/quick-check 200 symmetric)]
       (is (:pass? result)
           (str "read <-> write process yield different result. Failed at\n"
                (with-out-str (pprint/pprint result))))))
 
   (testing "very little ambiguity"
-    (let [result (tc/quick-check 100 little-ambiguity)]
+    (let [result (tc/quick-check 200 little-ambiguity)]
       (is (:pass? result)
           (str "high ambiguity case found. Please check the grammar to ensure "
                "high accuracy\n"

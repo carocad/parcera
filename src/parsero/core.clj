@@ -114,7 +114,7 @@
         | 'tab'
         | 'formfeed'
         | 'backspace'
-        | #'.';
+        | #'\\P{M}\\p{M}*+';
 
     (* fragments *)
     (*
