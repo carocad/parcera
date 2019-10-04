@@ -9,6 +9,8 @@
   (criterium/quick-bench (tc/quick-check 10 pt/validity)
                          :os :runtime :verbose))
 
+(newline)
+
 (deftest ^:benchmark roundtrip
   (println "Benchmark: Round trip of Clojure values 🚀")
   (criterium/quick-bench (tc/quick-check 10 pt/symmetric)
