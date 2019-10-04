@@ -152,80 +152,113 @@
 
 ;(time (instaparse.core/parses clojure (slurp "./resources/test_cases.clj")))
 
-(defn code
-  [ast]
+(defn- code*
+  [ast ^StringBuilder string-builder]
   (case (first ast)
     :code
-    (str/join "" (map code (rest ast)))
+    (doseq [child (rest ast)]
+      (code* child string-builder))
 
     :list
-    (str "(" (str/join (map code (rest ast))) ")")
+    (do (. string-builder (append "("))
+        (doseq [child (rest ast)] (code* child string-builder))
+        (. string-builder (append ")")))
 
     :vector
-    (str "[" (str/join (map code (rest ast))) "]")
+    (do (. string-builder (append "["))
+        (doseq [child (rest ast)] (code* child string-builder))
+        (. string-builder (append "]")))
 
     :map
-    (str/join (map code (rest ast)))
+    (doseq [child (rest ast)] (code* child string-builder))
 
     :map-namespace
-    (str "#" (code (second ast)))
+    (do (. string-builder (append "#"))
+        (code* (second ast) string-builder))
 
     :map-content
-    (str "{" (str/join (map code (rest ast))) "}")
+    (do (. string-builder (append "{"))
+        (doseq [child (rest ast)] (code* child string-builder))
+        (. string-builder (append "}")))
 
     :set
-    (str "#{" (str/join (map code (rest ast))) "}")
+    (do (. string-builder (append "#{"))
+        (doseq [child (rest ast)] (code* child string-builder))
+        (. string-builder (append "}")))
 
     (:number :whitespace :symbolic :auto-resolve :symbol)
-    (second ast)
+    (. string-builder (append (second ast)))
 
     :string
-    (str "\"" (second ast) "\"")
+    (do (. string-builder (append "\""))
+        (. string-builder (append (second ast)))
+        (. string-builder (append "\"")))
 
     :character
-    (str "\\" (second ast))
+    (do (. string-builder (append "\\"))
+        (. string-builder (append (second ast))))
 
     :simple-keyword
-    (str ":" (second ast))
+    (do (. string-builder (append ":"))
+        (. string-builder (append (second ast))))
 
     :macro-keyword
-    (str "::" (second ast))
+    (do (. string-builder (append "::"))
+        (. string-builder (append (second ast))))
 
     :comment
-    (str ";" (second ast))
+    (do (. string-builder (append ";"))
+        (. string-builder (append (second ast))))
 
     :metadata
-    (str "^" (str/join (map code (rest ast))))
+    (do (. string-builder (append "^"))
+        (doseq [child (rest ast)] (code* child string-builder)))
 
     :quote
-    (str "'" (str/join (map code (rest ast))))
+    (do (. string-builder (append "'"))
+        (doseq [child (rest ast)] (code* child string-builder)))
 
     :regex
-    (str "#" (code (second ast)))
+    (do (. string-builder (append "#"))
+        (. string-builder (append (code* (second ast) string-builder))))
 
     :var-quote
-    (str "#'" (code (second ast)))
+    (do (. string-builder (append "#'"))
+        (. string-builder (append (code* (second ast) string-builder))))
 
     :discard
-    (str "#_" (str/join (map code (rest ast))))
+    (do (. string-builder (append "#_"))
+        (doseq [child (rest ast)] (code* child string-builder)))
 
     :tag
-    (str "#" (str/join (map code (rest ast))))
+    (do (. string-builder (append "#"))
+        (doseq [child (rest ast)] (code* child string-builder)))
 
     :backtick
-    (str "`" (str/join (map code (rest ast))))
+    (do (. string-builder (append "`"))
+        (doseq [child (rest ast)] (code* child string-builder)))
 
     :unquote
-    (str "~" (str/join (map code (rest ast))))
+    (do (. string-builder (append "~"))
+        (doseq [child (rest ast)] (code* child string-builder)))
 
     :unquote-splicing
-    (str "~@" (str/join (map code (rest ast))))
+    (do (. string-builder (append "~@"))
+        (doseq [child (rest ast)] (code* child string-builder)))
 
     :deref
-    (str "@" (str/join (map code (rest ast))))
+    (do (. string-builder (append "@"))
+        (doseq [child (rest ast)] (code* child string-builder)))
 
     :function
-    (str "#" (code (second ast)))))
+    (do (. string-builder (append "#"))
+        (. string-builder (append (code* (second ast) string-builder))))))
+
+(defn code
+  [ast]
+  (let [string-builder (new StringBuilder)]
+    (code* ast string-builder)
+    (. string-builder (toString))))
 
 ; Successful parse.
 ; Profile:  {:create-node 1651, :push-full-listener 2, :push-stack 1651, :push-listener 1689, :push-result 273, :push-message 275}

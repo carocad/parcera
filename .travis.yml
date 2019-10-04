@@ -10,7 +10,7 @@ jobs:
         - lein trampoline test
 
     - stage: Benchmark
-      if: branch = master
+      #if: branch = master
       script:
         - lein trampoline test :benchmark
 
