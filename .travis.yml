@@ -6,7 +6,8 @@ jobs:
   include:
     - stage: Tests
       script:
-        - lein do clean, compile, check, eastwood, test
+        - lein do clean, compile, check, eastwood
+        - lein trampoline test
 
     - stage: Benchmark
       if: branch = master
