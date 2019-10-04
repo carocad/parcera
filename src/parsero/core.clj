@@ -218,16 +218,16 @@
     (str "#" (str/join (map code (rest ast))))
 
     :backtick
-    (str "`" (code (second ast)))
+    (str "`" (str/join (map code (rest ast))))
 
     :unquote
-    (str "~" (code (second ast)))
+    (str "~" (str/join (map code (rest ast))))
 
     :unquote-splicing
-    (str "~@" (code (second ast)))
+    (str "~@" (str/join (map code (rest ast))))
 
     :deref
-    (str "@" (code (second ast)))
+    (str "@" (str/join (map code (rest ast))))
 
     :function
     (str "#" (code (second ast)))))
