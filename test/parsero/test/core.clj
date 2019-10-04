@@ -13,6 +13,7 @@
   (prop/for-all [input (gen/fmap pr-str gen/any)]
     (= false (instaparse/failure? (parsero/clojure input)))))
 
+
 (def symmetric
   "The read <-> write process of parsero MUST be symmetrical. Meaning
   that the AST and the text representation are equivalent"
@@ -47,6 +48,7 @@
           (str "high ambiguity case found. Please check the grammar to ensure "
                "high accuracy\n"
                (with-out-str (pprint/pprint result)))))))
+
 
 (deftest macros
   (testing "metadata"
@@ -110,3 +112,25 @@
   (testing "namespaced map"
     (as-> "#::{:a 1 b 3}" input (is (= input (parsero/code (parsero/clojure input)))))
     (as-> "#::hello{:a 1 b 3}" input (is (= input (parsero/code (parsero/clojure input)))))))
+
+
+(deftest bootstrap
+
+  (testing "parsero should be able to parse itself"
+    (let [core-content (slurp "./src/parsero/core.clj")]
+      (is (= core-content (parsero/code (parsero/clojure core-content))))))
+
+  (testing "parsero should be able to parse its own test suite"
+    (let [test-content (slurp "./test/parsero/test/core.clj")]
+      (is (= test-content (parsero/code (parsero/clojure test-content)))))))
+
+
+(deftest clojure$cript
+
+  (testing "parsero should be able to parse clojure core"
+    (let [core-content (slurp "https://raw.githubusercontent.com/clojure/clojure/master/src/clj/clojure/core.clj")]
+      (is (= core-content (parsero/code (parsero/clojure core-content))))))
+
+  (testing "parsero should be able to parse clojurescript core"
+    (let [test-content (slurp "https://raw.githubusercontent.com/clojure/clojurescript/master/src/main/clojure/cljs/core.cljc")]
+      (is (= test-content (parsero/code (parsero/clojure test-content)))))))
