@@ -156,7 +156,7 @@
 (defn code
   [ast]
   (case (first ast)
-    (:code)
+    :code
     (str/join "" (map code (rest ast)))
 
     :list
