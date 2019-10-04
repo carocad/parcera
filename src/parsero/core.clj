@@ -78,9 +78,9 @@
 
     deref: <'@'> form;
 
-    discard: <'-'> form;
+    discard: <'_'> form;
 
-    tag: !'-' symbol form;
+    tag: !'_' symbol form;
 
     string : <'\"'> #'[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*' <'\"'>;
 
