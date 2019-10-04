@@ -11,7 +11,7 @@
                         | vector
                         | map
                         | set
-                        | reader_macro
+                        | reader-macro
                         )
             whitespace;
 
@@ -42,31 +42,31 @@
 
     number: DOUBLE | RATIO | LONG;
 
-    character: <'\\\\'> ( SIMPLE_CHAR | UNICODE_CHAR );
+    character: <'\\\\'> ( SIMPLE-CHAR | UNICODE-CHAR );
 
-    <reader_macro>:
+    <reader-macro>:
           dispatch
         | metadata
         | deref
         | quote
         | backtick
         | unquote
-        | unquote_splicing
+        | unquote-splicing
         ;
 
-    <dispatch>: <'#'> ( function | regex | var_quote | discard | tag)
+    <dispatch>: <'#'> ( function | regex | var-quote | discard | tag)
 
     function: list;
 
-    metadata: <'^'> ( map_metadata | shorthand_metadata );
+    metadata: <'^'> ( map-metadata | shorthand-metadata );
 
-    <map_metadata>: map form
+    <map-metadata>: map form
 
-    <shorthand_metadata>: ( symbol | string | keyword ) form;
+    <shorthand-metadata>: ( symbol | string | keyword ) form;
 
     regex: string;
 
-    var_quote: <'\\''> symbol;
+    var-quote: <'\\''> symbol;
 
     quote: <'\\''> form;
 
@@ -74,23 +74,23 @@
 
     unquote: <'~'> form;
 
-    unquote_splicing: <'~@'> form;
+    unquote-splicing: <'~@'> form;
 
     deref: <'@'> form;
 
-    discard: <'_'> form;
+    discard: <'-'> form;
 
-    tag: !'_' symbol form;
+    tag: !'-' symbol form;
 
     string : <'\"'> #'[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*' <'\"'>;
 
-    symbol: !SYMBOL_HEAD (VALID_CHARACTERS <'/'>)? (VALID_CHARACTERS | '/') !'/';
+    symbol: !SYMBOL-HEAD (VALID-CHARACTERS <'/'>)? (VALID-CHARACTERS | '/') !'/';
 
-    <keyword>: simple_keyword | macro_keyword
+    <keyword>: simple-keyword | macro-keyword
 
-    simple_keyword: <':'> !':' (VALID_CHARACTERS <'/'>)? (VALID_CHARACTERS | '/') !'/';
+    simple-keyword: <':'> !':' (VALID-CHARACTERS <'/'>)? (VALID-CHARACTERS | '/') !'/';
 
-    macro_keyword: <'::'> !':' VALID_CHARACTERS;
+    macro-keyword: <'::'> !':' VALID-CHARACTERS;
 
     comment: <';'> #'.*';
 
@@ -106,9 +106,9 @@
             !'.'; (* remove ambiguity with symbols 1.5
                      1 -> number, . -> symbol, 5 -> number *)
 
-    <UNICODE_CHAR>: #'u[\\dD-Fd-f]{4}';
+    <UNICODE-CHAR>: #'u[\\dD-Fd-f]{4}';
 
-    <SIMPLE_CHAR>:
+    <SIMPLE-CHAR>:
           'newline'
         | 'return'
         | 'space'
@@ -123,9 +123,9 @@
     ;; / is a valid symbol as long as it is not part of the name
     ;; note: added ' as invalid first character due to ambiguity in #'hello
     ;; -> [:tag [:symbol 'hello]]
-    ;; -> [:var_quote [:symbol hello]]
+    ;; -> [:var-quote [:symbol hello]]
     *)
-    SYMBOL_HEAD: number | ':' | '#' | '\\''
+    SYMBOL-HEAD: number | ':' | '#' | '\\''
 
     (*
     ;; NOTE: several characters are not allowed according to clojure reference.
@@ -134,7 +134,7 @@
     ;; nil, true, false are actually symbols with special meaning ... not grammar rules
     ;; on their own
     *)
-    <VALID_CHARACTERS>: #'[\\w.*+\\-!?$%&=<>\\':#]+'")
+    <VALID-CHARACTERS>: #'[\\w.*+\\-!?$%&=<>\\':#]+'")
 
 (def clojure (instaparse/parser grammar))
 
@@ -188,10 +188,10 @@
     :character
     (str "\\" (second ast))
 
-    :simple_keyword
+    :simple-keyword
     (str ":" (str/join "/" (rest ast)))
 
-    :macro_keyword
+    :macro-keyword
     (str "::" (second ast))
 
     :comment
@@ -206,14 +206,29 @@
     :regex
     (str "#" (code (second ast)))
 
-    :var_quote
+    :var-quote
     (str "#'" (code (second ast)))
 
     :discard
     (str "#_" (str/join (map code (rest ast))))
 
     :tag
-    (str "#" (str/join (map code (rest ast))))))
+    (str "#" (str/join (map code (rest ast))))
+
+    :backtick
+    (str "`" (code (second ast)))
+
+    :unquote
+    (str "~" (code (second ast)))
+
+    :unquote-splicing
+    (str "~@" (code (second ast)))
+
+    :deref
+    (str "@" (code (second ast)))
+
+    :function
+    (str "#" (code (second ast)))))
 
 ;(code (clojure (slurp "./src/parsero/core.clj")))
 ;(code (clojure (slurp "./resources/test_cases.clj")))
