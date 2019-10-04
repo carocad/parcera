@@ -220,11 +220,11 @@
 
     :regex
     (do (. string-builder (append "#"))
-        (. string-builder (append (code* (second ast) string-builder))))
+        (code* (second ast) string-builder))
 
     :var-quote
     (do (. string-builder (append "#'"))
-        (. string-builder (append (code* (second ast) string-builder))))
+        (code* (second ast) string-builder))
 
     :discard
     (do (. string-builder (append "#_"))
@@ -252,7 +252,7 @@
 
     :function
     (do (. string-builder (append "#"))
-        (. string-builder (append (code* (second ast) string-builder))))))
+        (code* (second ast) string-builder))))
 
 (defn code
   [ast]
