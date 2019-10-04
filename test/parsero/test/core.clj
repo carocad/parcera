@@ -128,11 +128,9 @@
 (deftest clojure$cript
 
   (testing "parsero should be able to parse clojure core"
-    (let [core-content   (slurp "https://raw.githubusercontent.com/clojure/clojure/master/src/clj/clojure/core.clj")]
-      (time (is (not (instaparse/failure? (parsero/clojure core-content
-                                                           :optimize :memory)))))))
+    (let [core-content (slurp "https://raw.githubusercontent.com/clojure/clojure/master/src/clj/clojure/core.clj")]
+      (time (is (= (parsero/code (parsero/clojure core-content :optimize :memory)))))))
 
   (testing "parsero should be able to parse clojurescript core"
-    (let [test-content (slurp "https://raw.githubusercontent.com/clojure/clojurescript/master/src/main/clojure/cljs/core.cljc")]
-      (time (is (not (instaparse/failure? (parsero/clojure test-content
-                                                           :optimize :memory))))))))
+    (let [core-content (slurp "https://raw.githubusercontent.com/clojure/clojurescript/master/src/main/clojure/cljs/core.cljc")]
+      (time (is (= (parsero/code (parsero/clojure core-content :optimize :memory))))))))
