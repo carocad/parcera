@@ -115,7 +115,7 @@
         | 'tab'
         | 'formfeed'
         | 'backspace'
-        | #'\\P{M}\\p{M}*+';
+        | #'\\P{M}\\p{M}*+'; (* https://www.regular-expressions.info/unicode.html *)
 
     (* fragments *)
     (*
