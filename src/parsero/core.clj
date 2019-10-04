@@ -23,7 +23,7 @@
 
     map: map-namespace? <'{'> map-content <'}'> ;
 
-    map-namespace: <'#'> keyword ;
+    map-namespace: <'#'> (keyword | auto-resolve);
 
     map-content: (form form)*
 
@@ -86,11 +86,13 @@
 
     symbol: !SYMBOL-HEAD (VALID-CHARACTERS <'/'>)? (VALID-CHARACTERS | '/') !'/';
 
-    <keyword>: simple-keyword | macro-keyword
+    <keyword>: simple-keyword | macro-keyword ;
+
+    auto-resolve: '::' ;
 
     simple-keyword: <':'> !':' (VALID-CHARACTERS <'/'>)? (VALID-CHARACTERS | '/') !'/';
 
-    macro-keyword: <'::'> !':' VALID-CHARACTERS;
+    macro-keyword: <auto-resolve> !':' VALID-CHARACTERS;
 
     comment: <';'> #'.*';
 
@@ -176,7 +178,7 @@
     :set
     (str "#{" (str/join (map code (rest ast))) "}")
 
-    (:number :whitespace :symbolic)
+    (:number :whitespace :symbolic :auto-resolve)
     (second ast)
 
     :string

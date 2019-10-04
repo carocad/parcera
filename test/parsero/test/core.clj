@@ -108,5 +108,5 @@
     (as-> "#(= (str %1 %2 %&))" input (is (= input (parsero/code (parsero/clojure input))))))
 
   (testing "namespaced map"
-    (as-> "::{:a 1 b 3}" input (is (= input (parsero/code (parsero/clojure input)))))
-    (as-> "::hello{:a 1 b 3}" input (is (= input (parsero/code (parsero/clojure input)))))))
+    (as-> "#::{:a 1 b 3}" input (is (= input (parsero/code (parsero/clojure input)))))
+    (as-> "#::hello{:a 1 b 3}" input (is (= input (parsero/code (parsero/clojure input)))))))
