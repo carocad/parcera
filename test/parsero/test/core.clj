@@ -20,7 +20,7 @@
     (= input (parsero/code (parsero/clojure input)))))
 
 
-(def little-ambiguity
+(def unambiguous
   "The process of parsing clojure code yields consistent results. Meaning
   that any input should (but must not) only have 1 AST representation ... however
   I have found this is not always possible"
@@ -42,7 +42,7 @@
                (with-out-str (pprint/pprint result))))))
 
   (testing "very little ambiguity"
-    (let [result (tc/quick-check 200 little-ambiguity)]
+    (let [result (tc/quick-check 200 unambiguous)]
       (is (:pass? result)
           (str "high ambiguity case found. Please check the grammar to ensure "
                "high accuracy\n"

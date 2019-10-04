@@ -43,7 +43,8 @@
     number: ( DOUBLE | RATIO | LONG ) !symbol (* remove ambiguity with symbols 1/5
                                                  1 -> number, / -> symbol, 5 -> number *);
 
-    character: <'\\\\'> ( SIMPLE-CHAR | UNICODE-CHAR );
+    character: <'\\\\'> ( SIMPLE-CHAR | UNICODE-CHAR ) !symbol (* remove ambiguity with symbols \backspace
+                                                                  \b -> character, ackspace -> symbol *);
 
     <reader-macro>:
           dispatch
