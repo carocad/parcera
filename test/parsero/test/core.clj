@@ -28,7 +28,7 @@
     (>= 2 (count (instaparse/parses parsero/clojure input)))))
 
 
-(deftest parsero
+(deftest data-structures
   (testing "grammar definitions"
     (let [result (tc/quick-check 100 validity)]
       (is (:pass? result)
@@ -48,5 +48,38 @@
                "high accuracy\n"
                (with-out-str (pprint/pprint result)))))))
 
+(deftest macros
+  (testing "metadata"
+    (as-> "^String [a b 2]" input (is (= input (parsero/code  (parsero/clojure input)))))
+    (as-> "^\"String\" [a b 2]" input(is (= input (parsero/code  (parsero/clojure input)))))
+    (as-> "^{:a 1} [a b 2]" input(is (= input (parsero/code  (parsero/clojure input))))))
 
-;(instaparse/parses parsero/clojure "[0N 0N]")
+  (testing "discard"
+    (as-> "#_[a b 2]" input(is (= input (parsero/code  (parsero/clojure input)))))
+    (as-> "#_(a b 2)" input(is (= input (parsero/code  (parsero/clojure input)))))
+    (as-> "#_{:a 1}" input(is (= input (parsero/code  (parsero/clojure input)))))
+    (as-> "#_macros" input(is (= input (parsero/code  (parsero/clojure input))))))
+
+  (testing "regex"
+    (as-> "#_\"[a b 2]\"" input(is (= input (parsero/code  (parsero/clojure input))))))
+
+  (testing "comments"
+    (as-> ";[a b 2]" input(is (= input (parsero/code  (parsero/clojure input)))))
+    (as-> ";; \"[a b 2]\"" input(is (= input (parsero/code  (parsero/clojure input))))))
+
+  (testing "var quote"
+    (as-> "#'hello/world" input(is (= input (parsero/code  (parsero/clojure input)))))
+    (as-> "#'/" input(is (= input (parsero/code  (parsero/clojure input))))))
+
+  (testing "tag"
+    (as-> "#hello/world [1 a \"3\"]" input(is (= input (parsero/code  (parsero/clojure input)))))
+    (as-> "#hello/world {1 \"3\"}" input(is (= input (parsero/code  (parsero/clojure input))))))
+
+  (testing "keyword"
+    (as-> "::hello/world [1 a \"3\"]" input(is (= input (parsero/code  (parsero/clojure input)))))
+    (as-> "::hello" input(is (= input (parsero/code  (parsero/clojure input))))))
+
+  (testing "quote"
+    (as-> "'hello/world" input(is (= input (parsero/code  (parsero/clojure input)))))
+    (as-> "'hello" input(is (= input (parsero/code  (parsero/clojure input)))))
+    (as-> "'/" input(is (= input (parsero/code  (parsero/clojure input)))))))
