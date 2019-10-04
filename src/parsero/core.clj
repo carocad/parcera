@@ -229,6 +229,7 @@
 
 ; Successful parse.
 ; Profile:  {:create-node 1651, :push-full-listener 2, :push-stack 1651, :push-listener 1689, :push-result 273, :push-message 275}
+; "Elapsed time: 141.452323 msecs"
 #_(time (clojure (str '(ns parsero.core
                          (:require [instaparse.core :as instaparse]
                                    [clojure.data :as data]
