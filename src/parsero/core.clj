@@ -86,15 +86,15 @@
 
     string : <'\"'> #'[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*' <'\"'>;
 
-    symbol: !SYMBOL-HEAD (VALID-CHARACTERS <'/'>)? (VALID-CHARACTERS | '/') !'/';
+    symbol: !SYMBOL-HEAD name;
 
     <keyword>: simple-keyword | macro-keyword ;
 
     auto-resolve: '::' ;
 
-    simple-keyword: <':'> !':' (VALID-CHARACTERS <'/'>)? (VALID-CHARACTERS | '/') !'/';
+    simple-keyword: <':'> !':' name;
 
-    macro-keyword: <auto-resolve> !':' VALID-CHARACTERS;
+    macro-keyword: <auto-resolve> !':' name;
 
     comment: <';'> #'.*';
 
@@ -113,8 +113,9 @@
     ;; EDN reader says otherwise https://github.com/edn-format/edn#symbols
     ;; nil, true, false are actually symbols with special meaning ... not grammar rules
     ;; on their own
+    VALID-CHARACTERS>: #'[\\w.*+\\-!?$%&=<>\\':#]+'
     *)
-    <VALID-CHARACTERS>: #'[\\w.*+\\-!?$%&=<>\\':#]+'
+    <name>: #'([\\w.*+\\-!?$%&=<>\\':#]+\\/)?(\\/|([\\w.*+\\-!?$%&=<>\\':#]+))(?!\\/)'
 
     (* HIDDEN PARSERS ------------------------------------------------------ *)
 
