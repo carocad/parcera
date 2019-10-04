@@ -1,5 +1,6 @@
 (ns parsero.core
   (:require [instaparse.core :as instaparse]
+            [clojure.data :as data]
             [clojure.string :as str]))
 
 (def grammar
@@ -176,20 +177,17 @@
     :set
     (str "#{" (str/join (map code (rest ast))) "}")
 
-    (:number :whitespace :symbolic :auto-resolve)
+    (:number :whitespace :symbolic :auto-resolve :symbol)
     (second ast)
 
     :string
     (str "\"" (second ast) "\"")
 
-    :symbol
-    (str/join "/" (rest ast))
-
     :character
     (str "\\" (second ast))
 
     :simple-keyword
-    (str ":" (str/join "/" (rest ast)))
+    (str ":" (second ast))
 
     :macro-keyword
     (str "::" (second ast))
@@ -230,11 +228,10 @@
     :function
     (str "#" (code (second ast)))))
 
-;(code (clojure (slurp "./src/parsero/core.clj")))
-;(code (clojure (slurp "./resources/test_cases.clj")))
-
-#_(spit "resources/output.clj"
-        (code (clojure (slurp "./resources/test_cases.clj"))))
-
-;(clojure (slurp "./resources/test_cases.clj"))
-;(clojure (slurp "./resources/test_cases.clj"))
+; Successful parse.
+; Profile:  {:create-node 1651, :push-full-listener 2, :push-stack 1651, :push-listener 1689, :push-result 273, :push-message 275}
+#_(clojure (str '(ns parsero.core
+                   (:require [instaparse.core :as instaparse]
+                             [clojure.data :as data]
+                             [clojure.string :as str])))
+           :trace true)
