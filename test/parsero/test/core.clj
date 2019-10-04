@@ -5,7 +5,14 @@
             [clojure.test.check.properties :as prop]
             [clojure.test.check :as tc]
             [parsero.core :as parsero]
-            [instaparse.core :as instaparse]))
+            [instaparse.core :as instaparse])
+  (:import (java.security MessageDigest)))
+
+(defn md5
+  [^String s]
+  (let [algorithm (MessageDigest/getInstance "MD5")
+        raw (.digest algorithm (.getBytes s))]
+    (format "%032x" (BigInteger. 1 raw))))
 
 (def validity
   "The grammar definition of parsero is valid for any clojure value. Meaning
@@ -128,9 +135,13 @@
 (deftest clojure$cript
 
   (testing "parsero should be able to parse clojure core"
-    (let [core-content (slurp "https://raw.githubusercontent.com/clojure/clojure/master/src/clj/clojure/core.clj")]
-      (is (= core-content (parsero/code (parsero/clojure core-content))))))
+    (let [core-content   (slurp "https://raw.githubusercontent.com/clojure/clojure/master/src/clj/clojure/core.clj")
+          hashed-content (md5 core-content)]
+      ;(is (= core-content (parsero/code (parsero/clojure core-content))))
+      (time (is (= hashed-content (md5 (parsero/code (parsero/clojure core-content))))))))
 
   (testing "parsero should be able to parse clojurescript core"
-    (let [test-content (slurp "https://raw.githubusercontent.com/clojure/clojurescript/master/src/main/clojure/cljs/core.cljc")]
-      (is (= test-content (parsero/code (parsero/clojure test-content)))))))
+    (let [test-content (slurp "https://raw.githubusercontent.com/clojure/clojurescript/master/src/main/clojure/cljs/core.cljc")
+          hashed-content (md5 test-content)]
+      ;(is (= test-content (parsero/code (parsero/clojure test-content))))
+      (time (is (= hashed-content (md5 (parsero/code (parsero/clojure test-content)))))))))
