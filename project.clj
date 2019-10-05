@@ -11,6 +11,8 @@
   :test-selectors {:default     (fn [m] (not (some #{:benchmark} (keys m))))
                    :benchmark   :benchmark}
   :deploy-repositories [["releases"  {:url "https://clojars.org/repo"
-                                      :sign-releases false}]
+                                      :sign-releases false
+                                      :username      :env/clojars_username
+                                      :password      :env/clojars_password}]
                         ["snapshots" {:url "https://clojars.org/repo"
                                       :sign-releases false}]])
