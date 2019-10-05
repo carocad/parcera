@@ -112,7 +112,13 @@
 
   (testing "namespaced map"
     (as-> "#::{:a 1 b 3}" input (is (= input (parcera/code (parcera/clojure input)))))
-    (as-> "#::hello{:a 1 b 3}" input (is (= input (parcera/code (parcera/clojure input)))))))
+    (as-> "#::hello{:a 1 b 3}" input (is (= input (parcera/code (parcera/clojure input))))))
+
+  (testing "reader conditional"
+    (as-> "#?(:clj Double/NaN :cljs js/NaN :default nil)" input
+          (is (= input (parcera/code (parcera/clojure input)))))
+    (as-> "[1 2 #?@(:clj [3 4] :cljs [5 6])]" input
+          (is (= input (parcera/code (parcera/clojure input)))))))
 
 
 (deftest bootstrap

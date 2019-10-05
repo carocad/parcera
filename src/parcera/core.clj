@@ -55,7 +55,7 @@
         | unquote-splicing
         ;
 
-    <dispatch>: <'#'> ( function | regex | var-quote | discard | tag)
+    <dispatch>: <'#'> ( function | regex | var-quote | discard | tag | conditional | conditional-splicing);
 
     function: list;
 
@@ -80,6 +80,10 @@
     discard: <'_'> form;
 
     tag: !'_' symbol form;
+
+    conditional: <'?'> list;
+
+    conditional-splicing: <'?@'> list;
 
     string : <'\"'> #'[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*' <'\"'>;
 
@@ -242,6 +246,14 @@
     :unquote-splicing
     (do (. string-builder (append "~@"))
         (doseq [child (rest ast)] (code* child string-builder)))
+
+    :conditional
+    (do (. string-builder (append "#?"))
+        (code* (second ast) string-builder))
+
+    :conditional-splicing
+    (do (. string-builder (append "#?@"))
+        (code* (second ast) string-builder))
 
     :deref
     (do (. string-builder (append "@"))
