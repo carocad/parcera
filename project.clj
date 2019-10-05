@@ -9,4 +9,8 @@
                                   [org.clojure/test.check "0.10.0"]]
                    :plugins      [[jonase/eastwood "0.3.5"]]}}
   :test-selectors {:default     (fn [m] (not (some #{:benchmark} (keys m))))
-                   :benchmark   :benchmark})
+                   :benchmark   :benchmark}
+  :deploy-repositories [["releases"  {:url "https://clojars.org/repo"
+                                      :sign-releases false}]
+                        ["snapshots" {:url "https://clojars.org/repo"
+                                      :sign-releases false}]])
