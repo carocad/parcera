@@ -137,23 +137,23 @@
         | 'backspace'
         | #'\\P{M}\\p{M}*+'; (* https://www.regular-expressions.info/unicode.html *)")
 
-(def clojure (instaparse/parser grammar))
+(def clojure
+  "Clojure's (instaparse) parser. It can be used as:
+  - (parcera/clojure input-string)
+     -> returns an AST representation of input-string
+  - (instaparse/parse parcera/clojure input-string)
+     -> same as above but more explicit
+  - (instaparse/parses parcera/clojure input-string)
+   -> returns a sequence of possible AST representations in case of ambiguity
+      in input-string
 
-#_(data/diff (first (instaparse/parses clojure (slurp "./src/parsero/core.clj")))
-             (second (instaparse/parses clojure (slurp "./src/parsero/core.clj"))))
-
-;(count (instaparse/parses clojure (slurp "./src/parsero/core.clj")))
-
-;(time (clojure (slurp "./src/parsero/core.clj")))
-
-;(time (clojure (slurp "./src/parsero/clojure.clj")))
-
-;(dotimes [n 100])
-;(time (clojure (slurp "./src/parsero/core.clj")))
-
-;(time (instaparse.core/parses clojure (slurp "./resources/test_cases.clj")))
+   For a description of all possible options, visit
+   Instaparse's official documentation: https://github.com/Engelberg/instaparse#reference"
+  (instaparse/parser grammar))
 
 (defn- code*
+  "internal function used to imperatively build up the code from the provided
+   AST as Clojure's str would be too slow"
   [ast ^StringBuilder string-builder]
   (case (first ast)
     :code
@@ -264,6 +264,16 @@
         (code* (second ast) string-builder))))
 
 (defn code
+  "Transforms your AST back into code
+
+   Args:
+     ast: The nested sequence of [:keyword & content] which MUST follow the
+         same structure as the result of `(parcera/clojure input-string)`
+
+   Returns:
+     A string representation of the provided AST
+
+   In general `(= input (parcera/code (parcera/clojure input)))`"
   [ast]
   (let [string-builder (new StringBuilder)]
     (code* ast string-builder)
