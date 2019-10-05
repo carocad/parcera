@@ -1,6 +1,6 @@
 # parcera
 
-[![Build Status](https://travis-ci.com/carocad/parcero.svg?branch=master)](https://travis-ci.com/carocad/parcero)
+[![Build Status](https://travis-ci.com/carocad/parcera.svg?branch=master)](https://travis-ci.com/carocad/parcera)
 
 Grammar-based Clojure(script) parser.
 
@@ -18,7 +18,7 @@ full explanation of the options available for a parser please visit Instaparse w
             [instaparse.core :as instaparse]))
 
 ;;parse clojure code from a string
-(parcera/clojure (str '(ns parsero.core
+(parcera/clojure (str '(ns parcera.core
                          (:require [instaparse.core :as instaparse]
                                    [clojure.data :as data]
                                    [clojure.string :as str]))))
@@ -28,7 +28,7 @@ full explanation of the options available for a parser please visit Instaparse w
  [:list
   [:symbol "ns"]
   [:whitespace " "]
-  [:symbol "parsero.core"]
+  [:symbol "parcera.core"]
   [:whitespace " "]
   [:list
    [:simple-keyword "require"]
