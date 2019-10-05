@@ -10,9 +10,7 @@
                    :plugins      [[jonase/eastwood "0.3.5"]]}}
   :test-selectors {:default     (fn [m] (not (some #{:benchmark} (keys m))))
                    :benchmark   :benchmark}
-  :deploy-repositories [["releases"  {:url "https://clojars.org/repo"
-                                      :sign-releases false
-                                      :username      :env/clojars_username
-                                      :password      :env/clojars_password}]
-                        ["snapshots" {:url "https://clojars.org/repo"
-                                      :sign-releases false}]])
+  :deploy-repositories [["clojars" {:url "https://clojars.org/repo"
+                                    :username :env/clojars_username
+                                    :password :env/clojars_password
+                                    :sign-releases false}]])
