@@ -1,6 +1,5 @@
-(ns parcero.core
-  (:require [instaparse.core :as instaparse]
-            [clojure.string :as str]))
+(ns parcera.core
+  (:require [instaparse.core :as instaparse]))
 
 (def grammar
     "code: form*;
@@ -60,11 +59,9 @@
 
     function: list;
 
-    metadata: <'^'> ( map-metadata | shorthand-metadata );
+    metadata: <'^'> ( map | shorthand-metadata ) form;
 
-    <map-metadata>: map form
-
-    <shorthand-metadata>: ( symbol | string | keyword ) form;
+    <shorthand-metadata>: ( symbol | string | keyword );
 
     regex: string;
 
