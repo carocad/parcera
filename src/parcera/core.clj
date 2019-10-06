@@ -138,7 +138,7 @@
         | #'\\P{M}\\p{M}*+'; (* https://www.regular-expressions.info/unicode.html *)")
 
 (def clojure
-  "Clojure's (instaparse) parser. It can be used as:
+  "Clojure (instaparse) parser. It can be used as:
   - (parcera/clojure input-string)
      -> returns an AST representation of input-string
   - (instaparse/parse parcera/clojure input-string)
@@ -147,8 +147,8 @@
    -> returns a sequence of possible AST representations in case of ambiguity
       in input-string
 
-   For a description of all possible options, visit
-   Instaparse's official documentation: https://github.com/Engelberg/instaparse#reference"
+   For a description of all possible options, visit Instaparse's official
+   documentation: https://github.com/Engelberg/instaparse#reference"
   (instaparse/parser grammar))
 
 (defn- code*
@@ -266,14 +266,12 @@
 (defn code
   "Transforms your AST back into code
 
-   Args:
-     ast: The nested sequence of [:keyword & content] which MUST follow the
-         same structure as the result of `(parcera/clojure input-string)`
+   ast: The nested sequence of [:keyword & content] which MUST follow the
+        same structure as the result of `(parcera/clojure input-string)`
 
-   Returns:
-     A string representation of the provided AST
+   Returns a string representation of the provided AST
 
-   In general `(= input (parcera/code (parcera/clojure input)))`"
+   In general (= input (parcera/code (parcera/clojure input)))"
   [ast]
   (let [string-builder (new StringBuilder)]
     (code* ast string-builder)
