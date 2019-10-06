@@ -5,7 +5,8 @@
             [clojure.test.check.properties :as prop]
             [clojure.test.check :as tc]
             [parcera.core :as parcera]
-            [instaparse.core :as instaparse]))
+            [instaparse.core :as instaparse])
+  #?(:cljs (:require-macros [parcera.shims :refer [slurp]])))
 
 (def validity
   "The grammar definition of parcera is valid for any clojure value. Meaning
