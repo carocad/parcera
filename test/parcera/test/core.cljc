@@ -28,6 +28,16 @@
   (prop/for-all [input (gen/fmap pr-str gen/any)]
     (= 1 (count (instaparse/parses parcera/clojure input)))))
 
+(deftest simple
+  (testing "character literals"
+    (as-> "\\t" input (is (= input (parcera/code (parcera/clojure input)))))
+    (as-> "\\n" input (is (= input (parcera/code (parcera/clojure input)))))
+    (as-> "\\r" input (is (= input (parcera/code (parcera/clojure input)))))
+    (as-> "\\a" input (is (= input (parcera/code (parcera/clojure input)))))
+    (as-> "\\é" input (is (= input (parcera/code (parcera/clojure input)))))
+    (as-> "\\ö" input (is (= input (parcera/code (parcera/clojure input)))))
+    (as-> "\\ï" input (is (= input (parcera/code (parcera/clojure input)))))
+    (as-> "\\ϕ" input (is (= input (parcera/code (parcera/clojure input)))))))
 
 (deftest data-structures
   (testing "grammar definitions"
@@ -116,19 +126,19 @@
 
   (testing "reader conditional"
     (as-> "#?(:clj Double/NaN :cljs js/NaN :default nil)" input
-          (is (= input (parcera/code (parcera/clojure input)))))
+      (is (= input (parcera/code (parcera/clojure input)))))
     (as-> "[1 2 #?@(:clj [3 4] :cljs [5 6])]" input
-          (is (= input (parcera/code (parcera/clojure input)))))))
+      (is (= input (parcera/code (parcera/clojure input)))))))
 
 
 (deftest bootstrap
 
   (testing "parcera should be able to parse itself"
-    (let [core-content (slurp "./src/parcera/core.clj")]
+    (let [core-content (slurp "./src/parcera/core.cljc")]
       (is (= core-content (parcera/code (parcera/clojure core-content))))))
 
   (testing "parcera should be able to parse its own test suite"
-    (let [test-content (slurp "./test/parcera/test/core.clj")]
+    (let [test-content (slurp "./test/parcera/test/core.cljc")]
       (is (= test-content (parcera/code (parcera/clojure test-content)))))))
 
 

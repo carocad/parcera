@@ -136,7 +136,7 @@
         | 'tab'
         | 'formfeed'
         | 'backspace'
-        | #'\\P{M}\\p{M}*+'; (* https://www.regular-expressions.info/unicode.html *)")
+        | #'[^\\u0300-\\u036F\\u1DC0-\\u1DFF\\u20D0-\\u20FF][\\u0300-\\u036F\\u1DC0-\\u1DFF\\u20D0-\\u20FF]*'; (* https://www.regular-expressions.info/unicode.html *)")
 
 (def clojure
   "Clojure (instaparse) parser. It can be used as:
