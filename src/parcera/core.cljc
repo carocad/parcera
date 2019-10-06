@@ -1,5 +1,6 @@
 (ns parcera.core
-  (:require [instaparse.core :as instaparse]))
+  (:require [instaparse.core :as instaparse]
+            #?(:cljs [parcera.string-builder :refer [StringBuilder]])))
 
 (def grammar
     "code: form*;
