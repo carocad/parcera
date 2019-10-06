@@ -26,7 +26,9 @@
   that any input should (but must not) only have 1 AST representation ... however
   I have found this is not always possible"
   (prop/for-all [input (gen/fmap pr-str gen/any)]
-    (= 1 (count (instaparse/parses parcera/clojure input)))))
+    (= 1 (count (instaparse/parses parcera/clojure
+                                   input
+                                   :unhide :all)))))
 
 
 (deftest data-structures
