@@ -51,6 +51,12 @@
                "high accuracy\n"
                (with-out-str (pprint/pprint result)))))))
 
+(deftest simple-edge-cases
+  (testing "unicode symbols"
+    (as-> "hellö/world" input (is (= input (parcera/code (parcera/clojure input)))))
+    (as-> "héllö" input (is (= input (parcera/code (parcera/clojure input)))))
+    (as-> "héllö.cœre/ßorld" input (is (= input (parcera/code (parcera/clojure input)))))))
+
 
 (deftest macros
   (testing "metadata"
