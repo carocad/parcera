@@ -55,8 +55,12 @@
   (testing "unicode symbols"
     (as-> "hellö/world" input (is (= input (parcera/code (parcera/clojure input)))))
     (as-> "héllö" input (is (= input (parcera/code (parcera/clojure input)))))
-    (as-> "héllö.cœre/ßorld" input (is (= input (parcera/code (parcera/clojure input)))))))
+    (as-> "héllö.cœre/ßorld" input (is (= input (parcera/code (parcera/clojure input)))))
+    (as-> ":héllö.cœre/ßorld" input (is (= input (parcera/code (parcera/clojure input))))))
 
+  (testing "unicode keywords"
+    (as-> ":héllö.cœre/ßorld" input (is (= input (parcera/code (parcera/clojure input)))))
+    (as-> "::héllö" input (is (= input (parcera/code (parcera/clojure input)))))))
 
 (deftest macros
   (testing "metadata"
