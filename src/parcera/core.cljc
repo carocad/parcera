@@ -3,7 +3,7 @@
   #?(:cljs (:import goog.string.StringBuffer)))
 
 (def grammar
-    "code: form*;
+  "code: form*;
 
     <form>: whitespace ( literal
                         | symbol
@@ -136,7 +136,9 @@
         | 'tab'
         | 'formfeed'
         | 'backspace'
-        | #'[^\\u0300-\\u036F\\u1DC0-\\u1DFF\\u20D0-\\u20FF][\\u0300-\\u036F\\u1DC0-\\u1DFF\\u20D0-\\u20FF]*'; (* https://www.regular-expressions.info/unicode.html *)")
+        | #'[^\\u0300-\\u036F\\u1DC0-\\u1DFF\\u20D0-\\u20FF][\\u0300-\\u036F\\u1DC0-\\u1DFF\\u20D0-\\u20FF]*';
+         (* This is supposed to be the JavaScript friendly version of #'\\P{M}\\p{M}*+' mentioned here: https://www.regular-expressions.info/unicode.html
+            It's cooked by this generator: http://kourge.net/projects/regexp-unicode-block, ticking all 'Combining Diacritical Marks' boxes *)")
 
 (def clojure
   "Clojure (instaparse) parser. It can be used as:
