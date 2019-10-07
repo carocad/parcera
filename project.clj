@@ -4,6 +4,7 @@
   :license {:name "LGPLv3"
             :url  "https://github.com/carocad/parcera/blob/master/LICENSE.md"}
   :dependencies [[org.clojure/clojure "1.10.1"]
+                 [org.clojure/test.check "0.10.0"]
                  [instaparse/instaparse "1.4.10"]]
   :profiles {:dev {:dependencies [[criterium/criterium "0.4.5"] ;; benchmark
                                   [org.clojure/test.check "0.10.0"]]
