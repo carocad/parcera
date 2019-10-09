@@ -160,11 +160,11 @@
 (deftest bootstrap
 
   (testing "parcera should be able to parse itself"
-    (let [input (slurp "./src/parcera/core.clj")]
+    (let [input (slurp "./src/parcera/core.cljc")]
       (is (and (valid? input) (roundtrip input) (clear input)))))
 
   (testing "parcera should be able to parse its own test suite"
-    (let [input (slurp "./test/parcera/test/core.clj")]
+    (let [input (slurp "./test/parcera/test/core.cljc")]
       (is (and (valid? input) (roundtrip input) (clear input))))))
 
 
