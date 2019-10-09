@@ -114,9 +114,9 @@
     ;; EDN reader says otherwise https://github.com/edn-format/edn#symbols
     ;; nil, true, false are actually symbols with special meaning ... not grammar rules
     ;; on their own
-    VALID-CHARACTERS>: #'[\\w.*+\\-!?$%&=<>\\':#]+'
+    VALID-CHARACTERS>: #'[^\\s\\(\\)\\[\\]{}\"@~]+'
     *)
-    <name>: #'([\\p{L}\\w.*+\\-!?$%&=<>\\':#]+\\/)?(\\/|([\\p{L}\\w.*+\\-!?$%&=<>\\':#]+))(?!\\/)'
+    <name>: #'([^\\s\\(\\)\\[\\]{}\"@~,\\\\]+\\/)?(\\/|([^\\s\\(\\)\\[\\]{}\"@~,\\\\]+))(?!\\/)'
 
     (* HIDDEN PARSERS ------------------------------------------------------ *)
 
