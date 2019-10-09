@@ -7,11 +7,11 @@
 (def SYMBOL (str "(?![:#\\'])(" NAME "\\/)?(\\/|(" NAME "))"))
 
 
-(def DOUBLE "((\\d+(\\.\\d*)?([eE][-+]?\\d+)?)(M)?)")
+(def DOUBLE "(((\\.\\d*)?([eE][-+]?\\d+)?)M?)")
 ; todo: (0)|([1-9]\d*) is this needed ?
-(def LONG "(((0)|([1-9]\\d*)|0[xX]([\\dA-Fa-f]+)|0([0-7]+)|([1-9]\\d?)[rR]([\\d\\w]+)|0\\d+)(N)?)")
-(def RATIO "((\\d+)\\/(\\d+))")
-(def NUMBER (str "[+-]?(" LONG "|" DOUBLE "|" RATIO ")(?![\\.\\/])"))
+(def LONG "((0[xX]([\\dA-Fa-f]+)|0([0-7]+)|([1-9]\\d?)[rR]([\\d\\w]+)|0\\d+)?N?)")
+(def RATIO "(\\/(\\d+))")
+(def NUMBER (str "[+-]?\\d+(" LONG "|" DOUBLE "|" RATIO ")(?![\\.\\/])"))
 
 (def unicode-char "(\\P{M}\\p{M}*+)") ;; https://www.regular-expressions.info/unicode.html
 (def named-char "(newline|return|space|tab|formfeed|backspace)")
