@@ -55,17 +55,17 @@
         | unquote-splicing
         ;
 
-    <dispatch>: <'#'> ( function | regex | var-quote | discard | tag | conditional | conditional-splicing);
+    <dispatch>: &'#' ( function | regex | var-quote | discard | tag | conditional | conditional-splicing);
 
-    function: list;
+    function: <'#'> list;
 
     metadata: <'^'> ( map | shorthand-metadata ) form;
 
     <shorthand-metadata>: ( symbol | string | keyword );
 
-    regex: string;
+    regex: <'#'> string;
 
-    var-quote: <'\\''> symbol;
+    var-quote: <'#\\''> symbol;
 
     quote: <'\\''> form;
 
@@ -77,13 +77,13 @@
 
     deref: <'@'> form;
 
-    discard: <'_'> form;
+    discard: <'#_'> form;
 
-    tag: !'_' symbol form;
+    tag: <#'#(?![_?])'> symbol form;
 
-    conditional: <'?'> list;
+    conditional: <'#?'> list;
 
-    conditional-splicing: <'?@'> list;
+    conditional-splicing: <'#?@'> list;
 
     string : <'\"'> #'[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*' <'\"'>;
 
@@ -137,6 +137,7 @@
         | 'backspace'
         | #'\\P{M}\\p{M}*+'; (* https://www.regular-expressions.info/unicode.html *)")
 
+
 (def clojure
   "Clojure (instaparse) parser. It can be used as:
   - (parcera/clojure input-string)
@@ -150,6 +151,7 @@
    For a description of all possible options, visit Instaparse's official
    documentation: https://github.com/Engelberg/instaparse#reference"
   (instaparse/parser grammar))
+
 
 (defn- code*
   "internal function used to imperatively build up the code from the provided
@@ -262,6 +264,7 @@
     :function
     (do (. string-builder (append "#"))
         (code* (second ast) string-builder))))
+
 
 (defn code
   "Transforms your AST back into code
