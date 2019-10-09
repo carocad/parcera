@@ -1,13 +1,18 @@
-language: clojure
+language: generic
 jdk:
   - openjdk8
 
 jobs:
   include:
-    - stage: Tests
+    - stage: JvmTests
       script:
         - lein do clean, compile, check, eastwood
         - lein trampoline test
+
+    - stage: JsTests
+      script:
+        - nvm install 10.10 && nvm use 10.10
+        - lein trampoline cljsbuild test 
 
     - stage: Benchmark
       if: branch = master
