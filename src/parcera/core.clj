@@ -6,15 +6,19 @@
 
     <form>: whitespace ( literal
                         | symbol
-                        | list
-                        | vector
-                        | map
-                        | set
+                        | collection
                         | reader-macro
                         )
             whitespace;
 
     whitespace = #'[,\\s]*'
+
+    <collection>: &#'[\\(\\[{#]'  ( list
+                                  | vector
+                                  | map
+                                  | set
+                                  )
+                                  ;
 
     list: <'('> form* <')'> ;
 
