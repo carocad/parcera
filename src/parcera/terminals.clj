@@ -1,7 +1,7 @@
 (ns parcera.terminals)
 
 ;; Clojure's reader is quite permissive so we follow the motto "if it is not forbidden, it is allowed"
-(def NAME "[^\\s\\(\\)\\[\\]{}\"@~\\^;`]+")
+(def NAME "[^\\s\\(\\)\\[\\]{}\"@~\\^;`\\\\]+")
 ; todo: (?!\/) do i need that ?
 ;; symbols cannot start with a number, :, # nor '
 (def SYMBOL (str "(?![:#\\'])(" NAME "\\/)?(\\/|(" NAME "))"))
