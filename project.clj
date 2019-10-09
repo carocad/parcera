@@ -21,10 +21,6 @@
              :provided {:dependencies [[org.clojure/clojurescript "1.10.520"]]}}
   :test-selectors {:default     (fn [m] (not (some #{:benchmark} (keys m))))
                    :benchmark   :benchmark}
-  :cljsbuild {:builds
-              [{:source-paths ["src"]
-                :compiler {:output-dir "target/out"
-                           :optimizations :advanced}}]}
   :deploy-repositories [["clojars" {:url "https://clojars.org/repo"
                                     :username :env/clojars_username
                                     :password :env/clojars_password
