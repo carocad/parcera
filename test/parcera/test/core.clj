@@ -74,7 +74,6 @@
     (as-> "ϕ" input (is (and (valid? input) (roundtrip input) (clear input))))
     (as-> "❤️" input (is (and (valid? input) (roundtrip input) (clear input))))))
 
-
 (deftest macros
   (testing "metadata"
     (as-> "^String [a b 2]" input (is (and (valid? input) (roundtrip input) (clear input))))
