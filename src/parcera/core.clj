@@ -97,13 +97,11 @@
     comment: #';.*';")
 
 (def grammar-terminals
-  {:character      (combi/regexp terminal/CHARACTER)
-   :symbol-body    (combi/hide-tag (combi/regexp terminal/SYMBOL))
-   :number         (combi/regexp terminal/NUMBER)
-   :macro-keyword  (combi/regexp terminal/MACRO-KEYWORD)
-   :simple-keyword (combi/regexp terminal/SIMPLE-KEYWORD)})
-
-(combi/regexp terminal/NUMBER)
+  {:character      (combi/regexp terminal/character-pattern)
+   :symbol-body    (combi/hide-tag (combi/regexp terminal/symbol-pattern))
+   :number         (combi/regexp terminal/number-pattern)
+   :macro-keyword  (combi/regexp terminal/macro-keyword)
+   :simple-keyword (combi/regexp terminal/simple-keyword)})
 
 (def grammar (merge (cfg/ebnf grammar-rules) grammar-terminals))
 
