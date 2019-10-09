@@ -71,7 +71,7 @@
 
     backtick: <'`'> form;
 
-    unquote: <'~'> form;
+    unquote: <#'~(?!@)'> form;
 
     unquote-splicing: <'~@'> form;
 
