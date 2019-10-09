@@ -49,6 +49,17 @@
                "high accuracy\n"
                (with-out-str (pprint/pprint result)))))))
 
+(deftest unit-tests
+  (testing "names"
+    (as-> "foo" input (is (= input (parcera/code (parcera/clojure input)))))
+    (as-> "foo-bar" input (is (= input (parcera/code (parcera/clojure input)))))
+    (as-> "foo->bar" input (is (= input (parcera/code (parcera/clojure input)))))
+    (as-> "->" input (is (= input (parcera/code (parcera/clojure input)))))
+    (as-> "->as" input (is (= input (parcera/code (parcera/clojure input)))))
+    (as-> "föl" input (is (= input (parcera/code (parcera/clojure input)))))
+    (as-> "Öl" input (is (= input (parcera/code (parcera/clojure input)))))
+    (as-> "ϕ" input (is (= input (parcera/code (parcera/clojure input)))))
+    (as-> "❤️" input (is (= input (parcera/code (parcera/clojure input)))))))
 
 (deftest macros
   (testing "metadata"
