@@ -9,7 +9,6 @@
                                   [org.clojure/test.check "0.10.0"]]
                    :plugins      [[jonase/eastwood "0.3.5"]
                                   [lein-cljsbuild "1.1.7"]]
-                   :hooks [leiningen.cljsbuild]
                    :cljsbuild {:builds
                                [{:id "dev"
                                  :source-paths ["src" "test"]
@@ -18,7 +17,7 @@
                                             :target :nodejs
                                             :optimizations :none}}]
                                :test-commands
-                               {"dev" ["node" "target/out/tests.js"]}}}
+                               {"test" ["node" "target/out/tests.js"]}}}
              :provided {:dependencies [[org.clojure/clojurescript "1.10.520"]]}}
   :test-selectors {:default     (fn [m] (not (some #{:benchmark} (keys m))))
                    :benchmark   :benchmark}
