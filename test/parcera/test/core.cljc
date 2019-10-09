@@ -38,7 +38,18 @@
     (as-> "\\é" input (is (= input (parcera/code (parcera/clojure input)))))
     (as-> "\\ö" input (is (= input (parcera/code (parcera/clojure input)))))
     (as-> "\\ï" input (is (= input (parcera/code (parcera/clojure input)))))
-    (as-> "\\ϕ" input (is (= input (parcera/code (parcera/clojure input)))))))
+    (as-> "\\ϕ" input (is (= input (parcera/code (parcera/clojure input))))))
+  
+  (testing "names"
+    (as-> "foo" input (is (= input (parcera/code (parcera/clojure input)))))
+    (as-> "foo-bar" input (is (= input (parcera/code (parcera/clojure input)))))
+    (as-> "foo->bar" input (is (= input (parcera/code (parcera/clojure input)))))
+    (as-> "->" input (is (= input (parcera/code (parcera/clojure input)))))
+    (as-> "->as" input (is (= input (parcera/code (parcera/clojure input)))))
+    (as-> "föl" input (is (= input (parcera/code (parcera/clojure input)))))
+    (as-> "Öl" input (is (= input (parcera/code (parcera/clojure input)))))
+    (as-> "ϕ" input (is (= input (parcera/code (parcera/clojure input)))))
+    #_(as-> "❤️" input (is (= input (parcera/code (parcera/clojure input)))))))
 
 (deftest data-structures
   (testing "grammar definitions"
