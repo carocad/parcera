@@ -7,15 +7,19 @@
 
     <form>: whitespace ( literal
                         | symbol
-                        | list
-                        | vector
-                        | map
-                        | set
+                        | collection
                         | reader-macro
                         )
             whitespace;
 
     whitespace = #'[,\\s]*'
+
+    <collection>: &#'[\\(\\[{#]'  ( list
+                                  | vector
+                                  | map
+                                  | set
+                                  )
+                                  ;
 
     list: <'('> form* <')'> ;
 
@@ -56,35 +60,35 @@
         | unquote-splicing
         ;
 
-    <dispatch>: <'#'> ( function | regex | var-quote | discard | tag | conditional | conditional-splicing);
+    <dispatch>: &'#' ( function | regex | var-quote | discard | tag | conditional | conditional-splicing);
 
-    function: list;
+    function: <'#'> list;
 
     metadata: <'^'> ( map | shorthand-metadata ) form;
 
     <shorthand-metadata>: ( symbol | string | keyword );
 
-    regex: string;
+    regex: <'#'> string;
 
-    var-quote: <'\\''> symbol;
+    var-quote: <'#\\''> symbol;
 
     quote: <'\\''> form;
 
     backtick: <'`'> form;
 
-    unquote: <'~'> form;
+    unquote: <#'~(?!@)'> form;
 
     unquote-splicing: <'~@'> form;
 
     deref: <'@'> form;
 
-    discard: <'_'> form;
+    discard: <'#_'> form;
 
-    tag: !'_' symbol form;
+    tag: <#'#(?![_?])'> symbol form;
 
-    conditional: <'?'> list;
+    conditional: <'#?'> list;
 
-    conditional-splicing: <'?@'> list;
+    conditional-splicing: <'#?@'> list;
 
     string : <'\"'> #'[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*' <'\"'>;
 
@@ -115,9 +119,9 @@
     ;; EDN reader says otherwise https://github.com/edn-format/edn#symbols
     ;; nil, true, false are actually symbols with special meaning ... not grammar rules
     ;; on their own
-    VALID-CHARACTERS>: #'[\\w.*+\\-!?$%&=<>\\':#]+'
+    VALID-CHARACTERS>: #'[^\\s\\(\\)\\[\\]{}\"@~\\^;`]+'
     *)
-    <name>: #'([\\p{L}\\w.*+\\-!?$%&=<>\\':#]+\\/)?(\\/|([\\p{L}\\w.*+\\-!?$%&=<>\\':#]+))(?!\\/)'
+    <name>: #'([^\\s\\(\\)\\[\\]{}\"@~,\\\\^;`]+\\/)?(\\/|([^\\s\\(\\)\\[\\]{}\"@~,\\\\^;`]+))(?!\\/)'
 
     (* HIDDEN PARSERS ------------------------------------------------------ *)
 
@@ -140,6 +144,7 @@
          (* This is supposed to be the JavaScript friendly version of #'\\P{M}\\p{M}*+' mentioned here: https://www.regular-expressions.info/unicode.html
             It's cooked by this generator: http://kourge.net/projects/regexp-unicode-block, ticking all 'Combining Diacritical Marks' boxes *)")
 
+
 (def clojure
   "Clojure (instaparse) parser. It can be used as:
   - (parcera/clojure input-string)
@@ -153,6 +158,7 @@
    For a description of all possible options, visit Instaparse's official
    documentation: https://github.com/Engelberg/instaparse#reference"
   (instaparse/parser grammar))
+
 
 (defn- code*
   "internal function used to imperatively build up the code from the provided
@@ -266,6 +272,7 @@
     :function
     (do (. string-builder (append "#"))
         (code* (second ast) string-builder))))
+
 
 (defn code
   "Transforms your AST back into code
