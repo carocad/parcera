@@ -8,20 +8,11 @@
 (def grammar-rules
   "code: form*;
 
-    <form>: ( literal
-            | symbol
-            | collection
-            | reader-macro
-            | whitespace
-            );
+    <form>: literal | symbol | collection | reader-macro | whitespace;
 
     whitespace = #'([,\\s]*;.*)?([,\\s]+|$)' (* we treat comments the same way as commas *);
 
-    <collection>: &#'[\\(\\[{#]'  ( list
-                                  | vector
-                                  | map
-                                  | set
-                                  );
+    <collection>: &#'[\\(\\[{#]'  ( list | vector | map | set );
 
     list: <'('> form* <')'> ;
 
@@ -37,25 +28,11 @@
 
     set: <'#{'> form* <'}'> ;
 
-    <literal>:
-          number
-        | string
-        | character
-        | keyword
-        | symbolic
-        ;
+    <literal>: number | string | character | keyword | symbolic;
 
     symbolic: '##Inf' | '##-Inf' | '##NaN'
 
-    <reader-macro>:
-          dispatch
-        | metadata
-        | deref
-        | quote
-        | backtick
-        | unquote
-        | unquote-splicing
-        ;
+    <reader-macro>: dispatch | metadata | deref | quote | backtick | unquote | unquote-splicing;
 
     <dispatch>: &'#' ( function | regex | var-quote | discard | tag | conditional | conditional-splicing);
 
@@ -89,6 +66,7 @@
 
     <keyword>: simple-keyword | macro-keyword ;")
 
+
 (def grammar-terminals
   {:character      (combi/regexp terminal/character-pattern)
    :string         (combi/regexp terminal/string-pattern)
@@ -97,6 +75,7 @@
    :macro-keyword  (combi/regexp terminal/macro-keyword)
    :simple-keyword (combi/regexp terminal/simple-keyword)
    :regex          (combi/regexp terminal/regex-pattern)})
+
 
 (def grammar (merge (cfg/ebnf grammar-rules) grammar-terminals))
 
