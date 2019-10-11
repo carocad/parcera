@@ -1,4 +1,11 @@
-language: clojure
+
+# avoids building a PR twice, once for a branch and another due to the PR status
+# see: https://github.com/travis-ci/travis-ci/issues/1147#issuecomment-160820262
+branches:
+  only:
+    - master
+
+language: generic
 jdk:
   - openjdk8
 
@@ -8,9 +15,12 @@ jobs:
       script:
         - lein do clean, compile, check, eastwood
         - lein trampoline test
+        - nvm install 10.10 && nvm use 10.10 && lein trampoline cljsbuild test
 
+    # only run the benchmark is we are on master
+    # otherwise the build takes too long
     - stage: Benchmark
-      if: branch = master
+      if: head_branch = master
       script:
         - lein trampoline test :benchmark
 

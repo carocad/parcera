@@ -5,7 +5,8 @@
             [clojure.test.check.properties :as prop]
             [clojure.test.check :as tc]
             [parcera.core :as parcera]
-            [instaparse.core :as instaparse]))
+            [instaparse.core :as instaparse])
+  #?(:cljs (:require-macros [parcera.slurp :refer [slurp]])))
 
 (defn- roundtrip
   "checks parcera can parse and write back the exact same input code"
@@ -41,6 +42,16 @@
   (prop/for-all [input (gen/fmap pr-str gen/any)]
     (= 1 (count (instaparse/parses parcera/clojure input)))))
 
+(deftest simple
+  (testing "character literals"
+    (as-> "\\t" input (is (= input (parcera/code (parcera/clojure input)))))
+    (as-> "\\n" input (is (= input (parcera/code (parcera/clojure input)))))
+    (as-> "\\r" input (is (= input (parcera/code (parcera/clojure input)))))
+    (as-> "\\a" input (is (= input (parcera/code (parcera/clojure input)))))
+    (as-> "\\é" input (is (= input (parcera/code (parcera/clojure input)))))
+    (as-> "\\ö" input (is (= input (parcera/code (parcera/clojure input)))))
+    (as-> "\\ï" input (is (= input (parcera/code (parcera/clojure input)))))
+    (as-> "\\ϕ" input (is (= input (parcera/code (parcera/clojure input)))))))
 
 (deftest data-structures
   (testing "grammar definitions"
@@ -149,11 +160,11 @@
 (deftest bootstrap
 
   (testing "parcera should be able to parse itself"
-    (let [input (slurp "./src/parcera/core.clj")]
+    (let [input (slurp "./src/parcera/core.cljc")]
       (is (and (valid? input) (roundtrip input) (clear input)))))
 
   (testing "parcera should be able to parse its own test suite"
-    (let [input (slurp "./test/parcera/test/core.clj")]
+    (let [input (slurp "./test/parcera/test/core.cljc")]
       (is (and (valid? input) (roundtrip input) (clear input))))))
 
 

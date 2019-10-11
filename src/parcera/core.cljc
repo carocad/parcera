@@ -2,10 +2,11 @@
   (:require [instaparse.core :as instaparse]
             [instaparse.combinators-source :as combi]
             [instaparse.cfg :as cfg]
-            [parcera.terminals :as terminal]))
+            [parcera.terminals :as terminal])
+  #?(:cljs (:import goog.string.StringBuffer)))
 
 (def grammar-rules
-    "code: form*;
+  "code: form*;
 
     <form>: whitespace ( literal
                         | symbol
@@ -124,7 +125,8 @@
 (defn- code*
   "internal function used to imperatively build up the code from the provided
    AST as Clojure's str would be too slow"
-  [ast ^StringBuilder string-builder]
+  [ast #?(:clj ^StringBuilder string-builder
+          :cljs ^StringBuffer string-builder)]
   (case (first ast)
     :code
     (doseq [child (rest ast)]
@@ -224,7 +226,8 @@
 
    In general (= input (parcera/code (parcera/clojure input)))"
   [ast]
-  (let [string-builder (new StringBuilder)]
+  (let [string-builder #?(:clj (new StringBuilder)
+                          :cljs (new StringBuffer))]
     (code* ast string-builder)
     (. string-builder (toString))))
 

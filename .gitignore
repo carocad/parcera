@@ -10,3 +10,5 @@ pom.xml.asc
 .hgignore
 .hg/
 /.idea/
+/nashorn_code_cache
+/.cljs_nashorn_repl
