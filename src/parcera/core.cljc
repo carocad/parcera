@@ -36,7 +36,7 @@
 
     <dispatch>: &'#' ( function | regex | var-quote | discard | tag | conditional | conditional-splicing);
 
-    function: <'#'> list;
+    function: <'#('> form* <')'>;
 
     metadata: <'^'> ( map | shorthand-metadata ) form;
 
@@ -181,8 +181,9 @@
         (doseq [child (rest ast)] (code* child string-builder)))
 
     :function
-    (do (. string-builder (append "#"))
-        (code* (second ast) string-builder))))
+    (do (. string-builder (append "#("))
+        (doseq [child (rest ast)] (code* child string-builder))
+        (. string-builder (append ")")))))
 
 
 (defn code
