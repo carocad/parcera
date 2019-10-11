@@ -32,9 +32,11 @@
 
     symbolic: #'##(Inf|-Inf|NaN)'
 
-    <reader-macro>: dispatch | metadata | deref | quote | backtick | unquote | unquote-splicing;
+    <reader-macro>: &#'[#^\\'`~@]' (dispatch | metadata | deref | quote
+                                   | backtick | unquote | unquote-splicing);
 
-    <dispatch>: &'#' ( function | regex | var-quote | discard | tag | conditional | conditional-splicing);
+    <dispatch>: function | regex | var-quote | discard | tag |
+                conditional | conditional-splicing;
 
     function: <'#('> form* <')'>;
 
