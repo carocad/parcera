@@ -8,7 +8,7 @@
 (def grammar-rules
   "code: form*;
 
-    <form>: literal | symbol | collection | reader-macro | whitespace;
+    <form>: literal | collection | reader-macro | whitespace;
 
     whitespace = #'([,\\s]*;.*)?([,\\s]+|$)' (* we treat comments the same way as commas *);
 
@@ -28,7 +28,7 @@
 
     set: <'#{'> form* <'}'> ;
 
-    <literal>: number | string | character | keyword | symbolic;
+    <literal>: symbol | number | string | character | keyword | symbolic;
 
     symbolic: #'##(Inf|-Inf|NaN)'
 
@@ -207,7 +207,8 @@
     (. string-builder (toString))))
 
 ; Successful parse.
-; Profile:  {:create-node 1651, :push-full-listener 2, :push-stack 1651, :push-listener 1689, :push-result 273, :push-message 275}
+; Profile:  {:create-node 1651, :push-full-listener 2, :push-stack 1651,
+;            :push-listener 1689, :push-result 273, :push-message 275}
 ; "Elapsed time: 141.452323 msecs"
 #_(time (clojure (str '(ns parcera.core
                          (:require [instaparse.core :as instaparse]
