@@ -26,9 +26,7 @@
 
     set: <'#{'> form* <'}'> ;
 
-    <literal>: symbol | number | string | character | keyword | symbolic;
-
-    symbolic: #'##(Inf|-Inf|NaN)'
+    <literal>: symbol | number | string | character | keyword;
 
     <reader-macro>: &#'[#^\\'`~@]' ( dispatch
                                    | metadata
@@ -39,6 +37,7 @@
                                    | unquote-splicing
                                    | set
                                    | namespaced-map
+                                   | symbolic
                                    );
 
     <dispatch>: function | regex | var-quote | discard | tag |
@@ -73,7 +72,9 @@
 
     symbol: !number symbol-body;
 
-    <keyword>: simple-keyword | macro-keyword ;")
+    <keyword>: simple-keyword | macro-keyword ;
+
+    symbolic: #'##(Inf|-Inf|NaN)'")
 
 
 (def grammar-terminals
