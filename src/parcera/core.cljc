@@ -8,16 +8,14 @@
 (def grammar-rules
   "code: form*;
 
-    <form>: comment? whitespace ( literal
-                                | symbol
-                                | collection
-                                | reader-macro
-                                )
-                     whitespace;
+    <form>: whitespace  ( literal
+                        | symbol
+                        | collection
+                        | reader-macro
+                        )
+            whitespace;
 
-    whitespace = #'[,\\s]*';
-
-    comment: #';.*';
+    whitespace = #'(;.*)?[,\\s]*'; (* we treat comments the same way as commas *)
 
     <collection>: &#'[\\(\\[{#]'  ( list
                                   | vector
@@ -157,7 +155,7 @@
         (. string-builder (append "}")))
 
     (:number :whitespace :symbolic :auto-resolve :symbol :simple-keyword
-     :macro-keyword :comment :character :string :regex)
+     :macro-keyword :character :string :regex)
     (. string-builder (append (second ast)))
 
     :metadata
