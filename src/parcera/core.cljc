@@ -30,8 +30,6 @@
                                          | keyword
                                          );
 
-    symbol: !number symbol-body;
-
     <keyword>: simple-keyword | macro-keyword ;
 
     <reader-macro>: &#'[#^\\'`~@]' ( dispatch
@@ -97,7 +95,7 @@
 (def grammar-terminals
   {:character      (combi/regexp terminal/character-pattern)
    :string         (combi/regexp terminal/string-pattern)
-   :symbol-body    (combi/hide-tag (combi/regexp terminal/symbol-pattern))
+   :symbol         (combi/regexp terminal/symbol-pattern)
    :number         (combi/regexp terminal/number-pattern)
    :macro-keyword  (combi/regexp terminal/macro-keyword)
    :simple-keyword (combi/regexp terminal/simple-keyword)
@@ -230,9 +228,9 @@
     (. string-builder (toString))))
 
 ; Successful parse.
-; Profile:  {:create-node 1651, :push-full-listener 2, :push-stack 1651,
-;            :push-listener 1689, :push-result 273, :push-message 275}
-; "Elapsed time: 141.452323 msecs"
+; Profile:  {:create-node 594, :push-full-listener 2, :push-stack 594,
+;            :push-listener 592, :push-result 257, :push-message 257}
+; "Elapsed time: 63.203691 msecs"
 #_(time (clojure (str '(ns parcera.core
                          (:require [instaparse.core :as instaparse]
                                    [clojure.data :as data]

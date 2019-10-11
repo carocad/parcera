@@ -4,7 +4,7 @@
 (def NAME "[^\\s\\(\\)\\[\\]{}\"@~\\^;`\\\\]+")
 ; todo: (?!\/) do i need that ?
 ;; symbols cannot start with a number, :, # nor '
-(def symbol-pattern (str "(?![:#\\',])(" NAME "\\/)?(\\/|(" NAME "))"))
+(def symbol-pattern (str "(?![:#\\',]|[+-]?\\d+)(" NAME "\\/)?(\\/|(" NAME "))"))
 
 
 (def double-suffix "(((\\.\\d*)?([eE][-+]?\\d+)?)M?)")
