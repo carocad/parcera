@@ -38,9 +38,7 @@
 
     function: <'#('> form* <')'>;
 
-    metadata: <'^'> ( map | shorthand-metadata ) form;
-
-    <shorthand-metadata>: ( symbol | string | keyword );
+    metadata: <'^'> ( map | symbol | string | keyword ) form;
 
     var-quote: <'#\\''> symbol;
 
