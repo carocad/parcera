@@ -20,11 +20,13 @@
 
     map: <'{'> form* <'}'>;
 
-    auto-resolve: '::';
-
-    set: <'#{'> form* <'}'> ;
-
-    <literal>: symbol | number | string | character | keyword;
+    (* a literal is basically anything that is not a collection, macro or whitespace *)
+    <literal>: &#'[^\\(\\[{#^\\'`~@\\s]' ( symbol
+                                         | number
+                                         | string
+                                         | character
+                                         | keyword
+                                         );
 
     symbol: !number symbol-body;
 
