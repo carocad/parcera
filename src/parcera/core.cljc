@@ -8,14 +8,14 @@
 (def grammar-rules
   "code: form*;
 
-    <form>: whitespace  ( literal
-                        | symbol
-                        | collection
-                        | reader-macro
-                        )
-            whitespace;
+    <form>: ( literal
+            | symbol
+            | collection
+            | reader-macro
+            | whitespace
+            );
 
-    whitespace = #'[,\\s]*(;.*)?[,\\s]*' (* we treat comments the same way as commas *);
+    whitespace = #'[,\\s]*(;.*)?[,\\s]+' (* we treat comments the same way as commas *);
 
     <collection>: &#'[\\(\\[{#]'  ( list
                                   | vector
@@ -32,7 +32,7 @@
 
     map-namespace: <'#'> ( keyword | auto-resolve );
 
-    map-content: (form form)*
+    map-content: form*
 
     auto-resolve: '::';
 
