@@ -38,7 +38,10 @@
 
     function: <'#('> form* <')'>;
 
-    metadata: <'^'> ( map | symbol | string | keyword ) form;
+    metadata: (meta-info whitespace)+
+              (symbol | collection | tag | unquote | unquote-splicing);
+
+    meta-info: <'^'> ( map | symbol | string | keyword );
 
     var-quote: <'#\\''> symbol;
 
@@ -135,8 +138,13 @@
     (. string-builder (append (second ast)))
 
     :metadata
-    (do (. string-builder (append "^"))
-        (doseq [child (rest ast)] (code* child string-builder)))
+    (do (doseq [child (rest (butlast ast))] (code* child string-builder))
+        (code* (last ast) string-builder))
+
+    :meta-info
+    (doseq [child (rest ast)]
+      (. string-builder (append "^"))
+      (code* child string-builder))
 
     :quote
     (do (. string-builder (append "'"))
