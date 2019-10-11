@@ -8,18 +8,22 @@
             [instaparse.core :as instaparse])
   #?(:cljs (:require-macros [parcera.slurp :refer [slurp]])))
 
+
 (defn- roundtrip
   "checks parcera can parse and write back the exact same input code"
   [input]
   (= input (parcera/code (parcera/clojure input))))
 
+
 (defn- valid?
   [input]
   (not (instaparse/failure? (parcera/clojure input))))
 
+
 (defn- clear
   [input]
   (= 1 (count (instaparse/parses parcera/clojure input))))
+
 
 (def validity
   "The grammar definition of parcera is valid for any clojure value. Meaning
@@ -42,6 +46,7 @@
   (prop/for-all [input (gen/fmap pr-str gen/any)]
     (= 1 (count (instaparse/parses parcera/clojure input)))))
 
+
 (deftest simple
   (testing "character literals"
     (as-> "\\t" input (is (= input (parcera/code (parcera/clojure input)))))
@@ -52,6 +57,7 @@
     (as-> "\\ö" input (is (= input (parcera/code (parcera/clojure input)))))
     (as-> "\\ï" input (is (= input (parcera/code (parcera/clojure input)))))
     (as-> "\\ϕ" input (is (= input (parcera/code (parcera/clojure input)))))))
+
 
 (deftest data-structures
   (testing "grammar definitions"
@@ -73,6 +79,7 @@
                "high accuracy\n"
                (with-out-str (pprint/pprint result)))))))
 
+
 (deftest unit-tests
   (testing "names"
     (as-> "foo" input (is (and (valid? input) (roundtrip input) (clear input))))
@@ -84,6 +91,7 @@
     (as-> "Öl" input (is (and (valid? input) (roundtrip input) (clear input))))
     (as-> "ϕ" input (is (and (valid? input) (roundtrip input) (clear input))))
     (as-> "❤️" input (is (and (valid? input) (roundtrip input) (clear input))))))
+
 
 (deftest edge-cases
   (testing "comments"
@@ -109,8 +117,11 @@
     (as-> "#_\"[a b 2]\"" input (is (and (valid? input) (roundtrip input) (clear input)))))
 
   (testing "comments"
-    (as-> ";[a b 2]" input (is (and (valid? input) (roundtrip input) (clear input))))
-    (as-> ";; \"[a b 2]\"" input (is (and (valid? input) (roundtrip input) (clear input)))))
+    ; todo: should I allow a file containing only with a comment ?
+    #_(as-> ";[a b 2]" input (is (and (valid? input) (roundtrip input) (clear input))))
+    #_(as-> ";; \"[a b 2]\"" input (is (and (valid? input) (roundtrip input) (clear input))))
+    (as-> "2 ;[a b 2]" input (is (and (valid? input) (roundtrip input) (clear input))))
+    (as-> " :hello ;; \"[a b 2]\"" input (is (and (valid? input) (roundtrip input) (clear input)))))
 
   (testing "var quote"
     (as-> "#'hello/world" input (is (and (valid? input) (roundtrip input) (clear input))))

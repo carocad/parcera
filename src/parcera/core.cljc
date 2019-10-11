@@ -15,7 +15,7 @@
                         )
             whitespace;
 
-    whitespace = #'(;.*)?[,\\s]*'; (* we treat comments the same way as commas *)
+    whitespace = #'[,\\s]*(;.*)?[,\\s]*' (* we treat comments the same way as commas *);
 
     <collection>: &#'[\\(\\[{#]'  ( list
                                   | vector
