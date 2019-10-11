@@ -21,8 +21,7 @@
                                   | vector
                                   | map
                                   | set
-                                  )
-                                  ;
+                                  );
 
     list: <'('> form* <')'> ;
 
@@ -46,7 +45,7 @@
         | symbolic
         ;
 
-    symbolic: #'##(Inf|-Inf|NaN)'
+    symbolic: '##Inf' | '##-Inf' | '##NaN'
 
     <reader-macro>:
           dispatch
