@@ -8,14 +8,14 @@
 (def grammar-rules
   "code: form*;
 
-    <form>: literal | collection | reader-macro | whitespace;
+    <form>: whitespace / collection / literal / reader-macro;
 
     (* we treat comments the same way as commas *)
     whitespace = #'([,\\s]*;.*)?([,\\s]+|$)';
 
     (* for parsing purposes we dont consider a Set a collection since it starts
        with # -> dispatch macro *)
-    <collection>: &#'[\\(\\[{]' ( list | vector | map );
+    <collection>: list / vector / map;
 
     list: <'('> form* <')'> ;
 
@@ -24,26 +24,25 @@
     map: <'{'> form* <'}'>;
 
     (* a literal is basically anything that is not a collection, macro or whitespace *)
-    <literal>: &#'[^\\(\\[{#^\\'`~@\\s]' ( symbol
-                                         | number
-                                         | string
-                                         | character
-                                         | keyword
-                                         );
+    <literal>: ( symbol
+                / keyword
+                / string
+                / number
+                / character
+                );
 
-    <keyword>: simple-keyword | macro-keyword ;
+    <keyword>: simple-keyword / macro-keyword ;
 
-    <reader-macro>: &#'[#^\\'`~@]' ( dispatch
-                                   | metadata
-                                   | deref
-                                   | quote
-                                   | backtick
-                                   | unquote
-                                   | unquote-splicing
-                                   | set
-                                   | namespaced-map
-                                   | symbolic
-                                   );
+    <reader-macro>: ( set
+                    / dispatch
+                    / metadata
+                    / deref
+                    / quote
+                    / backtick
+                    / unquote
+                    / unquote-splicing
+                    / symbolic
+                    );
 
     set: <'#{'> form* <'}'>;
 
@@ -71,12 +70,13 @@
     deref: <'@'> form;
 
     <dispatch>:  function
-               | regex
-               | var-quote
-               | discard
-               | tag
-               | conditional
-               | conditional-splicing;
+               / regex
+               / namespaced-map
+               / var-quote
+               / discard
+               / tag
+               / conditional
+               / conditional-splicing;
 
     function: <'#('> form* <')'>;
 
