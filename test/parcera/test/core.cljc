@@ -85,6 +85,11 @@
     (as-> "ϕ" input (is (and (valid? input) (roundtrip input) (clear input))))
     (as-> "❤️" input (is (and (valid? input) (roundtrip input) (clear input))))))
 
+(deftest edge-cases
+  (testing "comments"
+    (as-> "{:hello ;2}
+           2}" input (is (and (valid? input) (roundtrip input) (clear input))))))
+
 
 (deftest macros
   (testing "metadata"

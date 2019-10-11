@@ -8,14 +8,16 @@
 (def grammar-rules
   "code: form*;
 
-    <form>: whitespace ( literal
-                        | symbol
-                        | collection
-                        | reader-macro
-                        )
-            whitespace;
+    <form>: comment? whitespace ( literal
+                                | symbol
+                                | collection
+                                | reader-macro
+                                )
+                     whitespace;
 
-    whitespace = #'[,\\s]*'
+    whitespace = #'[,\\s]*';
+
+    comment: #';.*';
 
     <collection>: &#'[\\(\\[{#]'  ( list
                                   | vector
@@ -43,7 +45,6 @@
         | string
         | character
         | keyword
-        | comment
         | symbolic
         ;
 
@@ -87,11 +88,9 @@
 
     conditional-splicing: <'#?@'> list;
 
-    symbol: !number symbol-body
+    symbol: !number symbol-body;
 
-    <keyword>: simple-keyword | macro-keyword ;
-
-    comment: #';.*';")
+    <keyword>: simple-keyword | macro-keyword ;")
 
 (def grammar-terminals
   {:character      (combi/regexp terminal/character-pattern)
@@ -232,3 +231,5 @@
                                    [clojure.data :as data]
                                    [clojure.string :as str])))
                  :trace true))
+
+#_(instaparse/disable-tracing!)
