@@ -10,7 +10,8 @@
 
     <form>: literal | collection | reader-macro | whitespace;
 
-    whitespace = #'([,\\s]*;.*)?([,\\s]+|$)' (* we treat comments the same way as commas *);
+    (* we treat comments the same way as commas *)
+    whitespace = #'([,\\s]*;.*)?([,\\s]+|$)';
 
     (* for parsing purposes we dont consider a Set a collection since it starts
        with # -> dispatch macro *)
