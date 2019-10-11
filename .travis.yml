@@ -20,7 +20,8 @@ jobs:
     # only run the benchmark is we are on master
     # otherwise the build takes too long
     - stage: Benchmark
-      if: head_branch = master
+      #if: head_branch = master
+      if: branch = master
       script:
         - lein trampoline test :benchmark
 
