@@ -12,6 +12,8 @@
 
     whitespace = #'([,\\s]*;.*)?([,\\s]+|$)' (* we treat comments the same way as commas *);
 
+    (* for parsing purposes we dont consider a Set a collection since it starts
+       with # -> dispatch macro *)
     <collection>: &#'[\\(\\[{]' ( list | vector | map );
 
     list: <'('> form* <')'> ;
@@ -44,7 +46,11 @@
                                    | symbolic
                                    );
 
-    namespaced-map: <'#'> ( keyword | auto-resolve ) map
+    set: <'#{'> form* <'}'>;
+
+    namespaced-map: <'#'> ( keyword | auto-resolve ) map;
+
+    auto-resolve: '::';
 
     metadata: (meta-info whitespace)+
               (symbol | collection | tag | unquote | unquote-splicing);
@@ -75,7 +81,7 @@
 
     discard: <'#_'> form;
 
-    tag: <#'#(?![_?])'> symbol form;
+    tag: <#'#(?![_?])'> symbol whitespace? (literal | collection);
 
     conditional: <'#?'> list;
 
