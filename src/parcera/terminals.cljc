@@ -14,7 +14,11 @@
 (def number-pattern (str "[+-]?\\d+(" long-suffix "|" double-suffix "|" ratio-suffix ")(?![\\.\\/])"))
 
 
-(def unicode-char "(\\P{M}\\p{M}*+)") ;; https://www.regular-expressions.info/unicode.html
+; This is supposed to be the JavaScript friendly version of #'\P{M}\p{M}*+'
+; mentioned here: https://www.regular-expressions.info/unicode.html
+; It's cooked by this generator: http://kourge.net/projects/regexp-unicode-block
+; ticking all 'Combining Diacritical Marks' boxes *))
+(def unicode-char "([^\\u0300-\\u036F\\u1DC0-\\u1DFF\\u20D0-\\u20FF][\\u0300-\\u036F\\u1DC0-\\u1DFF\\u20D0-\\u20FF]*)")
 (def named-char "(newline|return|space|tab|formfeed|backspace)")
 (def unicode "(u[\\dD-Fd-f]{4})")
 (def character-pattern (str "\\\\(" unicode-char "|" named-char "|" unicode ")(?!\\w+)"))
