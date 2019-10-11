@@ -18,8 +18,6 @@
 
     vector: <'['> form* <']'> ;
 
-    namespaced-map: <'#'> ( keyword | auto-resolve ) map
-
     map: <'{'> form* <'}'>;
 
     auto-resolve: '::';
@@ -27,6 +25,10 @@
     set: <'#{'> form* <'}'> ;
 
     <literal>: symbol | number | string | character | keyword;
+
+    symbol: !number symbol-body;
+
+    <keyword>: simple-keyword | macro-keyword ;
 
     <reader-macro>: &#'[#^\\'`~@]' ( dispatch
                                    | metadata
@@ -40,17 +42,12 @@
                                    | symbolic
                                    );
 
-    <dispatch>: function | regex | var-quote | discard | tag |
-                conditional | conditional-splicing;
-
-    function: <'#('> form* <')'>;
+    namespaced-map: <'#'> ( keyword | auto-resolve ) map
 
     metadata: (meta-info whitespace)+
               (symbol | collection | tag | unquote | unquote-splicing);
 
     meta-info: <'^'> ( map | symbol | string | keyword );
-
-    var-quote: <'#\\''> symbol;
 
     quote: <'\\''> form;
 
@@ -62,6 +59,18 @@
 
     deref: <'@'> form;
 
+    <dispatch>:  function
+               | regex
+               | var-quote
+               | discard
+               | tag
+               | conditional
+               | conditional-splicing;
+
+    function: <'#('> form* <')'>;
+
+    var-quote: <'#\\''> symbol;
+
     discard: <'#_'> form;
 
     tag: <#'#(?![_?])'> symbol form;
@@ -69,10 +78,6 @@
     conditional: <'#?'> list;
 
     conditional-splicing: <'#?@'> list;
-
-    symbol: !number symbol-body;
-
-    <keyword>: simple-keyword | macro-keyword ;
 
     symbolic: #'##(Inf|-Inf|NaN)'")
 
