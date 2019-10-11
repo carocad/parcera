@@ -52,10 +52,14 @@
 
     auto-resolve: '::';
 
-    metadata: (meta-info whitespace)+
-              (symbol | collection | tag | unquote | unquote-splicing);
+    metadata: (metadata-entry whitespace)+ ( symbol
+                                           | collection
+                                           | tag
+                                           | unquote
+                                           | unquote-splicing
+                                           );
 
-    meta-info: <'^'> ( map | symbol | string | keyword );
+    metadata-entry: <'^'> ( map | symbol | string | keyword );
 
     quote: <'\\''> form;
 
@@ -160,7 +164,7 @@
     (do (doseq [child (rest (butlast ast))] (code* child string-builder))
         (code* (last ast) string-builder))
 
-    :meta-info
+    :metadata-entry
     (doseq [child (rest ast)]
       (. string-builder (append "^"))
       (code* child string-builder))
