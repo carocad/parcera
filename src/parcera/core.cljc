@@ -12,17 +12,15 @@
 
     whitespace = #'([,\\s]*;.*)?([,\\s]+|$)' (* we treat comments the same way as commas *);
 
-    <collection>: &#'[\\(\\[{#]'  ( list | vector | map | set );
+    <collection>: &#'[\\(\\[{]' ( list | vector | map );
 
     list: <'('> form* <')'> ;
 
     vector: <'['> form* <']'> ;
 
-    map: map-namespace? <'{'> map-content <'}'> ;
+    namespaced-map: <'#'> ( keyword | auto-resolve ) map
 
-    map-namespace: <'#'> ( keyword | auto-resolve );
-
-    map-content: form*
+    map: <'{'> form* <'}'>;
 
     auto-resolve: '::';
 
@@ -33,7 +31,8 @@
     symbolic: #'##(Inf|-Inf|NaN)'
 
     <reader-macro>: &#'[#^\\'`~@]' (dispatch | metadata | deref | quote
-                                   | backtick | unquote | unquote-splicing);
+                                   | backtick | unquote | unquote-splicing
+                                   | set | namespaced-map);
 
     <dispatch>: function | regex | var-quote | discard | tag |
                 conditional | conditional-splicing;
@@ -118,14 +117,11 @@
         (doseq [child (rest ast)] (code* child string-builder))
         (. string-builder (append "]")))
 
-    :map
-    (doseq [child (rest ast)] (code* child string-builder))
-
-    :map-namespace
+    :namespaced-map
     (do (. string-builder (append "#"))
-        (code* (second ast) string-builder))
+        (doseq [child (rest ast)] (code* child string-builder)))
 
-    :map-content
+    :map
     (do (. string-builder (append "{"))
         (doseq [child (rest ast)] (code* child string-builder))
         (. string-builder (append "}")))
