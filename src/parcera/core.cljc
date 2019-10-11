@@ -30,7 +30,7 @@
 
     <literal>: number | string | character | keyword | symbolic;
 
-    symbolic: '##Inf' | '##-Inf' | '##NaN'
+    symbolic: #'##(Inf|-Inf|NaN)'
 
     <reader-macro>: dispatch | metadata | deref | quote | backtick | unquote | unquote-splicing;
 
