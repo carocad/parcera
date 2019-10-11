@@ -223,7 +223,8 @@
 
    In general (= input (parcera/code (parcera/clojure input)))"
   [ast]
-  (let [string-builder (new StringBuilder)]
+  (let [string-builder #?(:clj (new StringBuilder)
+                          :cljs (new StringBuffer))]
     (code* ast string-builder)
     (. string-builder (toString))))
 
