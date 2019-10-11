@@ -67,8 +67,6 @@
 
     <shorthand-metadata>: ( symbol | string | keyword );
 
-    regex: <'#'> string;
-
     var-quote: <'#\\''> symbol;
 
     quote: <'\\''> form;
@@ -89,8 +87,6 @@
 
     conditional-splicing: <'#?@'> list;
 
-    string : #'\"[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*\"';
-
     symbol: !number symbol-body
 
     <keyword>: simple-keyword | macro-keyword ;
@@ -99,10 +95,12 @@
 
 (def grammar-terminals
   {:character      (combi/regexp terminal/character-pattern)
+   :string         (combi/regexp terminal/string-pattern)
    :symbol-body    (combi/hide-tag (combi/regexp terminal/symbol-pattern))
    :number         (combi/regexp terminal/number-pattern)
    :macro-keyword  (combi/regexp terminal/macro-keyword)
-   :simple-keyword (combi/regexp terminal/simple-keyword)})
+   :simple-keyword (combi/regexp terminal/simple-keyword)
+   :regex          (combi/regexp terminal/regex-pattern)})
 
 (def grammar (merge (cfg/ebnf grammar-rules) grammar-terminals))
 
@@ -160,7 +158,7 @@
         (. string-builder (append "}")))
 
     (:number :whitespace :symbolic :auto-resolve :symbol :simple-keyword
-     :macro-keyword :comment :character :string)
+     :macro-keyword :comment :character :string :regex)
     (. string-builder (append (second ast)))
 
     :metadata
@@ -170,10 +168,6 @@
     :quote
     (do (. string-builder (append "'"))
         (doseq [child (rest ast)] (code* child string-builder)))
-
-    :regex
-    (do (. string-builder (append "#"))
-        (code* (second ast) string-builder))
 
     :var-quote
     (do (. string-builder (append "#'"))
@@ -226,8 +220,7 @@
 
    In general (= input (parcera/code (parcera/clojure input)))"
   [ast]
-  (let [string-builder #?(:clj (new StringBuilder)
-                          :cljs (new StringBuffer))]
+  (let [string-builder (new StringBuilder)]
     (code* ast string-builder)
     (. string-builder (toString))))
 

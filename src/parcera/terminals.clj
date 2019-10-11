@@ -13,11 +13,17 @@
 (def ratio-suffix "(\\/(\\d+))")
 (def number-pattern (str "[+-]?\\d+(" long-suffix "|" double-suffix "|" ratio-suffix ")(?![\\.\\/])"))
 
+
 (def unicode-char "(\\P{M}\\p{M}*+)") ;; https://www.regular-expressions.info/unicode.html
 (def named-char "(newline|return|space|tab|formfeed|backspace)")
 (def unicode "(u[\\dD-Fd-f]{4})")
 (def character-pattern (str "\\\\(" unicode-char "|" named-char "|" unicode ")(?!\\w+)"))
 
+
 ; : is not allowed as first keyword character
 (def simple-keyword (str ":(?!:)" symbol-pattern))
 (def macro-keyword (str "::(?!:)" NAME))
+
+
+(def string-pattern "\"[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*\"")
+(def regex-pattern (str "#" string-pattern))
