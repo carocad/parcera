@@ -230,9 +230,9 @@
     (. string-builder (toString))))
 
 ; Successful parse.
-; Profile:  {:create-node 594, :push-full-listener 2, :push-stack 594,
-;            :push-listener 592, :push-result 257, :push-message 257}
-; "Elapsed time: 63.203691 msecs"
+; Profile:  {:create-node 440, :push-full-listener 2, :push-stack 440,
+;            :push-listener 438, :push-result 234, :push-message 234}
+; "Elapsed time: 52.561627 msecs"
 #_(time (clojure (str '(ns parcera.core
                          (:require [instaparse.core :as instaparse]
                                    [clojure.data :as data]
