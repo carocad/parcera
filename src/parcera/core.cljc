@@ -30,9 +30,16 @@
 
     symbolic: #'##(Inf|-Inf|NaN)'
 
-    <reader-macro>: &#'[#^\\'`~@]' (dispatch | metadata | deref | quote
-                                   | backtick | unquote | unquote-splicing
-                                   | set | namespaced-map);
+    <reader-macro>: &#'[#^\\'`~@]' ( dispatch
+                                   | metadata
+                                   | deref
+                                   | quote
+                                   | backtick
+                                   | unquote
+                                   | unquote-splicing
+                                   | set
+                                   | namespaced-map
+                                   );
 
     <dispatch>: function | regex | var-quote | discard | tag |
                 conditional | conditional-splicing;
