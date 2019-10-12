@@ -8,7 +8,6 @@
 
 
 (def double-suffix "(((\\.\\d*)?([eE][-+]?\\d+)?)M?)")
-; todo: (0)|([1-9]\d*) is this needed ?
 (def long-suffix "((0[xX]([\\dA-Fa-f]+)|0([0-7]+)|([1-9]\\d?)[rR]([\\d\\w]+)|0\\d+)?N?)")
 (def ratio-suffix "(\\/(\\d+))")
 (def number-pattern (str "[+-]?\\d+(" long-suffix "|" double-suffix "|" ratio-suffix ")(?![\\.\\/])"))

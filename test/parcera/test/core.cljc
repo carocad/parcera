@@ -117,9 +117,8 @@
     (as-> "#_\"[a b 2]\"" input (is (and (valid? input) (roundtrip input) (clear input)))))
 
   (testing "comments"
-    ; todo: should I allow a file containing only with a comment ?
-    #_(as-> ";[a b 2]" input (is (and (valid? input) (roundtrip input) (clear input))))
-    #_(as-> ";; \"[a b 2]\"" input (is (and (valid? input) (roundtrip input) (clear input))))
+    (as-> ";[a b 2]" input (is (and (valid? input) (roundtrip input) (clear input))))
+    (as-> ";; \"[a b 2]\"" input (is (and (valid? input) (roundtrip input) (clear input))))
     (as-> "2 ;[a b 2]" input (is (and (valid? input) (roundtrip input) (clear input))))
     (as-> " :hello ;; \"[a b 2]\"" input (is (and (valid? input) (roundtrip input) (clear input)))))
 
