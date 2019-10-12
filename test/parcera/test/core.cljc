@@ -82,105 +82,207 @@
 
 (deftest unit-tests
   (testing "names"
-    (as-> "foo" input (is (and (valid? input) (roundtrip input) (clear input))))
-    (as-> "foo-bar" input (is (and (valid? input) (roundtrip input) (clear input))))
-    (as-> "foo->bar" input (is (and (valid? input) (roundtrip input) (clear input))))
-    (as-> "->" input (is (and (valid? input) (roundtrip input) (clear input))))
-    (as-> "->as" input (is (and (valid? input) (roundtrip input) (clear input))))
-    (as-> "föl" input (is (and (valid? input) (roundtrip input) (clear input))))
-    (as-> "Öl" input (is (and (valid? input) (roundtrip input) (clear input))))
-    (as-> "ϕ" input (is (and (valid? input) (roundtrip input) (clear input))))
-    (as-> "❤️" input (is (and (valid? input) (roundtrip input) (clear input))))))
+    (as-> "foo" input (and (is (valid? input))
+                           (is (roundtrip input))
+                           (is (clear input))))
+    (as-> "foo-bar" input (and (is (valid? input))
+                               (is (roundtrip input))
+                               (is (clear input))))
+    (as-> "foo->bar" input (and (is (valid? input))
+                                (is (roundtrip input))
+                                (is (clear input))))
+    (as-> "->" input (and (is (valid? input))
+                          (is (roundtrip input))
+                          (is (clear input))))
+    (as-> "->as" input (and (is (valid? input))
+                            (is (roundtrip input))
+                            (is (clear input))))
+    (as-> "föl" input (and (is (valid? input))
+                           (is (roundtrip input))
+                           (is (clear input))))
+    (as-> "Öl" input (and (is (valid? input))
+                          (is (roundtrip input))
+                          (is (clear input))))
+    (as-> "ϕ" input (and (is (valid? input))
+                         (is (roundtrip input))
+                         (is (clear input))))
+    (as-> "❤️" input (and (is (valid? input))
+                          (is (roundtrip input))
+                          (is (clear input))))))
 
 
 (deftest edge-cases
   (testing "comments"
     (as-> "{:hello ;2}
-           2}" input (is (and (valid? input) (roundtrip input) (clear input))))))
+           2}" input (and (is (valid? input))
+                          (is (roundtrip input))
+                          (is (clear input))))))
 
 
 (deftest macros
   (testing "metadata"
-    (as-> "^String [a b 2]" input (is (and (valid? input) (roundtrip input) (clear input))))
-    (as-> "^\"String\" [a b 2]" input (is (and (valid? input) (roundtrip input) (clear input))))
-    (as-> "^:string [a b 2]" input (is (and (valid? input) (roundtrip input) (clear input))))
-    (as-> "^{:a 1} [a b 2]" input (is (and (valid? input) (roundtrip input) (clear input))))
-    (as-> "^:hello ^\"World\" ^{:a 1} [a b 2]" input (is (and (valid? input) (roundtrip input) (clear input)))))
+    (as-> "^String [a b 2]" input (and (is (valid? input))
+                                       (is (roundtrip input))
+                                       (is (clear input))))
+    (as-> "^\"String\" [a b 2]" input (and (is (valid? input))
+                                           (is (roundtrip input))
+                                           (is (clear input))))
+    (as-> "^:string [a b 2]" input (and (is (valid? input))
+                                        (is (roundtrip input))
+                                        (is (clear input))))
+    (as-> "^{:a 1} [a b 2]" input (and (is (valid? input))
+                                       (is (roundtrip input))
+                                       (is (clear input))))
+    (as-> "^:hello ^\"World\" ^{:a 1} [a b 2]" input (and (is (valid? input))
+                                                          (is (roundtrip input))
+                                                          (is (clear input)))))
 
   (testing "discard"
-    (as-> "#_[a b 2]" input (is (and (valid? input) (roundtrip input) (clear input))))
-    (as-> "#_(a b 2)" input (is (and (valid? input) (roundtrip input) (clear input))))
-    (as-> "#_{:a 1}" input (is (and (valid? input) (roundtrip input) (clear input))))
-    (as-> "#_macros" input (is (and (valid? input) (roundtrip input) (clear input)))))
+    (as-> "#_[a b 2]" input (and (is (valid? input))
+                                 (is (roundtrip input))
+                                 (is (clear input))))
+    (as-> "#_(a b 2)" input (and (is (valid? input))
+                                 (is (roundtrip input))
+                                 (is (clear input))))
+    (as-> "#_{:a 1}" input (and (is (valid? input))
+                                (is (roundtrip input))
+                                (is (clear input))))
+    (as-> "#_macros" input (and (is (valid? input))
+                                (is (roundtrip input))
+                                (is (clear input)))))
 
   (testing "regex"
-    (as-> "#_\"[a b 2]\"" input (is (and (valid? input) (roundtrip input) (clear input)))))
+    (as-> "#_\"[a b 2]\"" input (and (is (valid? input))
+                                     (is (roundtrip input))
+                                     (is (clear input)))))
 
   (testing "comments"
-    (as-> ";[a b 2]" input (is (and (valid? input) (roundtrip input) (clear input))))
-    (as-> ";; \"[a b 2]\"" input (is (and (valid? input) (roundtrip input) (clear input))))
-    (as-> "2 ;[a b 2]" input (is (and (valid? input) (roundtrip input) (clear input))))
-    (as-> " :hello ;; \"[a b 2]\"" input (is (and (valid? input) (roundtrip input) (clear input)))))
+    (as-> ";[a b 2]" input (and (is (valid? input))
+                                (is (roundtrip input))
+                                (is (clear input))))
+    (as-> ";; \"[a b 2]\"" input (and (is (valid? input))
+                                      (is (roundtrip input))
+                                      (is (clear input))))
+    (as-> "2 ;[a b 2]" input (and (is (valid? input))
+                                  (is (roundtrip input))
+                                  (is (clear input))))
+    (as-> " :hello ;; \"[a b 2]\"" input (and (is (valid? input))
+                                              (is (roundtrip input))
+                                              (is (clear input)))))
 
   (testing "var quote"
-    (as-> "#'hello/world" input (is (and (valid? input) (roundtrip input) (clear input))))
-    (as-> "#'/" input (is (and (valid? input) (roundtrip input) (clear input)))))
+    (as-> "#'hello/world" input (and (is (valid? input))
+                                     (is (roundtrip input))
+                                     (is (clear input))))
+    (as-> "#'/" input (and (is (valid? input))
+                           (is (roundtrip input))
+                           (is (clear input)))))
 
   (testing "tag"
-    (as-> "#hello/world [1 a \"3\"]" input (is (and (valid? input) (roundtrip input) (clear input))))
-    (as-> "#hello/world {1 \"3\"}" input (is (and (valid? input) (roundtrip input) (clear input)))))
+    (as-> "#hello/world [1 a \"3\"]" input (and (is (valid? input))
+                                                (is (roundtrip input))
+                                                (is (clear input))))
+    (as-> "#hello/world {1 \"3\"}" input (and (is (valid? input))
+                                              (is (roundtrip input))
+                                              (is (clear input)))))
 
   (testing "keyword"
-    (as-> "::hello/world [1 a \"3\"]" input (is (and (valid? input) (roundtrip input) (clear input))))
-    (as-> "::hello" input (is (and (valid? input) (roundtrip input) (clear input)))))
+    (as-> "::hello/world [1 a \"3\"]" input (and (is (valid? input))
+                                                 (is (roundtrip input))
+                                                 (is (clear input))))
+    (as-> "::hello" input (and (is (valid? input))
+                               (is (roundtrip input))
+                               (is (clear input)))))
 
   (testing "quote"
-    (as-> "'hello/world" input (is (and (valid? input) (roundtrip input) (clear input))))
-    (as-> "'hello" input (is (and (valid? input) (roundtrip input) (clear input))))
-    (as-> "'/" input (is (and (valid? input) (roundtrip input) (clear input)))))
+    (as-> "'hello/world" input (and (is (valid? input))
+                                    (is (roundtrip input))
+                                    (is (clear input))))
+    (as-> "'hello" input (and (is (valid? input))
+                              (is (roundtrip input))
+                              (is (clear input))))
+    (as-> "'/" input (and (is (valid? input))
+                          (is (roundtrip input))
+                          (is (clear input)))))
 
   (testing "backtick"
-    (as-> "`hello/world" input (is (and (valid? input) (roundtrip input) (clear input))))
-    (as-> "`hello" input (is (and (valid? input) (roundtrip input) (clear input))))
-    (as-> "`/" input (is (and (valid? input) (roundtrip input) (clear input)))))
+    (as-> "`hello/world" input (and (is (valid? input))
+                                    (is (roundtrip input))
+                                    (is (clear input))))
+    (as-> "`hello" input (and (is (valid? input))
+                              (is (roundtrip input))
+                              (is (clear input))))
+    (as-> "`/" input (and (is (valid? input))
+                          (is (roundtrip input))
+                          (is (clear input)))))
 
   (testing "unquote"
-    (as-> "~hello/world" input (is (and (valid? input) (roundtrip input) (clear input))))
-    (as-> "~(hello 2 3)" input (is (and (valid? input) (roundtrip input) (clear input))))
-    (as-> "~/" input (is (and (valid? input) (roundtrip input) (clear input)))))
+    (as-> "~hello/world" input (and (is (valid? input))
+                                    (is (roundtrip input))
+                                    (is (clear input))))
+    (as-> "~(hello 2 3)" input (and (is (valid? input))
+                                    (is (roundtrip input))
+                                    (is (clear input))))
+    (as-> "~/" input (and (is (valid? input))
+                          (is (roundtrip input))
+                          (is (clear input)))))
 
   (testing "quote splicing"
-    (as-> "~@hello/world" input (is (and (valid? input) (roundtrip input) (clear input))))
-    (as-> "~@(hello 2 b)" input (is (and (valid? input) (roundtrip input) (clear input)))))
+    (as-> "~@hello/world" input (and (is (valid? input))
+                                     (is (roundtrip input))
+                                     (is (clear input))))
+    (as-> "~@(hello 2 b)" input (and (is (valid? input))
+                                     (is (roundtrip input))
+                                     (is (clear input)))))
 
   (testing "deref"
-    (as-> "@hello/world" input (is (and (valid? input) (roundtrip input) (clear input))))
-    (as-> "@hello" input (is (and (valid? input) (roundtrip input) (clear input))))
-    (as-> "@/" input (is (and (valid? input) (roundtrip input) (clear input)))))
+    (as-> "@hello/world" input (and (is (valid? input))
+                                    (is (roundtrip input))
+                                    (is (clear input))))
+    (as-> "@hello" input (and (is (valid? input))
+                              (is (roundtrip input))
+                              (is (clear input))))
+    (as-> "@/" input (and (is (valid? input))
+                          (is (roundtrip input))
+                          (is (clear input)))))
 
   (testing "anonymous function"
-    (as-> "#(= (str %1 %2 %&))" input (is (and (valid? input) (roundtrip input) (clear input)))))
+    (as-> "#(= (str %1 %2 %&))" input (and (is (valid? input))
+                                           (is (roundtrip input))
+                                           (is (clear input)))))
 
   (testing "namespaced map"
-    (as-> "#::{:a 1 b 3}" input (is (and (valid? input) (roundtrip input) (clear input))))
-    (as-> "#::hello{:a 1 b 3}" input (is (and (valid? input) (roundtrip input) (clear input)))))
+    (as-> "#::{:a 1 b 3}" input (and (is (valid? input))
+                                     (is (roundtrip input))
+                                     (is (clear input))))
+    (as-> "#::hello{:a 1 b 3}" input (and (is (valid? input))
+                                          (is (roundtrip input))
+                                          (is (clear input)))))
 
   (testing "reader conditional"
     (as-> "#?(:clj Double/NaN :cljs js/NaN :default nil)" input
-          (is (and (valid? input) (roundtrip input) (clear input))))
+          (and (is (valid? input))
+               (is (roundtrip input))
+               (is (clear input))))
     (as-> "[1 2 #?@(:clj [3 4] :cljs [5 6])]" input
-          (is (and (valid? input) (roundtrip input) (clear input))))))
+          (and (is (valid? input))
+               (is (roundtrip input))
+               (is (clear input))))))
 
 
 (deftest bootstrap
 
   (testing "parcera should be able to parse itself"
     (let [input (slurp "./src/parcera/core.cljc")]
-      (is (and (valid? input) (roundtrip input) (clear input)))))
+      (and (is (valid? input))
+           (is (roundtrip input))
+           (is (clear input)))))
 
   (testing "parcera should be able to parse its own test suite"
     (let [input (slurp "./test/parcera/test/core.cljc")]
-      (is (and (valid? input) (roundtrip input) (clear input))))))
+      (and (is (valid? input))
+           (is (roundtrip input))
+           (is (clear input))))))
 
 
 (deftest clojure$cript
