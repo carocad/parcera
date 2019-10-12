@@ -5,10 +5,19 @@
             [parcera.terminals :as terminal])
   #?(:cljs (:import goog.string.StringBuffer)))
 
+; NOTE: Through my experiments I found out that Instaparse will gladly take the
+; first match as long as the grammar is not ambiguous. Therefore I switched the
+; unordered OR (|) with an ordered one (/). This of course implies an heuristic
+; of knowing which grammar rules are expected to match more often. I use
+; Clojure's core as a reference with the following code snippet
+#_(let [core-content (slurp "https://raw.githubusercontent.com/clojure/clojure/master/src/clj/clojure/core.clj")]
+    (time (sort-by second > (frequencies (filter keyword? (flatten (clojure core-content :optimize :memory)))))))
+#_(let [core-content (slurp "https://raw.githubusercontent.com/clojure/clojurescript/master/src/main/clojure/cljs/core.cljc")]
+    (time (sort-by second > (frequencies (filter keyword? (flatten (clojure core-content :optimize :memory)))))))
 (def grammar-rules
   "code: form*;
 
-    <form>: whitespace / collection / literal / reader-macro;
+    <form>: whitespace / literal / collection / reader-macro;
 
     (* we treat comments the same way as commas *)
     whitespace = #'([,\\s]*;.*)?([,\\s]+|$)';
@@ -33,31 +42,30 @@
 
     <keyword>: simple-keyword / macro-keyword ;
 
-    <reader-macro>: ( set
-                    / dispatch
+    <reader-macro>: ( unquote
                     / metadata
-                    / deref
-                    / quote
                     / backtick
-                    / unquote
+                    / quote
+                    / dispatch
                     / unquote-splicing
+                    / deref
                     / symbolic
                     );
 
     set: <'#{'> form* <'}'>;
 
-    namespaced-map: <'#'> ( keyword | auto-resolve ) map;
+    namespaced-map: <'#'> ( keyword / auto-resolve ) map;
 
     auto-resolve: '::';
 
     metadata: (metadata-entry whitespace)+ ( symbol
-                                           | collection
-                                           | tag
-                                           | unquote
-                                           | unquote-splicing
+                                           / collection
+                                           / tag
+                                           / unquote
+                                           / unquote-splicing
                                            );
 
-    metadata-entry: <'^'> ( map | symbol | string | keyword );
+    metadata-entry: <'^'> ( map / symbol / string / keyword );
 
     quote: <'\\''> form;
 
@@ -71,12 +79,13 @@
 
     <dispatch>:  function
                / regex
+               / set
+               / conditional
+               / conditional-splicing
                / namespaced-map
                / var-quote
                / discard
-               / tag
-               / conditional
-               / conditional-splicing;
+               / tag;
 
     function: <'#('> form* <')'>;
 
@@ -84,7 +93,7 @@
 
     discard: <'#_'> form;
 
-    tag: <#'#(?![_?])'> symbol whitespace? (literal | collection);
+    tag: <#'#(?![_?])'> symbol whitespace? (literal / collection);
 
     conditional: <'#?'> list;
 
@@ -230,9 +239,9 @@
     (. string-builder (toString))))
 
 ; Successful parse.
-; Profile:  {:create-node 440, :push-full-listener 2, :push-stack 440,
-;            :push-listener 438, :push-result 234, :push-message 234}
-; "Elapsed time: 52.561627 msecs"
+; Profile:  {:create-node 384, :push-full-listener 2, :push-stack 384,
+;            :push-listener 382, :push-result 227, :push-message 227 }
+; "Elapsed time: 47.25084 msecs"
 #_(time (clojure (str '(ns parcera.core
                          (:require [instaparse.core :as instaparse]
                                    [clojure.data :as data]
