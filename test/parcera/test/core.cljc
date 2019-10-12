@@ -5,8 +5,8 @@
             [clojure.test.check.properties :as prop]
             [clojure.test.check :as tc]
             [parcera.core :as parcera]
-            [instaparse.core :as instaparse])
-  #?(:cljs (:require-macros [parcera.slurp :refer [slurp]])))
+            [instaparse.core :as instaparse]
+            #?(:cljs [parcera.slurp :refer [slurp]])))
 
 (defn- roundtrip
   "checks parcera can parse and write back the exact same input code"
