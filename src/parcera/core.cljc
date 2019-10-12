@@ -95,9 +95,9 @@
 
     tag: <#'#(?![_?])'> symbol whitespace? (literal / collection);
 
-    conditional: <'#?'> list;
+    conditional: <'#?('> form* <')'>;
 
-    conditional-splicing: <'#?@'> list;
+    conditional-splicing: <'#?@('> form*  <')'>;
 
     symbolic: #'##(Inf|-Inf|NaN)'")
 
@@ -206,12 +206,14 @@
         (doseq [child (rest ast)] (code* child string-builder)))
 
     :conditional
-    (do (. string-builder (append "#?"))
-        (code* (second ast) string-builder))
+    (do (. string-builder (append "#?("))
+        (doseq [child (rest ast)] (code* child string-builder))
+        (. string-builder (append ")")))
 
     :conditional-splicing
-    (do (. string-builder (append "#?@"))
-        (code* (second ast) string-builder))
+    (do (. string-builder (append "#?@("))
+        (doseq [child (rest ast)] (code* child string-builder))
+        (. string-builder (append ")")))
 
     :deref
     (do (. string-builder (append "@"))
