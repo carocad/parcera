@@ -26,6 +26,5 @@
   (criterium/quick-bench (parcera/clojure (str '(ns parcera.core
                                                   (:require [instaparse.core :as instaparse]
                                                             [clojure.data :as data]
-                                                            [clojure.string :as str])))
-                                          :trace true)
+                                                            [clojure.string :as str]))))
                          :os :runtime :verbose))
