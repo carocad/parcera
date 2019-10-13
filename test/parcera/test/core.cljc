@@ -29,14 +29,14 @@
   "The grammar definition of parcera is valid for any clojure value. Meaning
   that for any clojure value, parcera can create an AST for it"
   (prop/for-all [input (gen/fmap pr-str gen/any)]
-    (= false (instaparse/failure? (parcera/clojure input)))))
+    (valid? input)))
 
 
 (def symmetric
   "The read <-> write process of parcera MUST be symmetrical. Meaning
   that the AST and the text representation are equivalent"
   (prop/for-all [input (gen/fmap pr-str gen/any)]
-    (= input (parcera/code (parcera/clojure input)))))
+    (roundtrip input)))
 
 
 (def unambiguous
@@ -44,7 +44,7 @@
   that any input should (but must not) only have 1 AST representation ... however
   I have found this is not always possible"
   (prop/for-all [input (gen/fmap pr-str gen/any)]
-    (= 1 (count (instaparse/parses parcera/clojure input)))))
+    (clear input)))
 
 
 (deftest simple
