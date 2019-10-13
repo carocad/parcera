@@ -14,6 +14,7 @@
     (time (sort-by second > (frequencies (filter keyword? (flatten (clojure core-content :optimize :memory)))))))
 #_(let [core-content (slurp "https://raw.githubusercontent.com/clojure/clojurescript/master/src/main/clojure/cljs/core.cljc")]
     (time (sort-by second > (frequencies (filter keyword? (flatten (clojure core-content :optimize :memory)))))))
+; todo: performance of [,\s]*;.*|[,\s]+ for whitespace
 (def grammar-rules
   "code: form*;
 
