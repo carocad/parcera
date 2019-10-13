@@ -49,14 +49,30 @@
 
 (deftest simple
   (testing "character literals"
-    (as-> "\\t" input (is (= input (parcera/code (parcera/clojure input)))))
-    (as-> "\\n" input (is (= input (parcera/code (parcera/clojure input)))))
-    (as-> "\\r" input (is (= input (parcera/code (parcera/clojure input)))))
-    (as-> "\\a" input (is (= input (parcera/code (parcera/clojure input)))))
-    (as-> "\\é" input (is (= input (parcera/code (parcera/clojure input)))))
-    (as-> "\\ö" input (is (= input (parcera/code (parcera/clojure input)))))
-    (as-> "\\ï" input (is (= input (parcera/code (parcera/clojure input)))))
-    (as-> "\\ϕ" input (is (= input (parcera/code (parcera/clojure input)))))))
+    (as-> "\\t" input (and (is (valid? input))
+                           (is (roundtrip input))
+                           (is (clear input))))
+    (as-> "\\n" input (and (is (valid? input))
+                           (is (roundtrip input))
+                           (is (clear input))))
+    (as-> "\\r" input (and (is (valid? input))
+                           (is (roundtrip input))
+                           (is (clear input))))
+    (as-> "\\a" input (and (is (valid? input))
+                           (is (roundtrip input))
+                           (is (clear input))))
+    (as-> "\\é" input (and (is (valid? input))
+                           (is (roundtrip input))
+                           (is (clear input))))
+    (as-> "\\ö" input (and (is (valid? input))
+                           (is (roundtrip input))
+                           (is (clear input))))
+    (as-> "\\ï" input (and (is (valid? input))
+                           (is (roundtrip input))
+                           (is (clear input))))
+    (as-> "\\ϕ" input (and (is (valid? input))
+                           (is (roundtrip input))
+                           (is (clear input))))))
 
 
 (deftest data-structures
