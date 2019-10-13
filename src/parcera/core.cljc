@@ -5,6 +5,14 @@
             [parcera.terminals :as terminal])
   #?(:cljs (:import goog.string.StringBuffer)))
 
+; todo: implement advices from
+; http://blog.reverberate.org/2013/09/ll-and-lr-in-context-why-parsing-tools.html
+; https://www.loggly.com/blog/regexes-the-bad-better-best/
+; https://www.loggly.com/blog/five-invaluable-techniques-to-improve-regex-performance/
+
+; todo: use advices in https://medium.appbase.io/analyzing-20k-github-repositories-af76de21c3fc
+; to check if the heuristics are accurate
+
 ; NOTE: Through my experiments I found out that Instaparse will gladly take the
 ; first match as long as the grammar is not ambiguous. Therefore I switched the
 ; unordered OR (|) with an ordered one (/). This of course implies an heuristic
