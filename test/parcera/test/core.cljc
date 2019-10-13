@@ -276,10 +276,18 @@
     (let [input (slurp "./src/parcera/core.cljc")]
       (and (is (valid? input))
            (is (roundtrip input))
+           (is (clear input))))
+    (let [input (slurp "./src/parcera/slurp.cljc")]
+      (and (is (valid? input))
+           (is (roundtrip input))
            (is (clear input)))))
 
   (testing "parcera should be able to parse its own test suite"
     (let [input (slurp "./test/parcera/test/core.cljc")]
+      (and (is (valid? input))
+           (is (roundtrip input))
+           (is (clear input))))
+    (let [input (slurp "./test/parcera/test/benchmark.clj")]
       (and (is (valid? input))
            (is (roundtrip input))
            (is (clear input))))))
