@@ -22,7 +22,7 @@
 
 (defn- clear
   [input]
-  (= 1 (count (instaparse/parses parcera/clojure input))))
+  (= 1 (count (instaparse/parses parcera/clojure input :unhide :all))))
 
 
 (def validity
