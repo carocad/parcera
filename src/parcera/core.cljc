@@ -1,76 +1,80 @@
 (ns parcera.core
-  (:require [instaparse.core :as instaparse])
+  (:require [instaparse.core :as instaparse]
+            [instaparse.combinators-source :as combi]
+            [instaparse.cfg :as cfg]
+            [parcera.terminals :as terminal])
   #?(:cljs (:import goog.string.StringBuffer)))
 
-(def grammar
+; todo: implement advices from
+; http://blog.reverberate.org/2013/09/ll-and-lr-in-context-why-parsing-tools.html
+; https://www.loggly.com/blog/regexes-the-bad-better-best/
+; https://www.loggly.com/blog/five-invaluable-techniques-to-improve-regex-performance/
+
+; todo: use advices in https://medium.appbase.io/analyzing-20k-github-repositories-af76de21c3fc
+; to check if the heuristics are accurate
+
+; NOTE: Through my experiments I found out that Instaparse will gladly take the
+; first match as long as the grammar is not ambiguous. Therefore I switched the
+; unordered OR (|) with an ordered one (/). This of course implies an heuristic
+; of knowing which grammar rules are expected to match more often. I use
+; Clojure's core as a reference with the following code snippet
+#_(let [core-content (slurp "https://raw.githubusercontent.com/clojure/clojure/master/src/clj/clojure/core.clj")]
+    (time (sort-by second > (frequencies (filter keyword? (flatten (clojure core-content :optimize :memory)))))))
+#_(let [core-content (slurp "https://raw.githubusercontent.com/clojure/clojurescript/master/src/main/clojure/cljs/core.cljc")]
+    (time (sort-by second > (frequencies (filter keyword? (flatten (clojure core-content :optimize :memory)))))))
+; todo: performance of [,\s]*;.*|[,\s]+ for whitespace
+(def grammar-rules
   "code: form*;
 
-    <form>: whitespace ( literal
-                        | symbol
-                        | collection
-                        | reader-macro
-                        )
-            whitespace;
+    <form>: whitespace / literal / collection / reader-macro;
 
-    whitespace = #'[,\\s]*'
+    (* we treat comments the same way as commas *)
+    whitespace = #'([,\\s]*;.*)?([,\\s]+|$)';
 
-    <collection>: &#'[\\(\\[{#]'  ( list
-                                  | vector
-                                  | map
-                                  | set
-                                  )
-                                  ;
+    (* for parsing purposes we dont consider a Set a collection since it starts
+       with # -> dispatch macro *)
+    <collection>: list / vector / map;
 
     list: <'('> form* <')'> ;
 
     vector: <'['> form* <']'> ;
 
-    map: map-namespace? <'{'> map-content <'}'> ;
+    map: <'{'> form* <'}'>;
 
-    map-namespace: <'#'> (keyword | auto-resolve);
+    (* a literal is basically anything that is not a collection, macro or whitespace *)
+    <literal>: ( symbol
+                / keyword
+                / string
+                / number
+                / character
+                );
 
-    map-content: (form form)*
+    <keyword>: simple-keyword / macro-keyword ;
 
-    set: <'#{'> form* <'}'> ;
+    <reader-macro>: ( unquote
+                    / metadata
+                    / backtick
+                    / quote
+                    / dispatch
+                    / unquote-splicing
+                    / deref
+                    / symbolic
+                    );
 
-    <literal>:
-          number
-        | string
-        | character
-        | keyword
-        | comment
-        | symbolic
-        ;
+    set: <'#{'> form* <'}'>;
 
-    symbolic: #'##(Inf|-Inf|NaN)'
+    namespaced-map: <'#'> ( keyword / auto-resolve ) map;
 
-    number: ( DOUBLE | RATIO | LONG ) !symbol (* remove ambiguity with symbols 1/5
-                                                 1 -> number, / -> symbol, 5 -> number *);
+    auto-resolve: '::';
 
-    character: <'\\\\'> ( SIMPLE-CHAR | UNICODE-CHAR ) !symbol (* remove ambiguity with symbols \backspace
-                                                                  \b -> character, ackspace -> symbol *);
+    metadata: (metadata-entry whitespace)+ ( symbol
+                                           / collection
+                                           / tag
+                                           / unquote
+                                           / unquote-splicing
+                                           );
 
-    <reader-macro>:
-          dispatch
-        | metadata
-        | deref
-        | quote
-        | backtick
-        | unquote
-        | unquote-splicing
-        ;
-
-    <dispatch>: &'#' ( function | regex | var-quote | discard | tag | conditional | conditional-splicing);
-
-    function: <'#'> list;
-
-    metadata: <'^'> ( map | shorthand-metadata ) form;
-
-    <shorthand-metadata>: ( symbol | string | keyword );
-
-    regex: <'#'> string;
-
-    var-quote: <'#\\''> symbol;
+    metadata-entry: <'^'> ( map / symbol / string / keyword );
 
     quote: <'\\''> form;
 
@@ -82,67 +86,42 @@
 
     deref: <'@'> form;
 
+    <dispatch>:  function
+               / regex
+               / set
+               / conditional
+               / conditional-splicing
+               / namespaced-map
+               / var-quote
+               / discard
+               / tag;
+
+    function: <'#('> form* <')'>;
+
+    var-quote: <'#\\''> symbol;
+
     discard: <'#_'> form;
 
-    tag: <#'#(?![_?])'> symbol form;
+    tag: <#'#(?![_?])'> symbol whitespace? (literal / collection);
 
-    conditional: <'#?'> list;
+    conditional: <'#?('> form* <')'>;
 
-    conditional-splicing: <'#?@'> list;
+    conditional-splicing: <'#?@('> form*  <')'>;
 
-    string : <'\"'> #'[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*' <'\"'>;
+    symbolic: #'##(Inf|-Inf|NaN)'")
 
-    symbol: !SYMBOL-HEAD name;
 
-    <keyword>: simple-keyword | macro-keyword ;
+(def grammar-terminals
+  {:character      (combi/regexp terminal/character-pattern)
+   :string         (combi/regexp terminal/string-pattern)
+   :symbol         (combi/regexp terminal/symbol-pattern)
+   :number         (combi/regexp terminal/number-pattern)
+   :macro-keyword  (combi/regexp terminal/macro-keyword)
+   :simple-keyword (combi/regexp terminal/simple-keyword)
+   :regex          (combi/regexp terminal/regex-pattern)})
 
-    auto-resolve: '::' ;
 
-    simple-keyword: <':'> !':' name;
-
-    macro-keyword: <auto-resolve> !':' name;
-
-    comment: <';'> #'.*';
-
-    (*
-    ;; symbols cannot start with number, :, #
-    ;; / is a valid symbol as long as it is not part of the name
-    ;; note: added ' as invalid first character due to ambiguity in #'hello
-    ;; -> [:tag [:symbol 'hello]]
-    ;; -> [:var-quote [:symbol hello]]
-    *)
-    SYMBOL-HEAD: number | ':' | '#' | '\\''
-
-    (*
-    ;; NOTE: several characters are not allowed according to clojure reference.
-    ;; https://clojure.org/reference/reader#_symbols
-    ;; EDN reader says otherwise https://github.com/edn-format/edn#symbols
-    ;; nil, true, false are actually symbols with special meaning ... not grammar rules
-    ;; on their own
-    VALID-CHARACTERS>: #'[^\\s\\(\\)\\[\\]{}\"@~\\^;`]+'
-    *)
-    <name>: #'([^\\s\\(\\)\\[\\]{}\"@~,\\\\^;`]+\\/)?(\\/|([^\\s\\(\\)\\[\\]{}\"@~,\\\\^;`]+))(?!\\/)'
-
-    (* HIDDEN PARSERS ------------------------------------------------------ *)
-
-    <DOUBLE>: #'[-+]?(\\d+(\\.\\d*)?([eE][-+]?\\d+)?)(M)?'
-
-    <RATIO>: #'[-+]?(\\d+)/(\\d+)';
-
-    <LONG>: #'[-+]?(?:(0)|([1-9]\\d*)|0[xX]([\\dA-Fa-f]+)|0([0-7]+)|([1-9]\\d?)[rR]([\\d\\w]+)|0\\d+)(N)?';
-
-    <UNICODE-CHAR>: #'u[\\dD-Fd-f]{4}';
-
-    <SIMPLE-CHAR>:
-          'newline'
-        | 'return'
-        | 'space'
-        | 'tab'
-        | 'formfeed'
-        | 'backspace'
-        | #'[^\\u0300-\\u036F\\u1DC0-\\u1DFF\\u20D0-\\u20FF][\\u0300-\\u036F\\u1DC0-\\u1DFF\\u20D0-\\u20FF]*';
-         (* This is supposed to be the JavaScript friendly version of #'\\P{M}\\p{M}*+' mentioned here: https://www.regular-expressions.info/unicode.html
-            It's cooked by this generator: http://kourge.net/projects/regexp-unicode-block, ticking all 'Combining Diacritical Marks' boxes *)")
+(def grammar (merge (cfg/ebnf grammar-rules) grammar-terminals))
 
 
 (def clojure
@@ -157,7 +136,7 @@
 
    For a description of all possible options, visit Instaparse's official
    documentation: https://github.com/Engelberg/instaparse#reference"
-  (instaparse/parser grammar))
+  (instaparse/parser grammar :start :code))
 
 
 (defn- code*
@@ -180,14 +159,11 @@
         (doseq [child (rest ast)] (code* child string-builder))
         (. string-builder (append "]")))
 
-    :map
-    (doseq [child (rest ast)] (code* child string-builder))
-
-    :map-namespace
+    :namespaced-map
     (do (. string-builder (append "#"))
-        (code* (second ast) string-builder))
+        (doseq [child (rest ast)] (code* child string-builder)))
 
-    :map-content
+    :map
     (do (. string-builder (append "{"))
         (doseq [child (rest ast)] (code* child string-builder))
         (. string-builder (append "}")))
@@ -197,41 +173,22 @@
         (doseq [child (rest ast)] (code* child string-builder))
         (. string-builder (append "}")))
 
-    (:number :whitespace :symbolic :auto-resolve :symbol)
+    (:number :whitespace :symbolic :auto-resolve :symbol :simple-keyword
+     :macro-keyword :character :string :regex)
     (. string-builder (append (second ast)))
 
-    :string
-    (do (. string-builder (append "\""))
-        (. string-builder (append (second ast)))
-        (. string-builder (append "\"")))
-
-    :character
-    (do (. string-builder (append "\\"))
-        (. string-builder (append (second ast))))
-
-    :simple-keyword
-    (do (. string-builder (append ":"))
-        (. string-builder (append (second ast))))
-
-    :macro-keyword
-    (do (. string-builder (append "::"))
-        (. string-builder (append (second ast))))
-
-    :comment
-    (do (. string-builder (append ";"))
-        (. string-builder (append (second ast))))
-
     :metadata
-    (do (. string-builder (append "^"))
-        (doseq [child (rest ast)] (code* child string-builder)))
+    (do (doseq [child (rest (butlast ast))] (code* child string-builder))
+        (code* (last ast) string-builder))
+
+    :metadata-entry
+    (doseq [child (rest ast)]
+      (. string-builder (append "^"))
+      (code* child string-builder))
 
     :quote
     (do (. string-builder (append "'"))
         (doseq [child (rest ast)] (code* child string-builder)))
-
-    :regex
-    (do (. string-builder (append "#"))
-        (code* (second ast) string-builder))
 
     :var-quote
     (do (. string-builder (append "#'"))
@@ -258,20 +215,23 @@
         (doseq [child (rest ast)] (code* child string-builder)))
 
     :conditional
-    (do (. string-builder (append "#?"))
-        (code* (second ast) string-builder))
+    (do (. string-builder (append "#?("))
+        (doseq [child (rest ast)] (code* child string-builder))
+        (. string-builder (append ")")))
 
     :conditional-splicing
-    (do (. string-builder (append "#?@"))
-        (code* (second ast) string-builder))
+    (do (. string-builder (append "#?@("))
+        (doseq [child (rest ast)] (code* child string-builder))
+        (. string-builder (append ")")))
 
     :deref
     (do (. string-builder (append "@"))
         (doseq [child (rest ast)] (code* child string-builder)))
 
     :function
-    (do (. string-builder (append "#"))
-        (code* (second ast) string-builder))))
+    (do (. string-builder (append "#("))
+        (doseq [child (rest ast)] (code* child string-builder))
+        (. string-builder (append ")")))))
 
 
 (defn code
@@ -290,10 +250,13 @@
     (. string-builder (toString))))
 
 ; Successful parse.
-; Profile:  {:create-node 1651, :push-full-listener 2, :push-stack 1651, :push-listener 1689, :push-result 273, :push-message 275}
-; "Elapsed time: 141.452323 msecs"
+; Profile:  {:create-node 384, :push-full-listener 2, :push-stack 384,
+;            :push-listener 382, :push-result 227, :push-message 227 }
+; "Elapsed time: 47.25084 msecs"
 #_(time (clojure (str '(ns parcera.core
                          (:require [instaparse.core :as instaparse]
                                    [clojure.data :as data]
                                    [clojure.string :as str])))
                  :trace true))
+
+#_(instaparse/disable-tracing!)
