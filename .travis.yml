@@ -18,10 +18,9 @@ jobs:
         - lein trampoline test
         - nvm install 10.10 && nvm use 10.10 && lein trampoline cljsbuild test
 
-    # only run the benchmark is we are on master
+    # only run the benchmark if we are trying to merge to master
     # otherwise the build takes too long
     - stage: Benchmark
-      #if: head_branch = master
       if: branch = master
       script:
         - lein trampoline test :benchmark
