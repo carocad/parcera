@@ -2,12 +2,19 @@
 
 ;; Clojure's reader is quite permissive so we follow the motto
 ;; "if it is not forbidden, it is allowed"
-(def NAME "[^\\s\\(\\)\\[\\]{}\"@~\\^;`\\\\\\/,]+")
-;; symbols cannot start with a number, :, # nor '
-; todo: no need for negative lookahead of chars
-(def first-character "(?![:#\\',]|[+-]?\\d+)")
+(def not-allowed "\\s\\(\\)\\[\\]{}\"@~\\^;`\\\\\\/,")
+(def allowed-characters (str "[^" not-allowed "]*"))
+(def not-number "(?![+-]?\\d+)")
 (def symbol-end "(?=[\\s\"()\\[\\]{},]|$)")
-(def symbol-pattern (str first-character "(" NAME "\\/)?(\\/|(" NAME "))" symbol-end))
+
+(defn- name-pattern
+  [restriction]
+  (let [first-character (str "[^" restriction not-allowed "]")]
+    (str "(" first-character allowed-characters "\\/)?"
+         "(\\/|(" first-character allowed-characters "))"
+         symbol-end)))
+
+(def symbol-pattern (str not-number (name-pattern ":#\\'")))
 
 (def double-suffix "(((\\.\\d*)?([eE][-+]?\\d+)?)M?)")
 (def long-suffix "((0[xX]([\\dA-Fa-f]+)|0([0-7]+)|([1-9]\\d?)[rR]([\\d\\w]+)|0\\d+)?N?)")
@@ -29,8 +36,8 @@
 
 ; : is not allowed as first keyword character
 ; todo: no need for negative lookahead of symbol
-(def simple-keyword (str ":(?!:)" symbol-pattern))
-(def macro-keyword (str "::(?!:)" symbol-pattern))
+(def simple-keyword (str ":" (name-pattern ":")))
+(def macro-keyword (str "::" (name-pattern ":")))
 
 
 (def string-pattern "\"[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*\"")
