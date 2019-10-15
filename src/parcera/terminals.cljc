@@ -1,4 +1,8 @@
-(ns parcera.terminals)
+(ns parcera.terminals
+  "Clojure symbols, keywords, numbers and string/regex share quite a lot
+  of matching logic. This namespace is aimed towards clearly identifying
+  those pieces and share them among the different definitions to
+  avoid recurring issues")
 
 ;; Clojure's reader is quite permissive so we follow the motto
 ;; "if it is not forbidden, it is allowed"
@@ -14,7 +18,11 @@
          "(\\/|(" first-character allowed-characters "))"
          symbol-end)))
 
+
 (def symbol-pattern (str not-number (name-pattern ":#\\'")))
+(def simple-keyword (str ":" (name-pattern ":")))
+(def macro-keyword (str "::" (name-pattern ":")))
+
 
 (def double-suffix "(((\\.\\d*)?([eE][-+]?\\d+)?)M?)")
 (def long-suffix "((0[xX]([\\dA-Fa-f]+)|0([0-7]+)|([1-9]\\d?)[rR]([\\d\\w]+)|0\\d+)?N?)")
@@ -32,12 +40,6 @@
 (def unicode "(u[\\dD-Fd-f]{4})")
 ; todo: use word boundary to avoid lookahead
 (def character-pattern (str "\\\\(" unicode-char "|" named-char "|" unicode ")(?!\\w+)"))
-
-
-; : is not allowed as first keyword character
-; todo: no need for negative lookahead of symbol
-(def simple-keyword (str ":" (name-pattern ":")))
-(def macro-keyword (str "::" (name-pattern ":")))
 
 
 (def string-pattern "\"[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*\"")
