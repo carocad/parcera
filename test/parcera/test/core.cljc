@@ -203,9 +203,9 @@
                                               (is (clear input)))))
 
   (testing "keyword"
-    (as-> "::hello/world [1 a \"3\"]" input (and (is (valid? input))
-                                                 (is (roundtrip input))
-                                                 (is (clear input))))
+    (as-> "::hello [1 a \"3\"]" input (and (is (valid? input))
+                                           (is (roundtrip input))
+                                           (is (clear input))))
     (as-> "::hello" input (and (is (valid? input))
                                (is (roundtrip input))
                                (is (clear input)))))
