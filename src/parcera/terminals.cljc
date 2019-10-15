@@ -1,15 +1,14 @@
 (ns parcera.terminals)
 
-; todo: anchor ALL to the beginning of string
 ; todo: try to avoid lookahead
 
 ;; Clojure's reader is quite permissive so we follow the motto "if it is not forbidden, it is allowed"
 ; todo: dont allow /
-(def NAME "[^\\s\\(\\)\\[\\]{}\"@~\\^;`\\\\]+")
+(def NAME "[^\\s\\(\\)\\[\\]{}\"@~\\^;`\\\\\\/]+")
 ; todo: (?!\/) do i need that ?
 ;; symbols cannot start with a number, :, # nor '
 ; todo: no need for negative lookahead of chars
-(def symbol-pattern (str "(?![:#\\',]|[+-]?\\d+)(" NAME "\\/)?(\\/|(" NAME "))"))
+(def symbol-pattern (str "(?![:#\\',]|[+-]?\\d+)(" NAME "\\/)?(\\/|(" NAME "))(?=[\\s\"()\\[\\]{}]|$)"))
 
 (def double-suffix "(((\\.\\d*)?([eE][-+]?\\d+)?)M?)")
 (def long-suffix "((0[xX]([\\dA-Fa-f]+)|0([0-7]+)|([1-9]\\d?)[rR]([\\d\\w]+)|0\\d+)?N?)")
