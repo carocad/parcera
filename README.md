@@ -54,7 +54,7 @@ full explanation of the options available for a parser please visit Instaparse w
 There are some restrictions as to how much can a parser do. In my experience, these restrictions
 are related to some [semantic context-sensitivity](http://blog.reverberate.org/2013/09/ll-and-lr-in-context-why-parsing-tools.html).
 which the Clojure reader has embedded into itself. In general I have found the following ones:
-    - `parcera` doesnt check that a map contains an even number of elements. This is specially difficult
-      to do since Clojure supports the discard macro `#_ form` which is a valid element but "doesnt count as one"
-    - `parcera` doesnt check if a map has repeated keys
-    - `parcera` doesnt check if a set has repeated elements
+- `parcera` doesnt check that a map contains an even number of elements. This is specially difficult
+  to do since Clojure supports the discard macro `#_ form` which is a valid element but "doesnt count as one"
+- `parcera` doesnt check if a map has repeated keys
+- `parcera` doesnt check if a set has repeated elements
