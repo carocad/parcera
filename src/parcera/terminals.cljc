@@ -31,7 +31,7 @@
 ; : is not allowed as first keyword character
 ; todo: no need for negative lookahead of symbol
 (def simple-keyword (str ":(?!:)" symbol-pattern))
-(def macro-keyword (str "::(?!:)" NAME))
+(def macro-keyword (str "::(?!:)" symbol-pattern))
 
 
 (def string-pattern "\"[^\"\\\\]*(?:\\\\.[^\"\\\\]*)*\"")
