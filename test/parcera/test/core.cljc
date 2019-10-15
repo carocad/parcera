@@ -132,7 +132,11 @@
     (as-> "{:hello ;2}
            2}" input (and (is (valid? input))
                           (is (roundtrip input))
-                          (is (clear input))))))
+                          (is (clear input)))))
+  (testing "symbols"
+    (as-> "hello/world/" input (is (not (valid? input))))
+    (as-> ":hello/world/" input (is (not (valid? input))))
+    (as-> "::hello/world/" input (is (not (valid? input))))))
 
 
 (deftest macros
