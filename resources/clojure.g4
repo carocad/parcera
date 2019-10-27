@@ -3,9 +3,13 @@ grammar clojure;
 
 code: form*;
 
-form: list | symbol | keyword | string | whitespace;
+form: whitespace | literal | collection;
+
+collection: list;
 
 list: '(' form*  ')';
+
+literal: symbol | keyword | string ;//| number | character;
 
 symbol: NAME;
 
