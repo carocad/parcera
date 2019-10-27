@@ -5,7 +5,7 @@ grammar clojure;
 
 code: form*;
 
-form: whitespace | literal | collection;
+form: whitespace | literal | collection | reader_macro;
 
 collection: list | vector | map;
 
@@ -15,7 +15,7 @@ vector: '[' form* ']';
 
 map: '{' form* '}';
 
-literal: number | character | symbol | keyword | string ;
+literal: symbol | keyword | string | number | character;
 
 number: NUMBER;
 
@@ -29,12 +29,73 @@ simple_keyword: ':' NAME;
 
 macro_keyword: '::' NAME;
 
-string: '"' ( ~'"' | '\\' '"' )* '"';
+string: STRING;
+
+reader_macro: ( unquote
+              | metadata
+              | backtick
+              | quote
+              | dispatch
+              | unquote_splicing
+              | deref
+              | symbolic
+              );
+
+unquote: '~' form;
+
+metadata: (metadata_entry whitespace)+ ( symbol
+                                       | collection
+                                       | tag
+                                       | unquote
+                                       | unquote_splicing
+                                       );
+
+metadata_entry: '^' ( map | symbol | string | keyword );
+
+quote: '\'' form;
+
+backtick: '`' form;
+
+unquote_splicing: '~@' form;
+
+deref: '@' form;
+
+dispatch: function
+          | regex
+          | set
+          | conditional
+          | conditional_splicing
+          | namespaced_map
+          | var_quote
+          | discard
+          | tag;
+
+function: '#(' form* ')';
+
+regex: '#' STRING;
+
+set: '#{' form* '}';
+
+namespaced_map: '#' ( keyword | '::' ) map;
+
+var_quote: '#\'' symbol;
+
+discard: '#_' form;
+
+tag: '#' symbol whitespace? (literal | collection);
+
+conditional: '#?(' form* ')';
+
+conditional_splicing: '#?@(' form* ')';
+
+symbolic: '##' ('Inf' | '-Inf' | 'NaN');
 
 // whitespace or comment
 whitespace: SPACE+ | (SPACE* COMMENT SPACE*);
 
 NUMBER: [+-]? DIGIT+ (DOUBLE_SUFFIX | LONG_SUFFIX | RATIO_SUFFIX);
+
+STRING: '"' ( ~'"' | '\\' '"' )* '"';
 
 UNICODE_CHAR: ~[\u0300-\u036F\u1DC0-\u1DFF\u20D0-\u20FF];
 
