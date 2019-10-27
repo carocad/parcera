@@ -19,7 +19,7 @@ vector: '[' form* ']';
 
 map: '{' form* '}';
 
-literal: symbol | keyword | string | number | character;
+literal: keyword | string | number | character | symbol;
 
 number: NUMBER;
 
@@ -80,7 +80,7 @@ regex: '#' STRING;
 
 set: '#{' form* '}';
 
-namespaced_map: '#' ( keyword | '::' ) map;
+namespaced_map: '#' ( keyword |  '::') map;
 
 var_quote: '#\'' symbol;
 
