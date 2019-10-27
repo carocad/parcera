@@ -22,7 +22,7 @@ literal: symbol | keyword | string | number | character;
 
 number: NUMBER;
 
-character: '\\' (UNICODE | NAMED_CHAR | UNICODE_CHAR);
+character: '\\' CHARACTER;
 
 symbol: NAME;
 
@@ -94,32 +94,34 @@ conditional_splicing: '#?@(' form* ')';
 symbolic: '##' ('Inf' | '-Inf' | 'NaN');
 
 // whitespace or comment
-whitespace: SPACE+ | (SPACE* COMMENT SPACE*);
+whitespace: (SPACE | COMMENT)+;
 
 NUMBER: [+-]? DIGIT+ (DOUBLE_SUFFIX | LONG_SUFFIX | RATIO_SUFFIX);
 
 STRING: '"' ( ~'"' | '\\' '"' )* '"';
 
-UNICODE_CHAR: ~[\u0300-\u036F\u1DC0-\u1DFF\u20D0-\u20FF];
-
-NAMED_CHAR: 'newline' | 'return' | 'space' | 'tab' | 'formfeed' | 'backspace';
-
-UNICODE: 'u' [0-9d-fD-F] [0-9d-fD-F] [0-9d-fD-F] [0-9d-fD-F];
+CHARACTER: UNICODE_CHAR | NAMED_CHAR | UNICODE;
 
 NAME: (SIMPLE_NAME '/')? ('/' | SIMPLE_NAME );
-
-SIMPLE_NAME: NAME_HEAD NAME_BODY*;
 
 COMMENT: ';' ~[\r\n]*;
 
 SPACE: [\r\n\t\f ];
+
+fragment SIMPLE_NAME: NAME_HEAD NAME_BODY*;
+
+fragment UNICODE_CHAR: ~[\u0300-\u036F\u1DC0-\u1DFF\u20D0-\u20FF];
+
+fragment NAMED_CHAR: 'newline' | 'return' | 'space' | 'tab' | 'formfeed' | 'backspace';
+
+fragment UNICODE: 'u' [0-9d-fD-F] [0-9d-fD-F] [0-9d-fD-F] [0-9d-fD-F];
 
 // re-allow :#' as valid characters inside the name itself
 fragment NAME_BODY: NAME_HEAD | [:#'0-9];
 
 // these is the set of characters that are allowed by all symbols and keywords
 // however, this is more strict that necessary so that we can re-use it for both
-fragment NAME_HEAD: ~[\r\n\t\f()[\]{}"@~^;`\\/, :#'0-9];
+fragment NAME_HEAD: ~[\r\n\t\f ()[\]{}"@~^;`\\/,:#'0-9];
 
 fragment DOUBLE_SUFFIX: ((('.' DIGIT*)? ([eE][-+]?DIGIT+)?) 'M'?);
 
