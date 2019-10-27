@@ -15,9 +15,11 @@ vector: '[' form* ']';
 
 map: '{' form* '}';
 
-literal: number | symbol | keyword | string ;// | character;
+literal: number | character | symbol | keyword | string ;
 
 number: NUMBER;
+
+character: '\\' (UNICODE | NAMED_CHAR | UNICODE_CHAR);
 
 symbol: NAME;
 
@@ -33,6 +35,12 @@ string: '"' ( ~'"' | '\\' '"' )* '"';
 whitespace: SPACE+ | (SPACE* COMMENT SPACE*);
 
 NUMBER: [+-]? DIGIT+ (DOUBLE_SUFFIX | LONG_SUFFIX | RATIO_SUFFIX);
+
+UNICODE_CHAR: ~[\u0300-\u036F\u1DC0-\u1DFF\u20D0-\u20FF];
+
+NAMED_CHAR: 'newline' | 'return' | 'space' | 'tab' | 'formfeed' | 'backspace';
+
+UNICODE: 'u' [0-9d-fD-F] [0-9d-fD-F] [0-9d-fD-F] [0-9d-fD-F];
 
 NAME: (SIMPLE_NAME '/')? ('/' | SIMPLE_NAME );
 
