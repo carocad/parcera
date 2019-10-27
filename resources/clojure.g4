@@ -95,19 +95,21 @@ conditional_splicing: '#?@(' form* ')';
 symbolic: '##' ('Inf' | '-Inf' | 'NaN');
 
 // whitespace or comment
-whitespace: (SPACE | COMMENT)+;
+whitespace: WHITESPACE;
 
 NUMBER: [+-]? DIGIT+ (DOUBLE_SUFFIX | LONG_SUFFIX | RATIO_SUFFIX);
 
 STRING: '"' ( ~'"' | '\\' '"' )* '"';
-
-COMMENT: ';' ~[\r\n]*;
 
 UNICODE_CHAR: [\u0300-\u036F\u1DC0-\u1DFF\u20D0-\u20FF];
 
 NAMED_CHAR: 'newline' | 'return' | 'space' | 'tab' | 'formfeed' | 'backspace';
 
 UNICODE: 'u' [0-9d-fD-F] [0-9d-fD-F] [0-9d-fD-F] [0-9d-fD-F];
+
+WHITESPACE: (SPACE | COMMENT)+;
+
+COMMENT: ';' ~[\r\n]*;
 
 SPACE: [\r\n\t\f, ]+;
 
