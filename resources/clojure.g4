@@ -24,7 +24,9 @@ NAME: (SIMPLE_NAME '/')? SIMPLE_NAME;
 SIMPLE_NAME: NAME_HEAD NAME_BODY+;
 
 // whitespace or comment
-WHITESPACE: SPACE+ | (SPACE* ';' ~[\r\n]* SPACE*);
+WHITESPACE: SPACE+ | (SPACE* COMMENT SPACE*);
+
+fragment COMMENT: ';' ~[\r\n]*;
 
 fragment SPACE: [\r\n\t\f ];
 
