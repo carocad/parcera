@@ -32,7 +32,7 @@ string: '"' ( ~'"' | '\\' '"' )* '"';
 // whitespace or comment
 whitespace: SPACE+ | (SPACE* COMMENT SPACE*);
 
-NUMBER: [0-9]+;
+NUMBER: [+-]? DIGIT+ (DOUBLE_SUFFIX | LONG_SUFFIX | RATIO_SUFFIX);
 
 NAME: (SIMPLE_NAME '/')? ('/' | SIMPLE_NAME );
 
@@ -48,3 +48,15 @@ fragment NAME_BODY: NAME_HEAD | [:#'];
 // these is the set of characters that are allowed by all symbols and keywords
 // however, this is more strict that necessary so that we can re-use it for both
 fragment NAME_HEAD: ~[\r\n\t\f()[\]{}"@~^;`\\/, :#'];
+
+fragment DOUBLE_SUFFIX: ((('.' DIGIT*)? ([eE][-+]?DIGIT+)?) 'M'?);
+
+fragment LONG_SUFFIX: ('0'[xX]((DIGIT|[A-Fa-f])+) |
+                       '0'([0-7]+) |
+                       ([1-9]DIGIT?)[rR](DIGIT[a-zA-Z]+) |
+                       '0'DIGIT+
+                      )?'N'?;
+
+fragment RATIO_SUFFIX: '/' DIGIT+;
+
+fragment DIGIT: [0-9];
