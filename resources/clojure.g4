@@ -17,22 +17,20 @@ macro_keyword: '::' NAME;
 
 string: '"' ( ~'"' | '\\' '"' )* '"';
 
-whitespace: WHITESPACE;
+// whitespace or comment
+whitespace: SPACE+ | (SPACE* COMMENT SPACE*);
 
 NAME: (SIMPLE_NAME '/')? SIMPLE_NAME;
 
 SIMPLE_NAME: NAME_HEAD NAME_BODY+;
 
-// whitespace or comment
-WHITESPACE: SPACE+ | (SPACE* COMMENT SPACE*);
+COMMENT: ';' ~[\r\n]*;
 
-fragment COMMENT: ';' ~[\r\n]*;
-
-fragment SPACE: [\r\n\t\f ];
+SPACE: [\r\n\t\f ];
 
 // re-allow :#' as valid characters inside the name itself
 fragment NAME_BODY: NAME_HEAD | [:#'];
 
 // these is the set of characters that are allowed by all symbols and keywords
 // however, this is more strict that necessary so that we can re-use it for both
-fragment NAME_HEAD: ~[\r\n\t\f()[\]{}@~^;`\\/, :#'];
+fragment NAME_HEAD: ~[\r\n\t\f()[\]{}"@~^;`\\/, :#'];
