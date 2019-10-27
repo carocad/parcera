@@ -3,6 +3,7 @@
 // it doesnt have any look ahead :(
 // therefore it will make the "right" decision on a valid grammar but it will
 // create a wrong AST on a wrong one
+// For example: 3.e -> invalid, but it parses as '3.' -> number, 'e' -> symbol
 
 grammar clojure;
 
