@@ -38,7 +38,6 @@ reader_macro: ( unquote
               | dispatch
               | unquote_splicing
               | deref
-              | symbolic
               );
 
 unquote: '~' form;
@@ -52,9 +51,9 @@ metadata: (metadata_entry whitespace)+ ( symbol
 
 metadata_entry: '^' ( map | symbol | string | keyword );
 
-quote: '\'' form;
-
 backtick: '`' form;
+
+quote: '\'' form;
 
 unquote_splicing: '~@' form;
 
@@ -68,7 +67,8 @@ dispatch: function
           | namespaced_map
           | var_quote
           | discard
-          | tag;
+          | tag
+          | symbolic;
 
 function: '#(' form* ')';
 
