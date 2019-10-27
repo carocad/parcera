@@ -19,7 +19,7 @@ STRING : '"' ( ~'"' | '\\' '"' )* '"' ;
 SYMBOL_NAME: NAME (NAME | [:#'])+;
 
 // whitespace or comment
-WHITESPACE: SPACE+ | (SPACE* ';' SPACE);
+WHITESPACE: SPACE+ | (SPACE* ';' ~[\r\n]* SPACE*);
 
 fragment SPACE: [\r\n\t\f ];
 
