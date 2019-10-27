@@ -20,9 +20,9 @@ string: '"' ( ~'"' | '\\' '"' )* '"';
 // whitespace or comment
 whitespace: SPACE+ | (SPACE* COMMENT SPACE*);
 
-NAME: (SIMPLE_NAME '/')? SIMPLE_NAME;
+NAME: (SIMPLE_NAME '/')? ('/' | SIMPLE_NAME );
 
-SIMPLE_NAME: NAME_HEAD NAME_BODY+;
+SIMPLE_NAME: NAME_HEAD NAME_BODY*;
 
 COMMENT: ';' ~[\r\n]*;
 
