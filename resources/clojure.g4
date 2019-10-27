@@ -1,5 +1,8 @@
 
-// NOTE: Antlr solves ambiguity based on the order of the rules
+// NOTE: Antlr solves ambiguity based on the order of the rules. Unfortunately
+// it doesnt have any look ahead :(
+// therefore it will make the "right" decision on a valid grammar but it will
+// create a wrong AST on a wrong one
 
 grammar clojure;
 
