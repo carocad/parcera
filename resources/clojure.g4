@@ -21,12 +21,6 @@ map: '{' form* '}';
 
 literal: keyword | string | number | character | symbol;
 
-number: NUMBER;
-
-character: '\\' (UNICODE_CHAR | NAMED_CHAR | UNICODE);
-
-symbol: NAME;
-
 keyword: simple_keyword | macro_keyword;
 
 simple_keyword: ':' NAME;
@@ -34,6 +28,12 @@ simple_keyword: ':' NAME;
 macro_keyword: '::' NAME;
 
 string: STRING;
+
+number: NUMBER;
+
+character: '\\' (UNICODE_CHAR | NAMED_CHAR | UNICODE);
+
+symbol: NAME;
 
 reader_macro: ( unquote
               | metadata
