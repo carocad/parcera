@@ -11,6 +11,8 @@ code: form*;
 
 form: whitespace | literal | collection | reader_macro;
 
+// sets and namespaced map are not considerd collection from grammar perspective
+// since they start with # -> dispatch macro
 collection: list | vector | map;
 
 list: '(' form* ')';
