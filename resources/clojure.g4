@@ -108,7 +108,7 @@ NAMED_CHAR: 'newline' | 'return' | 'space' | 'tab' | 'formfeed' | 'backspace';
 
 UNICODE: 'u' [0-9d-fD-F] [0-9d-fD-F] [0-9d-fD-F] [0-9d-fD-F];
 
-SPACE: [\r\n\t\f, ];
+SPACE: [\r\n\t\f, ]+;
 
 NAME: (SIMPLE_NAME '/')? ('/' | SIMPLE_NAME );
 
