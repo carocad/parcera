@@ -1,4 +1,6 @@
 
+// NOTE: Antlr solves ambiguity based on the order of the rules
+
 grammar clojure;
 
 code: form*;
