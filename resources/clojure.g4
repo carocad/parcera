@@ -5,11 +5,17 @@ code: form*;
 
 form: whitespace | literal | collection;
 
-collection: list;
+collection: list | vector | map;
 
-list: '(' form*  ')';
+list: '(' form* ')';
 
-literal: symbol | keyword | string ;//| number | character;
+vector: '[' form* ']';
+
+map: '{' form* '}';
+
+literal: number | symbol | keyword | string ;// | character;
+
+number: NUMBER;
 
 symbol: NAME;
 
@@ -23,6 +29,8 @@ string: '"' ( ~'"' | '\\' '"' )* '"';
 
 // whitespace or comment
 whitespace: SPACE+ | (SPACE* COMMENT SPACE*);
+
+NUMBER: [0-9]+;
 
 NAME: (SIMPLE_NAME '/')? ('/' | SIMPLE_NAME );
 
