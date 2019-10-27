@@ -67,12 +67,12 @@
 
     auto-resolve: '::';
 
-    metadata: (metadata-entry whitespace)+ ( symbol
-                                           / collection
-                                           / tag
-                                           / unquote
-                                           / unquote-splicing
-                                           );
+    metadata: (metadata-entry whitespace?)+ ( symbol
+                                            / collection
+                                            / tag
+                                            / unquote
+                                            / unquote-splicing
+                                            );
 
     metadata-entry: <'^'> ( map / symbol / string / keyword );
 

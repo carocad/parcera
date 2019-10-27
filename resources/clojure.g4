@@ -46,12 +46,12 @@ reader_macro: ( unquote
 
 unquote: '~' form;
 
-metadata: (metadata_entry whitespace)+ ( symbol
-                                       | collection
-                                       | tag
-                                       | unquote
-                                       | unquote_splicing
-                                       );
+metadata: (metadata_entry whitespace?)+ ( symbol
+                                        | collection
+                                        | tag
+                                        | unquote
+                                        | unquote_splicing
+                                        );
 
 metadata_entry: '^' ( map | symbol | string | keyword );
 
