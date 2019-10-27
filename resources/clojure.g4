@@ -99,7 +99,7 @@ whitespace: WHITESPACE;
 
 NUMBER: [+-]? DIGIT+ (DOUBLE_SUFFIX | LONG_SUFFIX | RATIO_SUFFIX);
 
-STRING: '"' ( ~'"' | '\\' '"' )* '"';
+STRING: '"' ~["\\]* ('\\' . ~["\\]*)* '"';
 
 WHITESPACE: (SPACE | COMMENT)+;
 
