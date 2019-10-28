@@ -1,11 +1,18 @@
 
-// NOTE: Antlr solves ambiguity based on the order of the rules. Unfortunately
-// it doesnt have any look ahead :(
-// therefore it will make the "right" decision on a valid grammar but it will
-// create a wrong AST on a wrong one
-// For example: 3.e -> invalid, but it parses as '3.' -> number, 'e' -> symbol
-
 grammar clojure;
+
+/*
+ * NOTES to myself and to other developers:
+ *
+ * - You have to remember that the parser cannot check for semantics
+ * - You have to find the right balance of dividing enforcement between the
+ *   grammar and your own code.
+ *
+ * The parser should only check the syntax. So the rule of thumb is that when
+ *  in doubt you let the parser pass the content up to your program. Then, in
+ * your program, you check the semantics and make sure that the rule actually
+ * have a proper meaning
+*/
 
 code: form*;
 
