@@ -12,6 +12,8 @@ grammar clojure;
  *  in doubt you let the parser pass the content up to your program. Then, in
  * your program, you check the semantics and make sure that the rule actually
  * have a proper meaning
+ *
+ * https://tomassetti.me/antlr-mega-tutorial/#lexers-and-parser
 */
 
 code: form*;
