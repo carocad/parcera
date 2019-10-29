@@ -3,6 +3,11 @@
            (java.util ArrayList)
            (org.antlr.v4.runtime CharStreams CommonTokenStream ParserRuleContext Token)))
 
+;; antlr automatically prints errors to std out
+;; line 1:14 token recognition error at: '\"hello @michael pink/this will work)'
+;; line 1:50 extraneous input '<EOF>' expecting {'(', ')', '[', '{', ':', '::', '~'
+
+;; todo: mute antlr default error listener
 ;; todo: identify parsing errors in the tree
 (defn- info
   "extract the match meta data information from the ast node"
