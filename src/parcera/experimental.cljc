@@ -3,11 +3,11 @@
            (java.util ArrayList)
            (org.antlr.v4.runtime CharStreams CommonTokenStream ParserRuleContext)))
 
-
+;; todo: add metadata to each node
 (defn- hiccup
   [ast rule-names]
   (if (and (instance? ParserRuleContext ast) (not-empty (.-children ast)))
-    (cons (keyword (aget rule-names (.getRuleIndex ast)))
+    (into [(keyword (aget rule-names (.getRuleIndex ast)))]
           (for [child (.-children ast)]
             (hiccup child rule-names)))
     (.toString ast)))
