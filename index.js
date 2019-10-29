@@ -13,25 +13,14 @@ const {clojureListener} = require('./build/js/clojureListener')
  */
 function treeSeq(ast, ruleNames) {
     const result = []
-    // a parser rule has childrens if it is a repetition (* or +)
+    // parser rules always have childrens
     if (ast.children !== undefined) {
         // we are inside a parser rule; therefore we add the rule name to the result
         result.push(ruleNames[ast.ruleIndex])
-        for (const child of ast.children) {
-            const childResult = treeSeq(child, ruleNames)
-            // we are on a lexer match so we just add the value and move on
-            if (child.getPayload().tokenIndex !== undefined) {
-                result.push(childResult)
-            } else if (child.getPayload().ruleIndex !== undefined) {
-                result.push.apply(result, childResult)
-            } else {
-                throw new Error(`Unexpected ast node: ${child.toString()}`)
-            }
-        }
+        result.push.apply(result, ast.children.map((child) => treeSeq(child, ruleNames)))
         return result
 
-        // the parser rule its not a repetition -> it matches directly
-        // therefore we just take the match
+        // lexer rules dont have childrens, so we just take the matched text
     } else {
         return ast.getText()
     }
