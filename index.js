@@ -15,17 +15,15 @@ function treeSeq(ast, ruleNames) {
     const result = []
     // a parser rule has childrens if it is a repetition (* or +)
     if (ast.children !== undefined) {
+        // we are inside a parser rule; therefore we add the rule name to the result
+        result.push(ruleNames[ast.ruleIndex])
         for (const child of ast.children) {
             const childResult = treeSeq(child, ruleNames)
             // we are on a lexer match so we just add the value and move on
             if (child.getPayload().tokenIndex !== undefined) {
                 result.push(childResult)
-
-                // we are inside a parser rule; therefore we add the rule and
-                // its result to the global one
             } else if (child.getPayload().ruleIndex !== undefined) {
-                const rule = ruleNames[child.ruleIndex]
-                result.push([rule].concat(childResult))
+                result.push.apply(result, childResult)
             } else {
                 throw new Error(`Unexpected ast node: ${child.toString()}`)
             }
@@ -47,15 +45,8 @@ const parser = new clojureParser(tokens)
 const ruleNames = parser.ruleNames
 parser.buildParseTrees = true
 
-const treeBuilder = (ast) => treeSeq(ast, ruleNames)
-
-class listener extends clojureListener {
-    enterCode(result) {
-        console.log(JSON.stringify(treeBuilder(result), null, 2))
-    }
-}
-
 const tree = parser.code()
-antlr4.tree.ParseTreeWalker.DEFAULT.walk(new listener(), tree)
+console.log(JSON.stringify(treeSeq(tree, ruleNames), null, 2))
+//antlr4.tree.ParseTreeWalker.DEFAULT.walk(new listener(), tree)
 
 console.log(`DONE 💫`)
