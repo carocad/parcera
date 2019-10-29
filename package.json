@@ -1,0 +1,11 @@
+{
+  "name": "parcera",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:carocad/parcera.git",
+  "author": "Camilo Roca <camilo.roca@cobi.bike>",
+  "license": "MIT",
+  "dependencies": {
+    "antlr4": "^4.7.2"
+  }
+}
