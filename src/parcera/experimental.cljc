@@ -1,18 +1,29 @@
 (ns parcera.experimental
   (:import (parcera.antlr clojureParser clojureLexer clojureListener)
            (java.util ArrayList)
-           (org.antlr.v4.runtime CharStreams CommonTokenStream ParserRuleContext)))
+           (org.antlr.v4.runtime CharStreams CommonTokenStream ParserRuleContext Token)))
 
-;; todo: add metadata to each node
 ;; todo: identify parsing errors in the tree
+(defn- info
+  "extract the match meta data information from the ast node"
+  [^ParserRuleContext ast]
+  (let [start (.getStart ast)
+        end   (.getStop ast)]
+    {::start {:row    (.getLine start)
+              :column (.getCharPositionInLine start)}
+     ::end   {:row    (.getLine end)
+              :column (.getCharPositionInLine end)}}))
+
 (defn- hiccup
   [ast rule-names]
   (if (and (instance? ParserRuleContext ast)
            ;; mainly for consistency with Js implementation
            (not-empty (.-children ast)))
-    (into [(keyword (aget rule-names (.getRuleIndex ast)))]
-          (for [child (.-children ast)]
-            (hiccup child rule-names)))
+    (let [head [(keyword (aget rule-names (.getRuleIndex ast)))]
+          body (for [child (.-children ast)]
+                 (hiccup child rule-names))]
+      ;; attach meta data ... ala instaparse
+      (with-meta (into head body) (info ast)))
     (. ast (toString))))
 
 
