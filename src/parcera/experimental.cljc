@@ -4,13 +4,16 @@
            (org.antlr.v4.runtime CharStreams CommonTokenStream ParserRuleContext)))
 
 ;; todo: add metadata to each node
+;; todo: identify parsing errors in the tree
 (defn- hiccup
   [ast rule-names]
-  (if (and (instance? ParserRuleContext ast) (not-empty (.-children ast)))
+  (if (and (instance? ParserRuleContext ast)
+           ;; mainly for consistency with Js implementation
+           (not-empty (.-children ast)))
     (into [(keyword (aget rule-names (.getRuleIndex ast)))]
           (for [child (.-children ast)]
             (hiccup child rule-names)))
-    (.toString ast)))
+    (. ast (toString))))
 
 
 (let [input      "(john :SHOUTS \"hello\" @michael pink/this will work)"
