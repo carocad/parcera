@@ -20,25 +20,31 @@
               :column (.getCharPositionInLine end)}}))
 
 (defn- hiccup
+  "transform the AST into a `hiccup-like` data structure.
+
+  This function doesnt return a vectors because they are
+  100 times slower for this use case compared to `cons`"
   [ast rule-names]
   (if (and (instance? ParserRuleContext ast)
            ;; mainly for consistency with Js implementation
            (not-empty (.-children ast)))
-    (let [head [(keyword (aget rule-names (.getRuleIndex ast)))]
+    (let [head (keyword (aget rule-names (.getRuleIndex ast)))
           body (for [child (.-children ast)]
                  (hiccup child rule-names))]
       ;; attach meta data ... ala instaparse
-      (with-meta (into head body) (info ast)))
+      (with-meta (cons head body) (info ast)))
     (. ast (toString))))
 
 
-(let [input      "(john :SHOUTS \"hello\" @michael pink/this will work)"
-      chars      (CharStreams/fromString input)
-      lexer      (new clojureLexer chars)
-      tokens     (new CommonTokenStream lexer)
-      parser     (new clojureParser tokens)
-      rule-names (. parser (getRuleNames))
-      _          (. parser (setBuildParseTree true))
-      tree       (. parser (code))]
-  (hiccup tree rule-names))
+(defn parse
+  [input]
+  (let [chars      (CharStreams/fromString input)
+        lexer      (new clojureLexer chars)
+        tokens     (new CommonTokenStream lexer)
+        parser     (new clojureParser tokens)
+        rule-names (. parser (getRuleNames))
+        _          (. parser (setBuildParseTree true))
+        tree       (. parser (code))]
+    (hiccup tree rule-names)))
 
+;(time (parse (slurp "test/parcera/test/core.cljc")))
