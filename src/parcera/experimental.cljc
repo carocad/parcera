@@ -7,9 +7,9 @@
 ;; line 1:14 token recognition error at: '\"hello @michael pink/this will work)'
 ;; line 1:50 extraneous input '<EOF>' expecting {'(', ')', '[', '{', ':', '::', '~'
 
-(def default-options {:hide {:tags     #{:form :collection :literal :keyword :reader_macro :dispatch}
-                             :literals #{"(" ")" "[" "]" "{" "}" "#{" "#" "^"
-                                         "`" "'" "~@" "@" "#(" "#'" "#_" "#?" "#?@" "##"}}})
+(def default-hidden {:tags     #{:form :collection :literal :keyword :reader_macro :dispatch}
+                     :literals #{"(" ")" "[" "]" "{" "}" "#{" "#" "^"
+                                 "`" "'" "~@" "@" "#(" "#'" "#_" "#?" "#?@" "##"}})
 
 
 ;; todo: mute antlr default error listener
@@ -29,32 +29,39 @@
 
   This function doesnt return a vectors because they are
   100 times slower for this use case compared to `cons`"
-  [ast rule-names]
+  [ast rule-names hide-tags hide-literals]
   (if (and (instance? ParserRuleContext ast)
            ;; mainly for consistency with Js implementation
            (not-empty (.-children ast)))
     (let [head       (keyword (aget rule-names (.getRuleIndex ast)))
-          wrap-child (fn [child] (hiccup child rule-names))]
+          wrap-child (fn [child] (hiccup child rule-names hide-tags hide-literals))]
       ;; attach meta data ... ala instaparse
-      (with-meta (if (contains? (:tags (:hide default-options)) head)
+      (with-meta (if (contains? hide-tags head)
                    (mapcat wrap-child (.-children ast))
                    (cons head (remove nil? (map wrap-child (.-children ast)))))
                  (info ast)))
     (let [text (. ast (toString))]
-      (when (not (contains? (:literals (:hide default-options)) text))
-        text))))
+      (if (contains? hide-literals text) nil text))))
 
+(defn- unhide
+  [options]
+  (case (:unhide options)
+    :all (dissoc default-hidden :literals :tags)
+    :content (dissoc default-hidden :literals)
+    :tags (dissoc default-hidden :tags)
+    default-hidden))
 
 (defn parse
-  [input & options]
-  (let [chars      (CharStreams/fromString input)
+  [input & {:as options}]
+  (let [hide       (unhide options)
+        chars      (CharStreams/fromString input)
         lexer      (new clojureLexer chars)
         tokens     (new CommonTokenStream lexer)
         parser     (new clojureParser tokens)
         rule-names (. parser (getRuleNames))
         _          (. parser (setBuildParseTree true))
         tree       (. parser (code))]
-    (hiccup tree rule-names)))
+    (hiccup tree rule-names (:tags hide) (:literals hide))))
 
 
 ;(time (parse (slurp "test/parcera/test/core.cljc")))
