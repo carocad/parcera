@@ -33,12 +33,12 @@
   (if (and (instance? ParserRuleContext ast)
            ;; mainly for consistency with Js implementation
            (not-empty (.-children ast)))
-    (let [head       (keyword (aget rule-names (.getRuleIndex ast)))
-          wrap-child (fn [child] (hiccup child rule-names hide-tags hide-literals))]
+    (let [rule         (keyword (aget rule-names (.getRuleIndex ast)))
+          hiccup-child (fn [child] (hiccup child rule-names hide-tags hide-literals))]
       ;; attach meta data ... ala instaparse
-      (with-meta (if (contains? hide-tags head)
-                   (mapcat wrap-child (.-children ast))
-                   (cons head (remove nil? (map wrap-child (.-children ast)))))
+      (with-meta (if (contains? hide-tags rule)
+                   (mapcat hiccup-child (.-children ast))
+                   (cons rule (remove nil? (map hiccup-child (.-children ast)))))
                  (info ast)))
     (let [text (. ast (toString))]
       (if (contains? hide-literals text) nil text))))
