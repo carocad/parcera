@@ -7,6 +7,11 @@
 ;; line 1:14 token recognition error at: '\"hello @michael pink/this will work)'
 ;; line 1:50 extraneous input '<EOF>' expecting {'(', ')', '[', '{', ':', '::', '~'
 
+(def default-options {:hide {:tags     #{:form :collection :literal :keyword :reader_macro :dispatch}
+                             :literals #{"(" ")" "[" "]" "{" "}" "#{" "#" "^"
+                                         "`" "'" "~@" "@" "#(" "#'" "#_" "#?" "#?@" "##"}}})
+
+
 ;; todo: mute antlr default error listener
 ;; todo: identify parsing errors in the tree
 (defn- info
@@ -28,16 +33,20 @@
   (if (and (instance? ParserRuleContext ast)
            ;; mainly for consistency with Js implementation
            (not-empty (.-children ast)))
-    (let [head (keyword (aget rule-names (.getRuleIndex ast)))
-          body (for [child (.-children ast)]
-                 (hiccup child rule-names))]
+    (let [head       (keyword (aget rule-names (.getRuleIndex ast)))
+          wrap-child (fn [child] (hiccup child rule-names))]
       ;; attach meta data ... ala instaparse
-      (with-meta (cons head body) (info ast)))
-    (. ast (toString))))
+      (with-meta (if (contains? (:tags (:hide default-options)) head)
+                   (mapcat wrap-child (.-children ast))
+                   (cons head (remove nil? (map wrap-child (.-children ast)))))
+                 (info ast)))
+    (let [text (. ast (toString))]
+      (when (not (contains? (:literals (:hide default-options)) text))
+        text))))
 
 
 (defn parse
-  [input]
+  [input & options]
   (let [chars      (CharStreams/fromString input)
         lexer      (new clojureLexer chars)
         tokens     (new CommonTokenStream lexer)
@@ -46,5 +55,6 @@
         _          (. parser (setBuildParseTree true))
         tree       (. parser (code))]
     (hiccup tree rule-names)))
+
 
 ;(time (parse (slurp "test/parcera/test/core.cljc")))
