@@ -43,6 +43,7 @@
     (let [text (. ast (toString))]
       (if (contains? hide-literals text) nil text))))
 
+
 (defn- unhide
   [options]
   (case (:unhide options)
@@ -50,6 +51,7 @@
     :content (dissoc default-hidden :literals)
     :tags (dissoc default-hidden :tags)
     default-hidden))
+
 
 (defn parse
   [input & {:as options}]
