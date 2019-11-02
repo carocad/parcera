@@ -21,12 +21,12 @@
     ;; TODO
     (println "report context sensitivity: " parser dfa start-index stop-index prediction configs))
   (syntaxError [this recognizer offending-symbol line char message error]
-    (let [report {:symbol     (str offending-symbol)
-                  :row        line
-                  :column     char
-                  :recognizer (.toString recognizer)
-                  :message    message
-                  :error      (str error)}]
+    ;; recognizer is either clojureParser or clojureLexer
+    (let [report {:symbol  (str offending-symbol)
+                  :row     line
+                  :column  char
+                  :message message
+                  :error   error}]
       (vswap! reports conj report))))
 
 (def default-hidden {:tags     #{:form :collection :literal :keyword :reader_macro :dispatch}
@@ -82,8 +82,9 @@
         listener   (->ParseFailure (volatile! ()))
         chars      (CharStreams/fromString input)
         lexer      (doto (new clojureLexer chars)
-                     (.removeErrorListeners)
-                     (.addErrorListener listener))
+                     (.removeErrorListeners))
+        ;; todo: how to handle lexer errors ?
+        ;(.addErrorListener listener))
         tokens     (new CommonTokenStream lexer)
         parser     (doto (new clojureParser tokens)
                      (.setBuildParseTree true)
@@ -101,4 +102,5 @@
 ;(time (parse (slurp "test/parcera/test/core.cljc")))
 
 ;(time (parse "(hello @michael \"pink/this will work)" :total true))
+;(time (parse "(hello @michael \"pink/this will work)"))
 ;(time (parse "(hello @michael pink/this will work)"))
