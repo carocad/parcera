@@ -1,11 +1,27 @@
 (ns parcera.experimental
   (:import (parcera.antlr clojureParser clojureLexer clojureListener)
            (java.util ArrayList)
-           (org.antlr.v4.runtime CharStreams CommonTokenStream ParserRuleContext Token)))
+           (org.antlr.v4.runtime CharStreams CommonTokenStream ParserRuleContext Token ANTLRErrorListener Parser)))
 
-;; antlr automatically prints errors to std out
-;; line 1:14 token recognition error at: '\"hello @michael pink/this will work)'
-;; line 1:50 extraneous input '<EOF>' expecting {'(', ')', '[', '{', ':', '::', '~'
+;; A custom Error Listener to avoid Antlr printing the errors on the terminal
+;; by default. This is also useful to mimic Instaparse :total parse mechanism
+;; such that if we get an error, we can report it as the result instead
+(defrecord ParseFailure [reports]
+  ANTLRErrorListener
+  (reportAmbiguity [this parser dfa start-index stop-index exact ambig-alts configs]
+    (println parser dfa start-index stop-index exact ambig-alts configs))
+  (reportAttemptingFullContext [this parser dfa start-index stop-index conflicting-alts configs]
+    (println parser dfa start-index stop-index conflicting-alts configs))
+  (reportContextSensitivity [this parser dfa start-index stop-index prediction configs]
+    (println parser dfa start-index stop-index prediction configs))
+  (syntaxError [this recognizer offending-symbol line char message error]
+    (let [report {:symbol     (str offending-symbol)
+                  :row        line
+                  :column     char
+                  :recognizer (.toString recognizer)
+                  :message    message
+                  :error      (str error)}]
+      (vswap! reports conj report))))
 
 (def default-hidden {:tags     #{:form :collection :literal :keyword :reader_macro :dispatch}
                      :literals #{"(" ")" "[" "]" "{" "}" "#{" "#" "^"
@@ -56,15 +72,24 @@
 
 (defn parse
   [input & {:as options}]
-  (let [hide       (unhide options)
+  (let [hidden     (unhide options)
+        listener   (->ParseFailure (volatile! ()))
         chars      (CharStreams/fromString input)
-        lexer      (new clojureLexer chars)
+        lexer      (doto (new clojureLexer chars)
+                     (.removeErrorListeners)
+                     (.addErrorListener listener))
         tokens     (new CommonTokenStream lexer)
-        parser     (new clojureParser tokens)
+        parser     (doto (new clojureParser tokens)
+                     (.setBuildParseTree true)
+                     (.removeErrorListeners)
+                     (.addErrorListener listener))
         rule-names (. parser (getRuleNames))
-        _          (. parser (setBuildParseTree true))
         tree       (. parser (code))]
-    (hiccup tree rule-names (:tags hide) (:literals hide))))
+    (if (and (not (empty? @(:reports listener)))
+             (:total options))
+      (hiccup tree rule-names (:tags hidden) (:literals hidden))
+      @(:reports listener))))
 
 
 ;(time (parse (slurp "test/parcera/test/core.cljc")))
+;(time (parse "(hello @michael \"pink/this will work)"))
