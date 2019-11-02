@@ -3,6 +3,7 @@
            (java.util ArrayList)
            (org.antlr.v4.runtime CharStreams CommonTokenStream ParserRuleContext Token ANTLRErrorListener Parser)))
 
+
 ;; A custom Error Listener to avoid Antlr printing the errors on the terminal
 ;; by default. This is also useful to mimic Instaparse :total parse mechanism
 ;; such that if we get an error, we can report it as the result instead
@@ -30,6 +31,7 @@
                   :stack   (when (instance? Parser recognizer)
                              (map keyword (reverse (.getRuleInvocationStack ^Parser recognizer))))}]
       (vswap! reports conj report))))
+
 
 (def default-hidden {:tags     #{:form :collection :literal :keyword :reader_macro :dispatch}
                      :literals #{"(" ")" "[" "]" "{" "}" "#{" "#" "^"
