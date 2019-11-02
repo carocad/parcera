@@ -92,8 +92,7 @@
         rule-names (. parser (getRuleNames))
         tree       (. parser (code))]
     ;(println @(:reports listener))
-    (if (and (not (empty? @(:reports listener)))
-             (:total options))
+    (if (or (empty? @(:reports listener)) (:total options))
       (hiccup tree rule-names (:tags hidden) (:literals hidden))
       @(:reports listener))))
 
@@ -102,4 +101,4 @@
 ;(time (parse (slurp "test/parcera/test/core.cljc")))
 
 ;(time (parse "(hello @michael \"pink/this will work)" :total true))
-;(time (parse "(hello @michael \"pink/this will work)"))
+;(time (parse "(hello @michael pink/this will work)"))
