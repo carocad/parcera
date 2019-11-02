@@ -26,7 +26,9 @@
                   :row     line
                   :column  char
                   :message message
-                  :error   error}]
+                  :error   error
+                  :stack   (when (instance? Parser recognizer)
+                             (map keyword (reverse (.getRuleInvocationStack ^Parser recognizer))))}]
       (vswap! reports conj report))))
 
 (def default-hidden {:tags     #{:form :collection :literal :keyword :reader_macro :dispatch}
@@ -34,7 +36,6 @@
                                  "`" "'" "~@" "@" "#(" "#'" "#_" "#?" "#?@" "##"}})
 
 
-;; todo: mute antlr default error listener
 ;; todo: identify parsing errors in the tree
 (defn- info
   "extract the match meta data information from the ast node"
