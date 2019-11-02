@@ -1,7 +1,8 @@
 (ns parcera.experimental
   (:import (parcera.antlr clojureParser clojureLexer clojureListener)
            (java.util ArrayList)
-           (org.antlr.v4.runtime CharStreams CommonTokenStream ParserRuleContext Token ANTLRErrorListener Parser)))
+           (org.antlr.v4.runtime CharStreams CommonTokenStream ParserRuleContext
+                                 Token ANTLRErrorListener Parser)))
 
 
 ;; A custom Error Listener to avoid Antlr printing the errors on the terminal
@@ -23,13 +24,16 @@
     (println "report context sensitivity: " parser dfa start-index stop-index prediction configs))
   (syntaxError [this recognizer offending-symbol line char message error]
     ;; recognizer is either clojureParser or clojureLexer
-    (let [report {:symbol  (str offending-symbol)
-                  :row     line
-                  :column  char
-                  :message message
-                  :error   error
-                  :stack   (when (instance? Parser recognizer)
-                             (map keyword (reverse (.getRuleInvocationStack ^Parser recognizer))))}]
+    (let [report (merge {:row     line
+                         :column  char
+                         :message message}
+                        (when (instance? Parser recognizer)
+                          {:symbol (str offending-symbol)
+                           :stack  (->> (.getRuleInvocationStack ^Parser recognizer)
+                                        (reverse)
+                                        (map keyword))})
+                        (when (some? error)
+                          {:error error}))]
       (vswap! reports conj report))))
 
 
