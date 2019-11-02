@@ -8,12 +8,18 @@
 ;; such that if we get an error, we can report it as the result instead
 (defrecord ParseFailure [reports]
   ANTLRErrorListener
+  ;; I am not sure how to use these methods. If you came here wondering why
+  ;; is this being printed, please open an issue so that we can all benefit
+  ;; from your findings ;)
   (reportAmbiguity [this parser dfa start-index stop-index exact ambig-alts configs]
-    (println parser dfa start-index stop-index exact ambig-alts configs))
+    ;; TODO
+    (println "report ambiguity: " parser dfa start-index stop-index exact ambig-alts configs))
   (reportAttemptingFullContext [this parser dfa start-index stop-index conflicting-alts configs]
-    (println parser dfa start-index stop-index conflicting-alts configs))
+    ;; TODO
+    (println "report attempting full context: " parser dfa start-index stop-index conflicting-alts configs))
   (reportContextSensitivity [this parser dfa start-index stop-index prediction configs]
-    (println parser dfa start-index stop-index prediction configs))
+    ;; TODO
+    (println "report context sensitivity: " parser dfa start-index stop-index prediction configs))
   (syntaxError [this recognizer offending-symbol line char message error]
     (let [report {:symbol     (str offending-symbol)
                   :row        line
@@ -85,11 +91,15 @@
                      (.addErrorListener listener))
         rule-names (. parser (getRuleNames))
         tree       (. parser (code))]
+    ;(println @(:reports listener))
     (if (and (not (empty? @(:reports listener)))
              (:total options))
       (hiccup tree rule-names (:tags hidden) (:literals hidden))
       @(:reports listener))))
 
 
+;(time (parse (slurp "test/parcera/test/core.cljc") :total true))
 ;(time (parse (slurp "test/parcera/test/core.cljc")))
+
+;(time (parse "(hello @michael \"pink/this will work)" :total true))
 ;(time (parse "(hello @michael \"pink/this will work)"))
