@@ -1,11 +1,7 @@
 (ns parcera.experimental
   (:require [parcera.antlr.protocols :as antlr]
             [parcera.antlr.java :as platform])
-  (:import (parcera.antlr clojureParser clojureLexer clojureListener)
-           (java.util ArrayList)
-           (org.antlr.v4.runtime CharStreams CommonTokenStream ParserRuleContext
-                                 Token ANTLRErrorListener Parser)
-           (org.antlr.v4.runtime.tree ErrorNode)))
+  (:import (org.antlr.v4.runtime ANTLRErrorListener Parser)))
 
 
 ;; A custom Error Listener to avoid Antlr printing the errors on the terminal
