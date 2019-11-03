@@ -39,8 +39,8 @@
 
 
 (def default-hidden {:tags     #{:form :collection :literal :keyword :reader_macro :dispatch}
-                     :literals #{"(" ")" "[" "]" "{" "}" "#{" "#" "^"
-                                 "`" "'" "~@" "@" "#(" "#'" "#_" "#?" "#?@" "##"}})
+                     :literals #{"(" ")" "[" "]" "{" "}" "#{" "#" "^" "`" "'"
+                                 "~@" "@" "#(" "#'" "#_" "#?" "#?@" "##" ":" "::"}})
 
 
 (defn- info
