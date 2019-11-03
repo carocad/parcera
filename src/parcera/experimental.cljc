@@ -1,4 +1,5 @@
 (ns parcera.experimental
+  (:require [parcera.antlr.protocols :as antlr])
   (:import (parcera.antlr clojureParser clojureLexer clojureListener)
            (java.util ArrayList)
            (org.antlr.v4.runtime CharStreams CommonTokenStream ParserRuleContext
@@ -45,13 +46,13 @@
 
 (defn- info
   "extract the match meta data information from the ast node"
-  [^ParserRuleContext ast]
-  (let [start (.getStart ast)
-        end   (.getStop ast)]
-    {::start {:row    (.getLine start)
-              :column (.getCharPositionInLine start)}
-     ::end   {:row    (.getLine end)
-              :column (.getCharPositionInLine end)}}))
+  [ast]
+  (let [start (antlr/start ast)
+        end   (antlr/end ast)]
+    {::start {:row    (antlr/row start)
+              :column (antlr/column start)}
+     ::end   {:row    (antlr/row end)
+              :column (antlr/column end)}}))
 
 
 (defn- hiccup
@@ -61,9 +62,9 @@
   100 times slower for this use case compared to `cons` cells"
   [tree rule-names hide-tags hide-literals]
   (cond
-    (instance? ParserRuleContext tree)
-    (let [rule         (keyword (aget rule-names (.getRuleIndex tree)))
-          children-ast (for [child (.-children tree)
+    (satisfies? antlr/ParserRule tree)
+    (let [rule         (keyword (get rule-names (antlr/rule-index tree)))
+          children-ast (for [child (antlr/children tree)
                              :let [child-ast (hiccup child rule-names hide-tags hide-literals)]
                              :when (not (nil? child-ast))]
                          child-ast)
@@ -73,11 +74,11 @@
       ;; attach meta data ... ala instaparse
       (with-meta ast (info tree)))
 
-    (instance? ErrorNode tree)
-    (let [token (.-symbol tree)
+    (satisfies? antlr/ErrorNode tree)
+    (let [token (antlr/token tree)
           ;; error metadata
-          info  {::start {:row    (.getLine token)
-                          :column (.getCharPositionInLine token)}}]
+          info  {::start {:row    (antlr/row token)
+                          :column (antlr/column token)}}]
       (with-meta (list ::failure (str tree)) info))
 
     :else
@@ -108,8 +109,8 @@
                      (.setBuildParseTree true)
                      (.removeErrorListeners)
                      (.addErrorListener listener))
-        rule-names (. parser (getRuleNames))
-        tree       (. parser (code))]
+        rule-names (antlr/rules parser)
+        tree       (antlr/tree parser)]
     ;(println @(:reports listener))
     (if (or (empty? @(:reports listener)) (:total options))
       (hiccup tree rule-names (:tags hidden) (:literals hidden))
