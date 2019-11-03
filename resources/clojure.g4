@@ -91,7 +91,9 @@ regex: '#' STRING;
 
 set: '#{' form* '}';
 
-namespaced_map: '#' ( keyword |  '::') map;
+namespaced_map: '#' ( keyword |  auto_resolve) map;
+
+auto_resolve: '::';
 
 var_quote: '#\'' symbol;
 
