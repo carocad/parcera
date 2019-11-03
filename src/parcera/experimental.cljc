@@ -2,7 +2,8 @@
   (:import (parcera.antlr clojureParser clojureLexer clojureListener)
            (java.util ArrayList)
            (org.antlr.v4.runtime CharStreams CommonTokenStream ParserRuleContext
-                                 Token ANTLRErrorListener Parser)))
+                                 Token ANTLRErrorListener Parser)
+           (org.antlr.v4.runtime.tree ErrorNode)))
 
 
 ;; A custom Error Listener to avoid Antlr printing the errors on the terminal
@@ -42,7 +43,6 @@
                                  "`" "'" "~@" "@" "#(" "#'" "#_" "#?" "#?@" "##"}})
 
 
-;; todo: identify parsing errors in the tree
 (defn- info
   "extract the match meta data information from the ast node"
   [^ParserRuleContext ast]
@@ -60,7 +60,8 @@
   This function doesnt return a vectors because they are
   100 times slower for this use case compared to `cons` cells"
   [tree rule-names hide-tags hide-literals]
-  (if (instance? ParserRuleContext tree)
+  (cond
+    (instance? ParserRuleContext tree)
     (let [rule         (keyword (aget rule-names (.getRuleIndex tree)))
           children-ast (for [child (.-children tree)
                              :let [child-ast (hiccup child rule-names hide-tags hide-literals)]
@@ -71,6 +72,15 @@
                          (cons rule children-ast))]
       ;; attach meta data ... ala instaparse
       (with-meta ast (info tree)))
+
+    (instance? ErrorNode tree)
+    (let [token (.-symbol tree)
+          ;; error metadata
+          info  {::start {:row    (.getLine token)
+                          :column (.getCharPositionInLine token)}}]
+      (with-meta (list ::failure (str tree)) info))
+
+    :else
     (let [text (str tree)]
       (if (contains? hide-literals text) nil text))))
 
@@ -103,12 +113,14 @@
     ;(println @(:reports listener))
     (if (or (empty? @(:reports listener)) (:total options))
       (hiccup tree rule-names (:tags hidden) (:literals hidden))
-      @(:reports listener))))
+      ;; hide the volatile to avoid exposing mutable memory ;)
+      (->ParseFailure @(:reports listener)))))
 
 
 ;(time (parse (slurp "test/parcera/test/core.cljc") :total true))
 ;(time (parse (slurp "test/parcera/test/core.cljc")))
 
 ;(time (parse "(hello @michael \"pink/this will work)" :total true))
+;(time (parse "(hello @michael pink/this will work)" :total true))
 ;(time (parse "(hello @michael \"pink/this will work)"))
 ;(time (parse "(hello @michael pink/this will work)"))
