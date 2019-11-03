@@ -1,5 +1,6 @@
 (ns parcera.experimental
-  (:require [parcera.antlr.protocols :as antlr])
+  (:require [parcera.antlr.protocols :as antlr]
+            [parcera.antlr.java :as platform])
   (:import (parcera.antlr clojureParser clojureLexer clojureListener)
            (java.util ArrayList)
            (org.antlr.v4.runtime CharStreams CommonTokenStream ParserRuleContext
@@ -99,19 +100,9 @@
   [input & {:as options}]
   (let [hidden     (unhide options)
         listener   (->ParseFailure (volatile! ()))
-        chars      (CharStreams/fromString input)
-        lexer      (doto (new clojureLexer chars)
-                     (.removeErrorListeners))
-        ;; todo: how to handle lexer errors ?
-        ;(.addErrorListener listener))
-        tokens     (new CommonTokenStream lexer)
-        parser     (doto (new clojureParser tokens)
-                     (.setBuildParseTree true)
-                     (.removeErrorListeners)
-                     (.addErrorListener listener))
+        parser     (platform/parser input listener)
         rule-names (antlr/rules parser)
         tree       (antlr/tree parser)]
-    ;(println @(:reports listener))
     (if (or (empty? @(:reports listener)) (:total options))
       (hiccup tree rule-names (:tags hidden) (:literals hidden))
       ;; hide the volatile to avoid exposing mutable memory ;)
