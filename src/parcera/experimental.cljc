@@ -58,19 +58,20 @@
   "transform the AST into a `hiccup-like` data structure.
 
   This function doesnt return a vectors because they are
-  100 times slower for this use case compared to `cons`"
-  [ast rule-names hide-tags hide-literals]
-  (if (and (instance? ParserRuleContext ast)
-           ;; mainly for consistency with Js implementation
-           (not-empty (.-children ast)))
-    (let [rule         (keyword (aget rule-names (.getRuleIndex ast)))
-          hiccup-child (fn [child] (hiccup child rule-names hide-tags hide-literals))]
+  100 times slower for this use case compared to `cons` cells"
+  [tree rule-names hide-tags hide-literals]
+  (if (instance? ParserRuleContext tree)
+    (let [rule         (keyword (aget rule-names (.getRuleIndex tree)))
+          children-ast (for [child (.-children tree)
+                             :let [child-ast (hiccup child rule-names hide-tags hide-literals)]
+                             :when (not (nil? child-ast))]
+                         child-ast)
+          ast          (if (contains? hide-tags rule)
+                         (apply concat children-ast)
+                         (cons rule children-ast))]
       ;; attach meta data ... ala instaparse
-      (with-meta (if (contains? hide-tags rule)
-                   (mapcat hiccup-child (.-children ast))
-                   (cons rule (remove nil? (map hiccup-child (.-children ast)))))
-                 (info ast)))
-    (let [text (. ast (toString))]
+      (with-meta ast (info tree)))
+    (let [text (str tree)]
       (if (contains? hide-literals text) nil text))))
 
 
