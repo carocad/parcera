@@ -6,21 +6,29 @@
   :dependencies [[org.clojure/clojure "1.10.1"]
                  [instaparse/instaparse "1.4.10"]]
   :profiles {:dev      {:dependencies      [[criterium/criterium "0.4.5"] ;; benchmark
-                                            [org.clojure/test.check "0.10.0"]
-                                            [org.antlr/antlr4-runtime "4.7.1"]]
+                                            [org.clojure/test.check "0.10.0"]]
                         :plugins           [[jonase/eastwood "0.3.5"]
                                             [lein-cljsbuild "1.1.7"]]
                         :java-source-paths ["build/java"]
+                        ;; todo: does this even work ?
+                        :foreign-libs      [{:file        "build/js/parcera/antlr/clojureLexer.js"
+                                             :provides    ["parcera.antlr.clojureLexer"]
+                                             :module-type :commonjs}
+                                            {:file        "build/js/parcera/antlr/clojureParser.js"
+                                             :provides    ["parcera.antlr.clojureParser"]
+                                             :module-type :commonjs}]
                         :cljsbuild         {:builds
                                             [{:id           "dev"
                                               :source-paths ["src" "test"]
                                               :compiler     {:main          parcera.test-runner
                                                              :output-to     "target/out/tests.js"
                                                              :target        :nodejs
+                                                             :infer-externs true
                                                              :optimizations :none}}]
                                             :test-commands
                                             {"test" ["node" "target/out/tests.js"]}}}
-             :provided {:dependencies [[org.clojure/clojurescript "1.10.520"]]}}
+             :provided {:dependencies [[org.clojure/clojurescript "1.10.520"]
+                                       [org.antlr/antlr4-runtime "4.7.1"]]}}
   :test-selectors {:default     (fn [m] (not (some #{:benchmark} (keys m))))
                    :benchmark   :benchmark}
   :deploy-repositories [["clojars" {:url "https://clojars.org/repo"
