@@ -1,39 +1,8 @@
 (ns parcera.experimental
   (:require [parcera.antlr.protocols :as antlr]
             [parcera.antlr.java :as platform])
-  (:import (org.antlr.v4.runtime ANTLRErrorListener Parser)))
+  #?(:cljs (:import goog.string.StringBuffer)))
 
-
-;; A custom Error Listener to avoid Antlr printing the errors on the terminal
-;; by default. This is also useful to mimic Instaparse :total parse mechanism
-;; such that if we get an error, we can report it as the result instead
-(defrecord ParseFailure [reports]
-  ANTLRErrorListener
-  ;; I am not sure how to use these methods. If you came here wondering why
-  ;; is this being printed, please open an issue so that we can all benefit
-  ;; from your findings ;)
-  (reportAmbiguity [this parser dfa start-index stop-index exact ambig-alts configs]
-    ;; TODO
-    (println "report ambiguity: " parser dfa start-index stop-index exact ambig-alts configs))
-  (reportAttemptingFullContext [this parser dfa start-index stop-index conflicting-alts configs]
-    ;; TODO
-    (println "report attempting full context: " parser dfa start-index stop-index conflicting-alts configs))
-  (reportContextSensitivity [this parser dfa start-index stop-index prediction configs]
-    ;; TODO
-    (println "report context sensitivity: " parser dfa start-index stop-index prediction configs))
-  (syntaxError [this recognizer offending-symbol line char message error]
-    ;; recognizer is either clojureParser or clojureLexer
-    (let [report (merge {:row     line
-                         :column  char
-                         :message message}
-                        (when (instance? Parser recognizer)
-                          {:symbol (str offending-symbol)
-                           :stack  (->> (.getRuleInvocationStack ^Parser recognizer)
-                                        (reverse)
-                                        (map keyword))})
-                        (when (some? error)
-                          {:error error}))]
-      (vswap! reports conj report))))
 
 
 (def default-hidden {:tags     #{:form :collection :literal :keyword :reader_macro :dispatch}
@@ -95,20 +64,130 @@
 (defn clojure
   [input & {:as options}]
   (let [hidden     (unhide options)
-        listener   (->ParseFailure (volatile! ()))
-        parser     (platform/parser input listener)
+        {:keys [parser listener]} (platform/parser input)
         rule-names (antlr/rules parser)
         tree       (antlr/tree parser)]
     (if (or (empty? @(:reports listener)) (:total options))
       (hiccup tree rule-names (:tags hidden) (:literals hidden))
-      ;; hide the volatile to avoid exposing mutable memory ;)
-      (->ParseFailure @(:reports listener)))))
+      @(:reports listener))))                               ;; todo: expose a proper error record ?
 
 
-;(time (parse (slurp "test/parcera/test/core.cljc") :total true))
-;(time (parse (slurp "test/parcera/test/core.cljc")))
+(defn- code*
+  "internal function used to imperatively build up the code from the provided
+   AST as Clojure's str would be too slow"
+  [ast #?(:clj  ^StringBuilder string-builder
+          :cljs ^StringBuffer string-builder)]
+  (case (first ast)
+    :code
+    (doseq [child (rest ast)]
+      (code* child string-builder))
 
-;(time (parse "(hello @michael \"pink/this will work)" :total true))
-;(time (parse "(hello @michael pink/this will work)" :total true))
-;(time (parse "(hello @michael \"pink/this will work)"))
-;(time (parse "(hello @michael pink/this will work)"))
+    :list
+    (do (. string-builder (append "("))
+        (doseq [child (rest ast)] (code* child string-builder))
+        (. string-builder (append ")")))
+
+    :vector
+    (do (. string-builder (append "["))
+        (doseq [child (rest ast)] (code* child string-builder))
+        (. string-builder (append "]")))
+
+    :namespaced-map
+    (do (. string-builder (append "#"))
+        (doseq [child (rest ast)] (code* child string-builder)))
+
+    :map
+    (do (. string-builder (append "{"))
+        (doseq [child (rest ast)] (code* child string-builder))
+        (. string-builder (append "}")))
+
+    :set
+    (do (. string-builder (append "#{"))
+        (doseq [child (rest ast)] (code* child string-builder))
+        (. string-builder (append "}")))
+
+    (:number :whitespace :symbolic :auto-resolve :symbol :simple-keyword
+      :macro-keyword :character :string :regex)
+    (. string-builder (append (second ast)))
+
+    :metadata
+    (do (doseq [child (rest (butlast ast))] (code* child string-builder))
+        (code* (last ast) string-builder))
+
+    :metadata-entry
+    (doseq [child (rest ast)]
+      (. string-builder (append "^"))
+      (code* child string-builder))
+
+    :quote
+    (do (. string-builder (append "'"))
+        (doseq [child (rest ast)] (code* child string-builder)))
+
+    :var-quote
+    (do (. string-builder (append "#'"))
+        (code* (second ast) string-builder))
+
+    :discard
+    (do (. string-builder (append "#_"))
+        (doseq [child (rest ast)] (code* child string-builder)))
+
+    :tag
+    (do (. string-builder (append "#"))
+        (doseq [child (rest ast)] (code* child string-builder)))
+
+    :backtick
+    (do (. string-builder (append "`"))
+        (doseq [child (rest ast)] (code* child string-builder)))
+
+    :unquote
+    (do (. string-builder (append "~"))
+        (doseq [child (rest ast)] (code* child string-builder)))
+
+    :unquote-splicing
+    (do (. string-builder (append "~@"))
+        (doseq [child (rest ast)] (code* child string-builder)))
+
+    :conditional
+    (do (. string-builder (append "#?("))
+        (doseq [child (rest ast)] (code* child string-builder))
+        (. string-builder (append ")")))
+
+    :conditional-splicing
+    (do (. string-builder (append "#?@("))
+        (doseq [child (rest ast)] (code* child string-builder))
+        (. string-builder (append ")")))
+
+    :deref
+    (do (. string-builder (append "@"))
+        (doseq [child (rest ast)] (code* child string-builder)))
+
+    :function
+    (do (. string-builder (append "#("))
+        (doseq [child (rest ast)] (code* child string-builder))
+        (. string-builder (append ")")))))
+
+
+(defn code
+  "Transforms your AST back into code
+
+   ast: The nested sequence of [:keyword & content] which MUST follow the
+        same structure as the result of `(parcera/clojure input-string)`
+
+   Returns a string representation of the provided AST
+
+   In general (= input (parcera/code (parcera/clojure input)))"
+  [ast]
+  (let [string-builder #?(:clj (new StringBuilder)
+                          :cljs (new StringBuffer))]
+    (code* ast string-builder)
+    (. string-builder (toString))))
+
+; Successful parse.
+; Profile:  {:create-node 384, :push-full-listener 2, :push-stack 384,
+;            :push-listener 382, :push-result 227, :push-message 227 }
+; "Elapsed time: 47.25084 msecs"
+#_(time (clojure (str '(ns parcera.core
+                         (:require [instaparse.core :as instaparse]
+                                   [clojure.data :as data]
+                                   [clojure.string :as str])))
+                 :trace true))
