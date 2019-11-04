@@ -5,8 +5,8 @@
 
 
 (def default-hidden {:tags     #{:form :collection :literal :keyword :reader_macro :dispatch}
-                     :literals #{"(" ")" "[" "]" "{" "}" "#{" "#" "^" "`" "'"
-                                 "~@" "@" "#(" "#'" "#_" "#?" "#?@" "##" ":" "::"}})
+                     :literals #{"(" ")" "[" "]" "{" "}" "#{" "#" "^" "`" "'" "~"
+                                 "~@" "@" "#(" "#'" "#_" "#?(" "#?@(" "##" ":" "::"}})
 
 (defn- info
   "extract the match meta data information from the ast node"
@@ -112,8 +112,16 @@
         (doseq [child (rest ast)] (code* child string-builder))
         (. string-builder (append "}")))
 
-    (:number :whitespace :symbolic :symbol :character :string :regex)
+    (:number :whitespace :symbol :character :string)
     (. string-builder (append (second ast)))
+
+    :symbolic
+    (do (. string-builder (append "##"))
+        (. string-builder (append (second ast))))
+
+    :regex
+    (do (. string-builder (append "#"))
+        (. string-builder (append (second ast))))
 
     :auto_resolve
     (. string-builder (append "::"))
