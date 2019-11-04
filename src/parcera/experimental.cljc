@@ -4,7 +4,6 @@
   #?(:cljs (:import goog.string.StringBuffer)))
 
 
-
 (def default-hidden {:tags     #{:form :collection :literal :keyword :reader_macro :dispatch}
                      :literals #{"(" ")" "[" "]" "{" "}" "#{" "#" "^" "`" "'"
                                  "~@" "@" "#(" "#'" "#_" "#?" "#?@" "##" ":" "::"}})
@@ -62,6 +61,13 @@
 
 
 (defn clojure
+  "Clojure (antlr4) parser. It can be used as:
+  - `(parcera/clojure input-string)`
+     -> returns an AST representation of input-string
+
+   The following options are accepted:
+   - `:unhide` can be one of `#{:tags :content :all}`. Defaults to `nil`
+   - `:total`  thruthy value to get a parse tree even on failures"
   [input & {:as options}]
   (let [hidden     (unhide options)
         {:keys [parser listener]} (platform/parser input)
