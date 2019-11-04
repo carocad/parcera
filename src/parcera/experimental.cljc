@@ -92,7 +92,7 @@
         (doseq [child (rest ast)] (code* child string-builder))
         (. string-builder (append "]")))
 
-    :namespaced-map
+    :namespaced_map
     (do (. string-builder (append "#"))
         (doseq [child (rest ast)] (code* child string-builder)))
 
@@ -106,15 +106,25 @@
         (doseq [child (rest ast)] (code* child string-builder))
         (. string-builder (append "}")))
 
-    (:number :whitespace :symbolic :auto-resolve :symbol :simple-keyword
-      :macro-keyword :character :string :regex)
+    (:number :whitespace :symbolic :symbol :character :string :regex)
     (. string-builder (append (second ast)))
+
+    :auto_resolve
+    (. string-builder (append "::"))
+
+    :simple_keyword
+    (do (. string-builder (append ":"))
+        (. string-builder (append (second ast))))
+
+    :macro_keyword
+    (do (. string-builder (append "::"))
+        (. string-builder (append (second ast))))
 
     :metadata
     (do (doseq [child (rest (butlast ast))] (code* child string-builder))
         (code* (last ast) string-builder))
 
-    :metadata-entry
+    :metadata_entry
     (doseq [child (rest ast)]
       (. string-builder (append "^"))
       (code* child string-builder))
@@ -123,7 +133,7 @@
     (do (. string-builder (append "'"))
         (doseq [child (rest ast)] (code* child string-builder)))
 
-    :var-quote
+    :var_quote
     (do (. string-builder (append "#'"))
         (code* (second ast) string-builder))
 
@@ -143,7 +153,7 @@
     (do (. string-builder (append "~"))
         (doseq [child (rest ast)] (code* child string-builder)))
 
-    :unquote-splicing
+    :unquote_splicing
     (do (. string-builder (append "~@"))
         (doseq [child (rest ast)] (code* child string-builder)))
 
@@ -152,7 +162,7 @@
         (doseq [child (rest ast)] (code* child string-builder))
         (. string-builder (append ")")))
 
-    :conditional-splicing
+    :conditional_splicing
     (do (. string-builder (append "#?@("))
         (doseq [child (rest ast)] (code* child string-builder))
         (. string-builder (append ")")))
