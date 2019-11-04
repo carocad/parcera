@@ -1,6 +1,6 @@
 const antlr4 = require('antlr4/index')
-const {clojureLexer} = require('./build/js/parcera/antlr/clojureLexer')
-const {clojureParser} = require('./build/js/parcera/antlr/clojureParser')
+const {ClojureLexer} = require('./src/javascript/parcera/antlr/ClojureLexer')
+const {ClojureParser} = require('./src/javascript/parcera/antlr/ClojureParser')
 
 /**
  * Takes an AST tree; the result of a parser walk and returns
@@ -15,7 +15,6 @@ function treeSeq(ast, ruleNames) {
     // parser rules always have childrens
     if (ast.children !== undefined) {
         // we are inside a parser rule; therefore we add the rule name to the result
-        console.log(ast instanceof antlr4.ParserRuleContext)
         result.push(ruleNames[ast.ruleIndex])
         result.push.apply(result, ast.children.map((child) => treeSeq(child, ruleNames)))
         return result
@@ -28,10 +27,10 @@ function treeSeq(ast, ruleNames) {
 
 const input = `(john :SHOUTS "hello" @michael pink/this will work)`
 const chars = new antlr4.CharStreams.fromString(input)
-const lexer = new clojureLexer(chars)
+const lexer = new ClojureLexer(chars)
 lexer.removeErrorListeners()
 const tokens = new antlr4.CommonTokenStream(lexer)
-const parser = new clojureParser(tokens)
+const parser = new ClojureParser(tokens)
 const ruleNames = parser.ruleNames
 parser.buildParseTrees = true
 parser.removeErrorListeners()
