@@ -63,6 +63,7 @@
   (rules [^clojureParser this] (vec (.getRuleNames this)))
   (tree [^clojureParser this] (. this (code))))
 
+
 (defn parser
   [input]
   (let [chars    (CharStreams/fromString input)
@@ -77,3 +78,6 @@
                    (.removeErrorListeners)
                    (.addErrorListener listener))]
     {:parser parser :listener listener}))
+
+
+(defn failure? [obj] (instance? ParseFailure obj))
