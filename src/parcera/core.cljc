@@ -1,148 +1,87 @@
 (ns parcera.core
-  (:require [instaparse.core :as instaparse]
-            [instaparse.combinators-source :as combi]
-            [instaparse.cfg :as cfg]
-            [parcera.terminals :as terminal])
+  (:require [parcera.antlr.protocols :as antlr]
+            [parcera.antlr.java :as platform])
   #?(:cljs (:import goog.string.StringBuffer)))
 
-; todo: implement advices from
-; http://blog.reverberate.org/2013/09/ll-and-lr-in-context-why-parsing-tools.html
-; https://www.loggly.com/blog/regexes-the-bad-better-best/
-; https://www.loggly.com/blog/five-invaluable-techniques-to-improve-regex-performance/
 
-; todo: use advices in https://medium.appbase.io/analyzing-20k-github-repositories-af76de21c3fc
-; to check if the heuristics are accurate
+(def default-hidden {:tags     #{:form :collection :literal :keyword :reader_macro :dispatch}
+                     :literals #{"(" ")" "[" "]" "{" "}" "#{" "#" "^" "`" "'"
+                                 "~@" "@" "#(" "#'" "#_" "#?" "#?@" "##" ":" "::"}})
 
-; NOTE: Through my experiments I found out that Instaparse will gladly take the
-; first match as long as the grammar is not ambiguous. Therefore I switched the
-; unordered OR (|) with an ordered one (/). This of course implies an heuristic
-; of knowing which grammar rules are expected to match more often. I use
-; Clojure's core as a reference with the following code snippet
-#_(let [core-content (slurp "https://raw.githubusercontent.com/clojure/clojure/master/src/clj/clojure/core.clj")]
-    (time (sort-by second > (frequencies (filter keyword? (flatten (clojure core-content :optimize :memory)))))))
-#_(let [core-content (slurp "https://raw.githubusercontent.com/clojure/clojurescript/master/src/main/clojure/cljs/core.cljc")]
-    (time (sort-by second > (frequencies (filter keyword? (flatten (clojure core-content :optimize :memory)))))))
-; todo: performance of [,\s]*;.*|[,\s]+ for whitespace
-(def grammar-rules
-  "code: form*;
-
-    <form>: whitespace / literal / collection / reader-macro;
-
-    (* we treat comments the same way as commas *)
-    whitespace = #'([,\\s]*;.*)?([,\\s]+|$)';
-
-    (* for parsing purposes we dont consider a Set a collection since it starts
-       with # -> dispatch macro *)
-    <collection>: list / vector / map;
-
-    list: <'('> form* <')'> ;
-
-    vector: <'['> form* <']'> ;
-
-    map: <'{'> form* <'}'>;
-
-    (* a literal is basically anything that is not a collection, macro or whitespace *)
-    <literal>: ( symbol
-                / keyword
-                / string
-                / number
-                / character
-                );
-
-    <keyword>: simple-keyword / macro-keyword ;
-
-    <reader-macro>: ( unquote
-                    / metadata
-                    / backtick
-                    / quote
-                    / dispatch
-                    / unquote-splicing
-                    / deref
-                    / symbolic
-                    );
-
-    set: <'#{'> form* <'}'>;
-
-    namespaced-map: <'#'> ( keyword / auto-resolve ) map;
-
-    auto-resolve: '::';
-
-    metadata: (metadata-entry whitespace?)+ ( symbol
-                                            / collection
-                                            / tag
-                                            / unquote
-                                            / unquote-splicing
-                                            );
-
-    metadata-entry: <'^'> ( map / symbol / string / keyword );
-
-    quote: <'\\''> form;
-
-    backtick: <'`'> form;
-
-    unquote: <#'~(?!@)'> form;
-
-    unquote-splicing: <'~@'> form;
-
-    deref: <'@'> form;
-
-    <dispatch>:  function
-               / regex
-               / set
-               / conditional
-               / conditional-splicing
-               / namespaced-map
-               / var-quote
-               / discard
-               / tag;
-
-    function: <'#('> form* <')'>;
-
-    var-quote: <'#\\''> symbol;
-
-    discard: <'#_'> form;
-
-    tag: <#'#(?![_?])'> symbol whitespace? (literal / collection);
-
-    conditional: <'#?('> form* <')'>;
-
-    conditional-splicing: <'#?@('> form*  <')'>;
-
-    symbolic: #'##(Inf|-Inf|NaN)'")
+(defn- info
+  "extract the match meta data information from the ast node"
+  [ast]
+  (let [start (antlr/start ast)
+        end   (antlr/end ast)]
+    {::start {:row    (antlr/row start)
+              :column (antlr/column start)}
+     ::end   {:row    (antlr/row end)
+              :column (antlr/column end)}}))
 
 
-(def grammar-terminals
-  {:character      (combi/regexp terminal/character-pattern)
-   :string         (combi/regexp terminal/string-pattern)
-   :symbol         (combi/regexp terminal/symbol-pattern)
-   :number         (combi/regexp terminal/number-pattern)
-   :macro-keyword  (combi/regexp terminal/macro-keyword)
-   :simple-keyword (combi/regexp terminal/simple-keyword)
-   :regex          (combi/regexp terminal/regex-pattern)})
+(defn- hiccup
+  "transform the AST into a `hiccup-like` data structure.
+
+  This function doesnt return a vectors because they are
+  100 times slower for this use case compared to `cons` cells"
+  [tree rule-names hide-tags hide-literals]
+  (cond
+    (satisfies? antlr/ParserRule tree)
+    (let [rule         (keyword (get rule-names (antlr/rule-index tree)))
+          children-ast (for [child (antlr/children tree)
+                             :let [child-ast (hiccup child rule-names hide-tags hide-literals)]
+                             :when (not (nil? child-ast))]
+                         child-ast)
+          ast          (if (contains? hide-tags rule)
+                         (apply concat children-ast)
+                         (cons rule children-ast))]
+      ;; attach meta data ... ala instaparse
+      (with-meta ast (info tree)))
+
+    (satisfies? antlr/ErrorNode tree)
+    (let [token (antlr/token tree)
+          ;; error metadata
+          info  {::start {:row    (antlr/row token)
+                          :column (antlr/column token)}}]
+      (with-meta (list ::failure (str tree)) info))
+
+    :else
+    (let [text (str tree)]
+      (if (contains? hide-literals text) nil text))))
 
 
-(def grammar (merge (cfg/ebnf grammar-rules) grammar-terminals))
+(defn- unhide
+  [options]
+  (case (:unhide options)
+    :all (dissoc default-hidden :literals :tags)
+    :content (dissoc default-hidden :literals)
+    :tags (dissoc default-hidden :tags)
+    default-hidden))
 
 
-(def clojure
-  "Clojure (instaparse) parser. It can be used as:
-  - (parcera/clojure input-string)
+(defn clojure
+  "Clojure (antlr4) parser. It can be used as:
+  - `(parcera/clojure input-string)`
      -> returns an AST representation of input-string
-  - (instaparse/parse parcera/clojure input-string)
-     -> same as above but more explicit
-  - (instaparse/parses parcera/clojure input-string)
-   -> returns a sequence of possible AST representations in case of ambiguity
-      in input-string
 
-   For a description of all possible options, visit Instaparse's official
-   documentation: https://github.com/Engelberg/instaparse#reference"
-  (instaparse/parser grammar :start :code))
+   The following options are accepted:
+   - `:unhide` can be one of `#{:tags :content :all}`. Defaults to `nil`
+   - `:total`  thruthy value to get a parse tree even on failures"
+  [input & {:as options}]
+  (let [hidden     (unhide options)
+        {:keys [parser listener]} (platform/parser input)
+        rule-names (antlr/rules parser)
+        tree       (antlr/tree parser)]
+    (if (or (empty? @(:reports listener)) (:total options))
+      (hiccup tree rule-names (:tags hidden) (:literals hidden))
+      @(:reports listener))))
+;; todo: expose a proper error record ?
 
 
 (defn- code*
   "internal function used to imperatively build up the code from the provided
    AST as Clojure's str would be too slow"
-  [ast #?(:clj ^StringBuilder string-builder
+  [ast #?(:clj  ^StringBuilder string-builder
           :cljs ^StringBuffer string-builder)]
   (case (first ast)
     :code
@@ -159,7 +98,7 @@
         (doseq [child (rest ast)] (code* child string-builder))
         (. string-builder (append "]")))
 
-    :namespaced-map
+    :namespaced_map
     (do (. string-builder (append "#"))
         (doseq [child (rest ast)] (code* child string-builder)))
 
@@ -173,15 +112,25 @@
         (doseq [child (rest ast)] (code* child string-builder))
         (. string-builder (append "}")))
 
-    (:number :whitespace :symbolic :auto-resolve :symbol :simple-keyword
-     :macro-keyword :character :string :regex)
+    (:number :whitespace :symbolic :symbol :character :string :regex)
     (. string-builder (append (second ast)))
+
+    :auto_resolve
+    (. string-builder (append "::"))
+
+    :simple_keyword
+    (do (. string-builder (append ":"))
+        (. string-builder (append (second ast))))
+
+    :macro_keyword
+    (do (. string-builder (append "::"))
+        (. string-builder (append (second ast))))
 
     :metadata
     (do (doseq [child (rest (butlast ast))] (code* child string-builder))
         (code* (last ast) string-builder))
 
-    :metadata-entry
+    :metadata_entry
     (doseq [child (rest ast)]
       (. string-builder (append "^"))
       (code* child string-builder))
@@ -190,7 +139,7 @@
     (do (. string-builder (append "'"))
         (doseq [child (rest ast)] (code* child string-builder)))
 
-    :var-quote
+    :var_quote
     (do (. string-builder (append "#'"))
         (code* (second ast) string-builder))
 
@@ -210,7 +159,7 @@
     (do (. string-builder (append "~"))
         (doseq [child (rest ast)] (code* child string-builder)))
 
-    :unquote-splicing
+    :unquote_splicing
     (do (. string-builder (append "~@"))
         (doseq [child (rest ast)] (code* child string-builder)))
 
@@ -219,7 +168,7 @@
         (doseq [child (rest ast)] (code* child string-builder))
         (. string-builder (append ")")))
 
-    :conditional-splicing
+    :conditional_splicing
     (do (. string-builder (append "#?@("))
         (doseq [child (rest ast)] (code* child string-builder))
         (. string-builder (append ")")))
@@ -259,4 +208,6 @@
                                    [clojure.string :as str])))
                  :trace true))
 
-#_(instaparse/disable-tracing!)
+;; this is just forwarding for the time
+;; ideally we shouldnt need to do it but directly define it here
+(defn failure? [obj] (platform/failure? obj))
