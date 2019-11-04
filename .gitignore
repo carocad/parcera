@@ -15,3 +15,4 @@ pom.xml.asc
 /yarn-error.log
 /node_modules/
 /out/
+/src/java/

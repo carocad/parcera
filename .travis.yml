@@ -14,6 +14,7 @@ jobs:
   include:
     - stage: Tests
       script:
+        - curl -O https://www.antlr.org/download/antlr-4.7.1-complete.jar
         - lein do clean, compile, check, eastwood
         - lein trampoline test
         - nvm install 10.10 && nvm use 10.10 && lein trampoline cljsbuild test

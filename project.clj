@@ -1,15 +1,16 @@
-(defproject carocad/parcera "0.3.1"
+(defproject carocad/parcera "0.4.0"
   :description "Grammar-based Clojure(script) parser"
   :url "https://github.com/carocad/parcera"
   :license {:name "LGPLv3"
             :url  "https://github.com/carocad/parcera/blob/master/LICENSE.md"}
   :dependencies [[org.clojure/clojure "1.10.1"]
                  [instaparse/instaparse "1.4.10"]]
+  :source-paths ["src/clojure"]
+  :java-source-paths ["src/java"]
   :profiles {:dev      {:dependencies      [[criterium/criterium "0.4.5"] ;; benchmark
                                             [org.clojure/test.check "0.10.0"]]
                         :plugins           [[jonase/eastwood "0.3.5"]
                                             [lein-cljsbuild "1.1.7"]]
-                        :java-source-paths ["build/java"]
                         ;; todo: does this even work ?
                         :foreign-libs      [{:file        "build/js/parcera/antlr/clojureLexer.js"
                                              :provides    ["parcera.antlr.clojureLexer"]
