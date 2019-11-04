@@ -1,6 +1,6 @@
 (ns parcera.antlr.java
   (:require [parcera.antlr.protocols :as antlr])
-  (:import (parcera.antlr clojureParser clojureLexer)
+  (:import (parcera.antlr ClojureParser ClojureLexer)
            (org.antlr.v4.runtime ParserRuleContext Token CommonTokenStream CharStreams ANTLRErrorListener Parser)
            (org.antlr.v4.runtime.tree ErrorNodeImpl)))
 
@@ -58,22 +58,22 @@
   (column [^Token this] (.getCharPositionInLine this)))
 
 
-(extend-type clojureParser
+(extend-type ClojureParser
   antlr/AntlrParser
-  (rules [^clojureParser this] (vec (.getRuleNames this)))
-  (tree [^clojureParser this] (. this (code))))
+  (rules [^ClojureParser this] (vec (.getRuleNames this)))
+  (tree [^ClojureParser this] (. this (code))))
 
 
 (defn parser
   [input]
   (let [chars    (CharStreams/fromString input)
-        lexer    (doto (new clojureLexer chars)
+        lexer    (doto (new ClojureLexer chars)
                    (.removeErrorListeners))
         ;; todo: how to handle lexer errors ?
         ;(.addErrorListener listener))
         tokens   (new CommonTokenStream lexer)
         listener (->ParseFailure (volatile! ()))
-        parser   (doto (new clojureParser tokens)
+        parser   (doto (new ClojureParser tokens)
                    (.setBuildParseTree true)
                    (.removeErrorListeners)
                    (.addErrorListener listener))]

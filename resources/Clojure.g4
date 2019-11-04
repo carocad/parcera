@@ -1,5 +1,5 @@
 
-grammar clojure;
+grammar Clojure;
 
 /*
  * NOTES to myself and to other developers:
@@ -9,7 +9,7 @@ grammar clojure;
  *   grammar and your own code.
  *
  * The parser should only check the syntax. So the rule of thumb is that when
- *  in doubt you let the parser pass the content up to your program. Then, in
+ * in doubt you let the parser pass the content up to your program. Then, in
  * your program, you check the semantics and make sure that the rule actually
  * have a proper meaning
  *
