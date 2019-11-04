@@ -16,3 +16,4 @@ pom.xml.asc
 /node_modules/
 /out/
 /src/java/
+/src/javascript
