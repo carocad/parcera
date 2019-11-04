@@ -293,11 +293,11 @@
 (deftest bootstrap
 
   (testing "parcera should be able to parse itself"
-    (let [input (slurp "./src/parcera/core.cljc")]
+    (let [input (slurp "./src/clojure/parcera/core.cljc")]
       (and (is (valid? input))
            (is (roundtrip input))))
     ;(is (clear input))))
-    (let [input (slurp "./src/parcera/slurp.cljc")]
+    (let [input (slurp "./src/clojure/parcera/slurp.cljc")]
       (and (is (valid? input))
            (is (roundtrip input)))))
   ;(is (clear input)))))
