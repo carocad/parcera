@@ -92,7 +92,7 @@
     default-hidden))
 
 
-(defn parse
+(defn clojure
   [input & {:as options}]
   (let [hidden     (unhide options)
         listener   (->ParseFailure (volatile! ()))
