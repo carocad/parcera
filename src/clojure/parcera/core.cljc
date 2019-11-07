@@ -12,7 +12,8 @@
             (filter zip/branch?)
             (iterate zip/next loc)))
 
-
+;; TODO: it would probably make more sense to do the lookahead directly on
+;; hiccup
 (defn- lookahead
   "given an AST yields a sequence of branches which match rule and are
   followed by the ahead rules"
@@ -251,7 +252,7 @@
 
 #_(let [input    "hello/world/"
         ast      (time (clojure input))
-        failures (negative-lookahead ast :symbol :symbol)]
+        failures (time (lookahead ast :symbol #{:symbol}))]
     (for [branch failures]
       (let [neighbour (zip/right branch)
             failure   (zip/replace branch (list ::failure
@@ -259,3 +260,25 @@
                                                 (zip/node neighbour)))
             removal   (zip/remove (zip/right failure))]
         (zip/root removal))))
+
+
+#_(let [core-content (slurp "https://raw.githubusercontent.com/clojure/clojurescript/master/src/main/clojure/cljs/core.cljc")]
+    (time (last (lookahead (time (clojure core-content :optimize :memory))
+                           :symbol
+                           #{:symbol}))))
+
+#_(let [core-content (slurp "https://raw.githubusercontent.com/clojure/clojurescript/master/src/main/clojure/cljs/core.cljc")]
+    (time (last (clojure core-content :optimize :memory))))
+
+#_(let [core-content (slurp "https://raw.githubusercontent.com/clojure/clojurescript/master/src/main/clojure/cljs/core.cljc")
+        ast          (time (clojure core-content :optimize :memory))
+        zipper       (zip/seq-zip ast)]
+    (time (last (for [branch (branches zipper)
+                      :when (not true)]
+                  branch))))
+
+
+#_(let [core-content (slurp "https://raw.githubusercontent.com/clojure/clojurescript/master/src/main/clojure/cljs/core.cljc")
+        ast          (time (clojure core-content :optimize :memory))]
+    (time (for [])))
+
