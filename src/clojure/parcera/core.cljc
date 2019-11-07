@@ -8,9 +8,9 @@
 (defn- branches
   "given a zipper loc returns all reachable branch nodes"
   [loc]
-  (filter zip/branch?
-          (take-while (complement zip/end?)
-                      (iterate zip/next loc))))
+  (eduction (take-while (complement zip/end?))
+            (filter zip/branch?)
+            (iterate zip/next loc)))
 
 
 (defn- lookahead
