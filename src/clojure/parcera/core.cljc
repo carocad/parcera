@@ -1,12 +1,42 @@
 (ns parcera.core
   (:require [parcera.antlr.protocols :as antlr]
-            [parcera.antlr.java :as platform])
+            [parcera.antlr.java :as platform]
+            [clojure.zip :as zip])
   #?(:cljs (:import goog.string.StringBuffer)))
+
+
+(defn- branches
+  "given a zipper loc returns all reachable branch nodes"
+  [loc]
+  (filter zip/branch?
+          (take-while (complement zip/end?)
+                      (iterate zip/next loc))))
+
+
+(defn- lookahead
+  "given an AST yields a sequence of branches which match rule and are
+  followed by the ahead rules"
+  [ast rule ahead]                                          ;; ahead -> #{:rule-names}
+  (let [zipper (zip/seq-zip ast)]
+    (for [branch (branches zipper)
+          :when (= rule (first (zip/node branch)))
+          :let [neighbour (zip/right branch)]
+          :when (some? neighbour)
+          :when (ahead (first (zip/node neighbour)))]
+      branch)))
+
+
+(defn- negative-lookahead
+  "given an AST yields a sequence of branches which match rule and are
+  followed by the forbidden rules"
+  [ast rule forbidden]                                      ;; ahead -> #{:rule-names}
+  (lookahead ast rule (complement forbidden)))
 
 
 (def default-hidden {:tags     #{:form :collection :literal :keyword :reader_macro :dispatch}
                      :literals #{"(" ")" "[" "]" "{" "}" "#{" "#" "^" "`" "'" "~"
                                  "~@" "@" "#(" "#'" "#_" "#?(" "#?@(" "##" ":" "::"}})
+
 
 (defn- info
   "extract the match meta data information from the ast node"
@@ -206,6 +236,10 @@
     (code* ast string-builder)
     (. string-builder (toString))))
 
+;; this is just forwarding for the time
+;; ideally we shouldnt need to do it but directly define it here
+(defn failure? [obj] (platform/failure? obj))
+
 ; Successful parse.
 ; Profile:  {:create-node 384, :push-full-listener 2, :push-stack 384,
 ;            :push-listener 382, :push-result 227, :push-message 227 }
@@ -213,9 +247,15 @@
 #_(time (clojure (str '(ns parcera.core
                          (:require [instaparse.core :as instaparse]
                                    [clojure.data :as data]
-                                   [clojure.string :as str])))
-                 :trace true))
+                                   [clojure.string :as str])))))
 
-;; this is just forwarding for the time
-;; ideally we shouldnt need to do it but directly define it here
-(defn failure? [obj] (platform/failure? obj))
+#_(let [input    "hello/world/"
+        ast      (time (clojure input))
+        failures (negative-lookahead ast :symbol :symbol)]
+    (for [branch failures]
+      (let [neighbour (zip/right branch)
+            failure   (zip/replace branch (list ::failure
+                                                (zip/node branch)
+                                                (zip/node neighbour)))
+            removal   (zip/remove (zip/right failure))]
+        (zip/root removal))))
