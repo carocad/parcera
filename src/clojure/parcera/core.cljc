@@ -224,8 +224,14 @@
 
 ;; this is just forwarding for the time
 ;; ideally we shouldnt need to do it but directly define it here
-;; todo
-#_(defn failure? [obj] (platform/failure? obj))
+(defn failure?
+  [ast]
+  (or                                                       ;; ast is root node
+    (::failure (meta ast))
+    ;; ast is child node
+    (and (seq? ast) (= ::failure (first ast)))
+    ;; ast is root node but "doesnt know" about the failure -> conformed
+    (some #{::failure} (filter keyword? (tree-seq seq? identity ast)))))
 
 ; Successful parse.
 ; Profile:  {:create-node 384, :push-full-listener 2, :push-stack 384,
