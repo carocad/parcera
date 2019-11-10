@@ -34,9 +34,11 @@ literal: keyword | string | number | character | symbol;
 
 keyword: simple_keyword | macro_keyword;
 
-simple_keyword: SIMPLE_KEYWORD;
+// making symbols, simple and macro keywords be based on NAME allows to
+// conform them all in the same way (see `conform` function)
+simple_keyword: ':' NAME;
 
-macro_keyword: MACRO_KEYWORD;
+macro_keyword: '::' NAME;
 
 string: STRING;
 
@@ -121,10 +123,6 @@ COMMENT: ';' ~[\r\n]*;
 SPACE: [\r\n\t\f, ]+;
 
 CHARACTER: '\\' (UNICODE_CHAR | NAMED_CHAR | UNICODE);
-
-MACRO_KEYWORD: '::' NAME;
-
-SIMPLE_KEYWORD: ':' NAME;
 
 NAME: NAME_HEAD NAME_BODY*;
 
