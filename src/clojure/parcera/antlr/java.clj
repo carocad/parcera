@@ -28,7 +28,8 @@
     ;; recognizer is either clojureParser or clojureLexer
     (let [report (merge {:row     line
                          :column  char
-                         :message message}
+                         :message message
+                         :type    :parser}                  ;; todo: lexer should also be allowed
                         (when (instance? Parser recognizer)
                           {:symbol (str offending-symbol)
                            :stack  (->> (.getRuleInvocationStack ^Parser recognizer)
@@ -78,6 +79,3 @@
                    (.removeErrorListeners)
                    (.addErrorListener listener))]
     {:parser parser :listener listener}))
-
-
-(defn failure? [obj] (instance? ParseFailure obj))
