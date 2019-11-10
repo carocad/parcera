@@ -11,7 +11,8 @@
                                        [org.clojure/test.check "0.10.0"]]
                         :plugins      [[jonase/eastwood "0.3.5"]
                                        [lein-cljsbuild "1.1.7"]
-                                       [lein-virgil "0.1.9"]]
+                                       ;; reactivate for optimal workflow when changing the g4 file
+                                       #_[lein-virgil "0.1.9"]]
                         ;; todo: does this even work ?
                         :foreign-libs [{:file        "build/js/parcera/antlr/clojureLexer.js"
                                         :provides    ["parcera.antlr.clojureLexer"]
