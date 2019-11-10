@@ -90,8 +90,7 @@
         tree       (antlr/tree parser)
         result     (hiccup tree rule-names (:tags hidden) (:literals hidden))
         reports    @(:reports listener)]
-    (with-meta result {::failure (not (empty? reports))
-                       ::reports reports})))
+    (with-meta result {::errors reports})))
 
 
 (defn- code*
@@ -227,7 +226,7 @@
 (defn failure?
   [ast]
   (or                                                       ;; ast is root node
-    (::failure (meta ast))
+    (not (empty? (::errors (meta ast))))
     ;; ast is child node
     (and (seq? ast) (= ::failure (first ast)))
     ;; ast is root node but "doesnt know" about the failure -> conformed
