@@ -225,11 +225,16 @@
     (code* ast string-builder)
     (. string-builder (toString))))
 
-;; this is just forwarding for the time
-;; ideally we shouldnt need to do it but directly define it here
 (defn failure?
+  "Checks if ast contains any `::failure` instances.
+
+  NOTE: This function is potentially slow since there it has to check the
+  complete ast to be sure that there are no failures.
+
+  Whenever possible, prefer to handle errors directly appearing in the ast"
   [ast]
-  (or                                                       ;; ast is root node
+  (or
+    ;; ast is root node
     (not (empty? (::errors (meta ast))))
     ;; ast is child node
     (and (seq? ast) (= ::failure (first ast)))
@@ -244,35 +249,3 @@
                          (:require [instaparse.core :as instaparse]
                                    [clojure.data :as data]
                                    [clojure.string :as str])))))
-
-#_(let [input    "hello/world/"
-        ast      (time (clojure input))
-        failures (time (lookahead ast :symbol #{:symbol}))]
-    (for [branch failures]
-      (let [neighbour (zip/right branch)
-            failure   (zip/replace branch (list ::failure
-                                                (zip/node branch)
-                                                (zip/node neighbour)))
-            removal   (zip/remove (zip/right failure))]
-        (zip/root removal))))
-
-
-#_(let [core-content (slurp "https://raw.githubusercontent.com/clojure/clojurescript/master/src/main/clojure/cljs/core.cljc")]
-    (time (last (lookahead (time (clojure core-content :optimize :memory))
-                           :symbol
-                           #{:symbol}))))
-
-#_(let [core-content (slurp "https://raw.githubusercontent.com/clojure/clojurescript/master/src/main/clojure/cljs/core.cljc")]
-    (time (last (clojure core-content :optimize :memory))))
-
-#_(let [core-content (slurp "https://raw.githubusercontent.com/clojure/clojurescript/master/src/main/clojure/cljs/core.cljc")
-        ast          (time (clojure core-content :optimize :memory))
-        zipper       (zip/seq-zip ast)]
-    (time (last (for [branch (branches zipper)
-                      :when (not true)]
-                  branch))))
-
-
-#_(let [core-content (slurp "https://raw.githubusercontent.com/clojure/clojurescript/master/src/main/clojure/cljs/core.cljc")
-        ast          (time (clojure core-content :optimize :memory))]
-    (time (for [])))
