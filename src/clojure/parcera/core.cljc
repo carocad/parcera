@@ -20,14 +20,18 @@
               :column (antlr/column end)}}))
 
 
+(def name-pattern #"^([^\s\/]+\/)?(\/|[^\s\/]+)$")
+
+
 (defn- conform
   "Checks that `rule` conforms to additional rules which are too difficult
   to represent with pure Antlr4 syntax"
   [rule children metadata]
   (case rule
-    :symbol (when (nil? (re-find #"^([^\s\/]+\/)?(\/|[^\s\/]+)$" (first children)))
-              (with-meta (list ::failure (cons rule children))
-                         metadata))
+    (:symbol :simple_keyword :macro_keyword)
+    (when (nil? (re-find name-pattern (first children)))
+      (with-meta (list ::failure (cons rule children))
+                 metadata))
 
     nil))
 
