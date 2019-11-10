@@ -1,37 +1,7 @@
 (ns parcera.core
   (:require [parcera.antlr.protocols :as antlr]
-            [parcera.antlr.java :as platform]
-            [clojure.zip :as zip])
+            [parcera.antlr.java :as platform])
   #?(:cljs (:import goog.string.StringBuffer)))
-
-
-(defn- branches
-  "given a zipper loc returns all reachable branch nodes"
-  [loc]
-  (eduction (take-while (complement zip/end?))
-            (filter zip/branch?)
-            (iterate zip/next loc)))
-
-;; TODO: it would probably make more sense to do the lookahead directly on
-;; hiccup
-(defn- lookahead
-  "given an AST yields a sequence of branches which match rule and are
-  followed by the ahead rules"
-  [ast rule ahead]                                          ;; ahead -> #{:rule-names}
-  (let [zipper (zip/seq-zip ast)]
-    (for [branch (branches zipper)
-          :when (= rule (first (zip/node branch)))
-          :let [neighbour (zip/right branch)]
-          :when (some? neighbour)
-          :when (ahead (first (zip/node neighbour)))]
-      branch)))
-
-
-(defn- negative-lookahead
-  "given an AST yields a sequence of branches which match rule and are
-  followed by the forbidden rules"
-  [ast rule forbidden]                                      ;; ahead -> #{:rule-names}
-  (lookahead ast rule (complement forbidden)))
 
 
 (def default-hidden {:tags     #{:form :collection :literal :keyword :reader_macro :dispatch}
@@ -39,7 +9,7 @@
                                  "~@" "@" "#(" "#'" "#_" "#?(" "#?@(" "##" ":" "::"}})
 
 
-(defn- info
+(defn- meta-data
   "extract the match meta data information from the ast node"
   [ast]
   (let [start (antlr/start ast)
@@ -50,24 +20,40 @@
               :column (antlr/column end)}}))
 
 
-(defn- hiccup
-  "transform the AST into a `hiccup-like` data structure.
+(defn- conform
+  "Checks that `rule` conforms to additional rules which are too difficult
+  to represent with pure Antlr4 syntax"
+  [rule children metadata]
+  (case rule
+    :symbol (when (nil? (re-find #"^([^\s\/]+\/)?(\/|[^\s\/]+)$" (first children)))
+              (with-meta (list ::failure (cons rule children))
+                         metadata))
 
-  This function doesnt return a vectors because they are
-  100 times slower for this use case compared to `cons` cells"
+    nil))
+
+
+(defn- hiccup
+  "transforms the tree `hiccup-like` ast data structure.
+
+  Yields a lazy sequence to avoid expensive computation whenever
+  the user is not interested in the full content."
   [tree rule-names hide-tags hide-literals]
   (cond
     (satisfies? antlr/ParserRule tree)
-    (let [rule         (keyword (get rule-names (antlr/rule-index tree)))
-          children-ast (for [child (antlr/children tree)
-                             :let [child-ast (hiccup child rule-names hide-tags hide-literals)]
-                             :when (not (nil? child-ast))]
-                         child-ast)
-          ast          (if (contains? hide-tags rule)
-                         (apply concat children-ast)
-                         (cons rule children-ast))]
-      ;; attach meta data ... ala instaparse
-      (with-meta ast (info tree)))
+    (let [rule      (keyword (get rule-names (antlr/rule-index tree)))
+          children  (for [child (antlr/children tree)
+                          :let [child (hiccup child rule-names hide-tags hide-literals)]
+                          :when (not (nil? child))]
+                      child)
+          ;; flatten out first children level in case of hidden tags
+          ast       (if (contains? hide-tags rule)
+                      (apply concat children)
+                      (cons rule children))
+          ;; attach meta data ... ala instaparse
+          ast-meta  (meta-data tree)
+          conformed (conform rule children ast-meta)]
+      (with-meta (if (some? conformed) conformed ast)
+                 ast-meta))
 
     (satisfies? antlr/ErrorNode tree)
     (let [token (antlr/token tree)
@@ -96,17 +82,16 @@
      -> returns an AST representation of input-string
 
    The following options are accepted:
-   - `:unhide` can be one of `#{:tags :content :all}`. Defaults to `nil`
-   - `:total`  thruthy value to get a parse tree even on failures"
+   - `:unhide` can be one of `#{:tags :content :all}`. Defaults to `nil`"
   [input & {:as options}]
   (let [hidden     (unhide options)
         {:keys [parser listener]} (platform/parser input)
         rule-names (antlr/rules parser)
-        tree       (antlr/tree parser)]
-    (if (or (empty? @(:reports listener)) (:total options))
-      (hiccup tree rule-names (:tags hidden) (:literals hidden))
-      @(:reports listener))))
-;; todo: expose a proper error record ?
+        tree       (antlr/tree parser)
+        result     (hiccup tree rule-names (:tags hidden) (:literals hidden))
+        reports    @(:reports listener)]
+    (with-meta result {::failure (not (empty? reports))
+                       ::reports reports})))
 
 
 (defn- code*
@@ -239,7 +224,8 @@
 
 ;; this is just forwarding for the time
 ;; ideally we shouldnt need to do it but directly define it here
-(defn failure? [obj] (platform/failure? obj))
+;; todo
+#_(defn failure? [obj] (platform/failure? obj))
 
 ; Successful parse.
 ; Profile:  {:create-node 384, :push-full-listener 2, :push-stack 384,
@@ -281,4 +267,3 @@
 #_(let [core-content (slurp "https://raw.githubusercontent.com/clojure/clojurescript/master/src/main/clojure/cljs/core.cljc")
         ast          (time (clojure core-content :optimize :memory))]
     (time (for [])))
-
