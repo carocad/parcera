@@ -3,6 +3,11 @@
             [parcera.antlr.java :as platform])
   #?(:cljs (:import goog.string.StringBuffer)))
 
+;; TODO: it would be interesting to explore the idea of 'visitor'
+;; for Clojure(script). Such that instead of computing the full AST
+;; a developer could extend a multi-method with the rules that
+;; it wants to handle and only those are called
+
 
 (def default-hidden {:tags     #{:form :collection :literal :keyword :reader_macro :dispatch}
                      :literals #{"(" ")" "[" "]" "{" "}" "#{" "#" "^" "`" "'" "~"
