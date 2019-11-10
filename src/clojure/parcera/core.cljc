@@ -85,11 +85,11 @@
    - `:unhide` can be one of `#{:tags :content :all}`. Defaults to `nil`"
   [input & {:as options}]
   (let [hidden     (unhide options)
-        {:keys [parser listener]} (platform/parser input)
+        {:keys [parser errors]} (platform/parser input)
         rule-names (antlr/rules parser)
         tree       (antlr/tree parser)
         result     (hiccup tree rule-names (:tags hidden) (:literals hidden))
-        reports    @(:reports listener)]
+        reports    @(:reports (:parser errors))]
     (with-meta result {::errors reports})))
 
 

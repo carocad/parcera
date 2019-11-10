@@ -78,4 +78,4 @@
                    (.setBuildParseTree true)
                    (.removeErrorListeners)
                    (.addErrorListener listener))]
-    {:parser parser :listener listener}))
+    {:parser parser :errors {:parser listener}}))
