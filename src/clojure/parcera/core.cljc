@@ -80,7 +80,7 @@
     default-hidden))
 
 
-(defn clojure
+(defn ast
   "Clojure (antlr4) parser. It can be used as:
   - `(parcera/clojure input-string)`
      -> returns an AST representation of input-string
@@ -245,7 +245,7 @@
 ; Profile:  {:create-node 384, :push-full-listener 2, :push-stack 384,
 ;            :push-listener 382, :push-result 227, :push-message 227 }
 ; "Elapsed time: 47.25084 msecs"
-#_(time (clojure (str '(ns parcera.core
-                         (:require [instaparse.core :as instaparse]
-                                   [clojure.data :as data]
-                                   [clojure.string :as str])))))
+#_(time (ast (str '(ns parcera.core
+                     (:require [instaparse.core :as instaparse]
+                               [clojure.data :as data]
+                               [clojure.string :as str])))))

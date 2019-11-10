@@ -23,8 +23,8 @@
   (newline)
   (newline)
   (println "Benchmark: Parsing parcera namespace with traces 👮")
-  (criterium/quick-bench (parcera/clojure (str '(ns parcera.core
-                                                  (:require [instaparse.core :as instaparse]
-                                                            [clojure.data :as data]
-                                                            [clojure.string :as str]))))
+  (criterium/quick-bench (parcera/ast (str '(ns parcera.core
+                                              (:require [instaparse.core :as instaparse]
+                                                        [clojure.data :as data]
+                                                        [clojure.string :as str]))))
                          :os :runtime :verbose))

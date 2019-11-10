@@ -11,18 +11,18 @@
 (defn- roundtrip
   "checks parcera can parse and write back the exact same input code"
   [input]
-  (= input (parcera/code (parcera/clojure input))))
+  (= input (parcera/code (parcera/ast input))))
 
 
 (defn- valid?
   [input]
-  (not (parcera/failure? (parcera/clojure input))))
+  (not (parcera/failure? (parcera/ast input))))
 
 
 ;; todo: is this even possible with antlr ? 🤔
 #_(defn- clear
     [input]
-    (= 1 (count (instaparse/parses parcera/clojure input :unhide :all))))
+    (= 1 (count (instaparse/parses parcera/ast input :unhide :all))))
 
 
 (def validity
@@ -317,8 +317,8 @@
 
   (testing "parcera should be able to parse clojure core"
     (let [core-content (slurp "https://raw.githubusercontent.com/clojure/clojure/master/src/clj/clojure/core.clj")]
-      (time (is (= core-content (parcera/code (parcera/clojure core-content :optimize :memory)))))))
+      (time (is (= core-content (parcera/code (parcera/ast core-content :optimize :memory)))))))
 
   (testing "parcera should be able to parse clojurescript core"
     (let [core-content (slurp "https://raw.githubusercontent.com/clojure/clojurescript/master/src/main/clojure/cljs/core.cljc")]
-      (time (is (= core-content (parcera/code (parcera/clojure core-content :optimize :memory))))))))
+      (time (is (= core-content (parcera/code (parcera/ast core-content :optimize :memory))))))))
