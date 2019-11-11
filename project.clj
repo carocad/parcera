@@ -9,7 +9,9 @@
 
   :profiles {:dev      {:dependencies   [[criterium/criterium "0.4.5"] ;; benchmark
                                          [org.clojure/test.check "0.10.0"] ;; generative testing
-                                         [com.bhauman/figwheel-main "0.2.3"]] ;; cljs repl
+                                         ;; todo: bump version to 0.2.4
+                                         ;; https://github.com/bhauman/figwheel-main/issues/161
+                                         [com.bhauman/figwheel-main "0.2.0"]] ;; cljs repl
                         :plugins        [[jonase/eastwood "0.3.5"]] ;; linter
                         :resource-paths ["target"]}
              ;; java reloader
