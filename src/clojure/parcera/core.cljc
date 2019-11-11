@@ -26,7 +26,9 @@
               :column (antlr/column end)}}))
 
 
-(def name-pattern #"^([^\s\/]+\/)?(\/|[^\s\/]+)$")
+;; for some reason cljs doesnt accept escaping the / characters
+(def name-pattern #?(:clj  #"^([^\s\/]+\/)?(\/|[^\s\/]+)$"
+                     :cljs #"^([^\s/]+/)?(/|[^\s/]+)$"))
 
 
 (defn- conform
