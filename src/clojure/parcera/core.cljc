@@ -1,6 +1,7 @@
 (ns parcera.core
   (:require [parcera.antlr.protocols :as antlr]
-            [parcera.antlr.java :as platform])
+            #?(:clj  [parcera.antlr.java :as platform]
+               :cljs [parcera.antlr.javascript :as platform]))
   #?(:cljs (:import goog.string.StringBuffer)))
 
 ;; TODO: it would be interesting to explore the idea of 'visitor'
