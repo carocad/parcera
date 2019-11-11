@@ -51,7 +51,7 @@
   the user is not interested in the full content."
   [tree rule-names hide-tags hide-literals]
   (cond
-    (satisfies? antlr/ParserRule tree)
+    (boolean (satisfies? antlr/ParserRule tree))
     (let [rule      (keyword (get rule-names (antlr/rule-index tree)))
           children  (for [child (antlr/children tree)
                           :let [child (hiccup child rule-names hide-tags hide-literals)]
@@ -67,7 +67,7 @@
       (with-meta (if (some? conformed) conformed ast)
                  ast-meta))
 
-    (satisfies? antlr/ErrorNode tree)
+    (boolean (satisfies? antlr/ErrorNode tree))
     (let [token (antlr/token tree)
           ;; error metadata
           info  {::start {:row    (antlr/row token)
