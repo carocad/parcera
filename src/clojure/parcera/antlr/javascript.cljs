@@ -5,7 +5,7 @@
   ;; am I suppose to code the whole thing and hope that it works by running
   ;; the tests 🤔 ... I can feel the pain of other languages 😭
   (:require [parcera.antlr.protocols :as antlr]
-    #_[antlr4.index :as runtime]
+            [antlr4 :as runtime]
     #_[parcera.antlr.clojureLexer :as clojureLexer]
     #_[parcera.antlr.clojureParser :as clojureParser]))
 

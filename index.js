@@ -1,4 +1,4 @@
-const antlr4 = require('antlr4/index')
+const antlr4 = require('antlr4')
 const {ClojureLexer} = require('./src/javascript/parcera/antlr/ClojureLexer')
 const {ClojureParser} = require('./src/javascript/parcera/antlr/ClojureParser')
 

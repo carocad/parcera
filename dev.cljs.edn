@@ -1,1 +1,4 @@
-{:main parcera.core}
+{:main         parcera.core
+ :target       :nodejs
+ :npm-deps     {"antlr4" "^4.7.2"}
+ :install-deps true}

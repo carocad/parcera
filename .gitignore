@@ -18,3 +18,4 @@ pom.xml.asc
 /src/java/
 /src/javascript
 /figwheel_server.log
+package*.json
