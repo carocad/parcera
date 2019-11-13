@@ -19,3 +19,4 @@ pom.xml.asc
 /src/javascript
 /figwheel_server.log
 package*.json
+/.eastwood

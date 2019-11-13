@@ -13,6 +13,7 @@
                                          ;; https://github.com/bhauman/figwheel-main/issues/161
                                          [com.bhauman/figwheel-main "0.2.0"]] ;; cljs repl
                         :plugins        [[jonase/eastwood "0.3.5"]] ;; linter
+                        :source-paths   ["src/clojure" "scripts"]
                         :resource-paths ["target"]
                         :clean-targets  ^{:protect false} ["target"]}
              ;; java reloader
