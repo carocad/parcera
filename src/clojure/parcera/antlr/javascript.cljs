@@ -1,14 +1,8 @@
 (ns parcera.antlr.javascript
-  ;; TODO: does this even works ?
-  ;; TODO: translate the index.js file to Clojurescript 😥
-  ;; TODO: how do I get a Clojurescript repl ... I am blind without it
-  ;; am I suppose to code the whole thing and hope that it works by running
-  ;; the tests 🤔 ... I can feel the pain of other languages 😭
   (:require [parcera.antlr.protocols :as antlr]
-            [antlr4 :as runtime]
-    #_[parcera.antlr.clojureLexer :as clojureLexer]
-    #_[parcera.antlr.clojureParser :as clojureParser]))
-
+            [antlr4 :refer [CharStreams CommonTokenStream]]
+            [parcera.antlr.ClojureLexer :refer [ClojureLexer]]
+            [parcera.antlr.ClojureParser :refer [ClojureParser]]))
 
 (set! *warn-on-infer* true)
 
