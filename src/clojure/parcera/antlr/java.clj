@@ -61,7 +61,7 @@
 
 (extend-type ClojureParser
   antlr/AntlrParser
-  (rules [^ClojureParser this] (vec (.getRuleNames this)))
+  (rules [^ClojureParser this] (into [] (map keyword) (.getRuleNames this)))
   (tree [^ClojureParser this] (. this (code))))
 
 

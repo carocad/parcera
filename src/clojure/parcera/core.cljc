@@ -52,7 +52,7 @@
   [tree rule-names hide-tags hide-literals]
   (cond
     (boolean (satisfies? antlr/ParserRule tree))
-    (let [rule      (keyword (get rule-names (antlr/rule-index tree)))
+    (let [rule      (get rule-names (antlr/rule-index tree))
           children  (for [child (antlr/children tree)
                           :let [child (hiccup child rule-names hide-tags hide-literals)]
                           :when (not (nil? child))]
