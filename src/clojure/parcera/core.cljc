@@ -235,7 +235,7 @@
 (defn failure?
   "Checks if ast contains any `::failure` instances.
 
-  NOTE: This function is potentially slow since there it has to check the
+  NOTE: This function is potentially slow since it might have to check the
   complete ast to be sure that there are no failures.
 
   Whenever possible, prefer to handle errors directly appearing in the ast"
