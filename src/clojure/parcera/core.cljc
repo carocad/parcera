@@ -4,11 +4,6 @@
                :cljs [parcera.antlr.javascript :as platform]))
   #?(:cljs (:import goog.string.StringBuffer)))
 
-;; TODO: it would be interesting to explore the idea of 'visitor'
-;; for Clojure(script). Such that instead of computing the full AST
-;; a developer could extend a multi-method with the rules that
-;; it wants to handle and only those are called
-
 
 (def default-hidden {:tags     #{:form :collection :literal :keyword :reader_macro :dispatch}
                      :literals #{"(" ")" "[" "]" "{" "}" "#{" "#" "^" "`" "'" "~"
@@ -90,11 +85,15 @@
 
 (defn ast
   "Clojure (antlr4) parser. It can be used as:
-  - `(parcera/clojure input-string)`
-     -> returns an AST representation of input-string
+  - `(parcera/ast input-string)`
+     -> returns a lazy AST representation of input-string
 
    The following options are accepted:
-   - `:unhide` can be one of `#{:tags :content :all}`. Defaults to `nil`"
+   - `:unhide` can be one of `#{:tags :content :all}`. Defaults to `nil`
+
+   NOTE: Antlr returns a fully parsed version of the provided input string
+       however this function returns a lazy sequence in order to expose
+       those through Clojure's immutable data structures"
   [input & {:as options}]
   (let [hidden     (unhide options)
         {:keys [parser errors]} (platform/parser input)
