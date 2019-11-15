@@ -3,7 +3,7 @@
   :url "https://github.com/carocad/parcera"
   :license {:name "LGPLv3"
             :url  "https://github.com/carocad/parcera/blob/master/LICENSE.md"}
-  :source-paths ["src/clojure" "src/javascript" "scripts"]
+  :source-paths ["src/clojure" "src/javascript"]
   :java-source-paths ["src/java"]
   :profiles {:dev      {:dependencies   [[criterium/criterium "0.4.5"] ;; benchmark
                                          [org.clojure/test.check "0.10.0"] ;; generative testing
