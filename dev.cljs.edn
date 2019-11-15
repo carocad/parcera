@@ -1,4 +1,3 @@
-^{:extra-main-files {:tests {:main parcera.test-runner}}}
 {:main         parcera.core
  :target       :nodejs
  :npm-deps     {"antlr4" "^4.7.2"}
