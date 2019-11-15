@@ -1,4 +1,5 @@
 const antlr4 = require('antlr4')
+const fs = require('fs')
 const {ClojureLexer} = require('./src/javascript/parcera/antlr/ClojureLexer')
 const {ClojureParser} = require('./src/javascript/parcera/antlr/ClojureParser')
 
@@ -25,7 +26,8 @@ function treeSeq(ast, ruleNames) {
     }
 }
 
-const input = `(john :SHOUTS "hello" @michael pink/this will work)`
+// const input = `(john :SHOUTS "hello" @michael pink/this will work)`
+const input = fs.readFileSync('foo.text', {encoding: 'utf8'})
 const chars = new antlr4.CharStreams.fromString(input)
 const lexer = new ClojureLexer(chars)
 lexer.removeErrorListeners()
@@ -37,7 +39,9 @@ parser.removeErrorListeners()
 // parser.addErrorListener()
 
 const tree = parser.code()
+console.time()
 console.log(JSON.stringify(treeSeq(tree, ruleNames), null, 2))
+console.timeEnd()
 //antlr4.tree.ParseTreeWalker.DEFAULT.walk(new listener(), tree)
 
 console.log(`DONE 💫`)
