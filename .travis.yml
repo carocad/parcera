@@ -30,6 +30,9 @@ jobs:
     - stage: Benchmark
       if: branch = master
       script:
+        - curl -O https://www.antlr.org/download/antlr-4.7.1-complete.jar
+        # generate java
+        - java -jar antlr-4.7.1-complete.jar -Xexact-output-dir -o src/java/parcera/antlr -package parcera.antlr -Dlanguage=Java -no-listener -no-visitor src/Clojure.g4
         - lein trampoline test :benchmark
 
     - stage: Release
