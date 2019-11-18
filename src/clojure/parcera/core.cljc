@@ -9,17 +9,31 @@
                      :literals #{"(" ")" "[" "]" "{" "}" "#{" "#" "^" "`" "'" "~"
                                  "~@" "@" "#(" "#'" "#_" "#?(" "#?@(" "##" ":" "::"}})
 
-
+;; start and end are tokens not positions.
+;; So '(hello/world)' has '(' 'hello/world' and ')' as tokens
 (defn- meta-data
   "extract the match meta data information from the ast node"
   [ast]
   (let [start (antlr/start ast)
         end   (antlr/end ast)]
-    (merge {::start {:row    (antlr/row start)
-                     :column (antlr/column start)}}
-           (when (some? end)
-             {::end {:row    (antlr/row end)
-                     :column (antlr/column end)}}))))
+    (cond
+      ;; happens when the parser rule is a single lexer rule
+      (= start end)
+      {::start {:row    (antlr/row start)
+                :column (antlr/column start)}
+       ::end   {:row    (antlr/row start)
+                :column (.getStopIndex start)}}
+
+      ;; no end found - happens on errors
+      (nil? end)
+      {::start {:row    (antlr/row start)
+                :column (antlr/column start)}}
+
+      :else
+      {::start {:row    (antlr/row start)
+                :column (antlr/column start)}
+       ::end   {:row    (antlr/row end)
+                  :column (antlr/column end)}})))
 
 
 ;; for some reason cljs doesnt accept escaping the / characters
@@ -27,7 +41,7 @@
                      :cljs #"^([^\s/]+/)?(/|[^\s/]+)$"))
 
 
-(defn- conform
+(defn- failure
   "Checks that `rule` conforms to additional rules which are too difficult
   to represent with pure Antlr4 syntax"
   [rule children metadata]
@@ -65,25 +79,19 @@
   [tree rule-names hide-tags hide-literals]
   (cond
     (boolean (satisfies? antlr/ParserRule tree))
-    (let [rule      (get rule-names (antlr/rule-index tree))
-          children  (for [child (antlr/children tree)
-                          :let [child (hiccup child rule-names hide-tags hide-literals)]
-                          :when (not (nil? child))]
-                      child)
+    (let [rule     (get rule-names (antlr/rule-index tree))
+          children (for [child (antlr/children tree)
+                         :let [child (hiccup child rule-names hide-tags hide-literals)]
+                         :when (not (nil? child))]
+                     child)
           ;; attach meta data ... ala instaparse
-          ast-meta  (meta-data tree)
+          ast-meta (meta-data tree)
           ;; extra validation rules
-          conformed (conform rule children ast-meta)]
-      ;; flatten out first children level in case of hidden tags
+          fail     (failure rule children ast-meta)]
+      ;; parcera hidden tags are always "or" statements, so just take the single children
       (if (contains? hide-tags rule)
         (first children)
-        (or conformed (with-meta (cons rule children)
-                                 ast-meta))
-        #_(clojure.pprint/pprint {:conformed conformed
-                                  :rule      rule
-                                  :children  children
-                                  :ast       ast
-                                  :meta      (or (meta conformed) ast-meta)})))
+        (or fail (with-meta (cons rule children) ast-meta))))
 
     (boolean (satisfies? antlr/ErrorNode tree))
     (let [token (antlr/token tree)
@@ -272,10 +280,6 @@
     ;; ast is root node but "doesnt know" about the failure -> conformed
     (some #{::failure} (filter keyword? (tree-seq seq? identity ast)))))
 
-; Successful parse.
-; Profile:  {:create-node 384, :push-full-listener 2, :push-stack 384,
-;            :push-listener 382, :push-result 227, :push-message 227 }
-; "Elapsed time: 47.25084 msecs"
 #_(time (ast (str '(ns parcera.core
                      (:require [instaparse.core :as instaparse]
                                [clojure.data :as data]
@@ -284,4 +288,9 @@
 #_(time (ast "(ns parcera.core
               (:require [instaparse.core :as #{:hello \"world\" :hello}]
                         [clojure.data :as data]
-                        [clojure.string :as str]))"))
+                        [clojure.string :as str])"))
+
+#_(filter :meta (map #(hash-map :item % :meta (meta %))
+                     (tree-seq seq? seq (ast "
+      (ns
+        parcera.core))"))))
