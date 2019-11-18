@@ -285,5 +285,3 @@
               (:require [instaparse.core :as #{:hello \"world\" :hello}]
                         [clojure.data :as data]
                         [clojure.string :as str]))"))
-;; TODO
-;(ast "\"hello/world")

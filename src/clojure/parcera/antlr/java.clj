@@ -10,7 +10,7 @@
 ;; A custom Error Listener to avoid Antlr printing the errors on the terminal
 ;; by default. This is also useful to mimic Instaparse :total parse mechanism
 ;; such that if we get an error, we can report it as the result instead
-(defrecord ParseFailure [reports]
+(defrecord AntlrFailure [reports]
   ANTLRErrorListener
   ;; I am not sure how to use these methods. If you came here wondering why
   ;; is this being printed, please open an issue so that we can all benefit
@@ -29,7 +29,7 @@
     (let [report (merge {:row     line
                          :column  char
                          :message message
-                         :type    :parser}                  ;; todo: lexer should also be allowed
+                         :type    (if (instance? Parser recognizer) :parser :lexer)}
                         (when (instance? Parser recognizer)
                           {:symbol (str offending-symbol)
                            :stack  (->> (.getRuleInvocationStack ^Parser recognizer)
@@ -67,13 +67,12 @@
 
 (defn parser
   [input]
-  (let [chars    (CharStreams/fromString input)
+  (let [listener (->AntlrFailure (volatile! ()))
+        chars    (CharStreams/fromString input)
         lexer    (doto (new ClojureLexer chars)
-                   (.removeErrorListeners))
-        ;; todo: how to handle lexer errors ?
-        ;(.addErrorListener listener))
+                   (.removeErrorListeners)
+                   (.addErrorListener listener))
         tokens   (new CommonTokenStream lexer)
-        listener (->ParseFailure (volatile! ()))
         parser   (doto (new ClojureParser tokens)
                    (.setBuildParseTree true)
                    (.removeErrorListeners)
