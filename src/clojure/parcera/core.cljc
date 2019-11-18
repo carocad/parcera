@@ -15,10 +15,11 @@
   [ast]
   (let [start (antlr/start ast)
         end   (antlr/end ast)]
-    {::start {:row    (antlr/row start)
-              :column (antlr/column start)}
-     ::end   {:row    (antlr/row end)
-              :column (antlr/column end)}}))
+    (merge {::start {:row    (antlr/row start)
+                     :column (antlr/column start)}}
+           (when (some? end)
+             {::end {:row    (antlr/row end)
+                     :column (antlr/column end)}}))))
 
 
 ;; for some reason cljs doesnt accept escaping the / characters
@@ -51,7 +52,7 @@
       (when (not= set-length unique-length)
         (with-meta (list ::failure (cons rule children))
                    (assoc-in metadata [::start :message]
-                             "Set literal contains duplicate keys"))))
+                             "Set literal contains duplicate forms"))))
 
     nil))
 
@@ -123,7 +124,7 @@
         tree       (antlr/tree parser)
         result     (hiccup tree rule-names (:tags hidden) (:literals hidden))
         reports    @(:reports (:parser errors))]
-    (with-meta result {::errors reports})))
+    (vary-meta result assoc ::errors reports)))
 
 
 (defn- code*
