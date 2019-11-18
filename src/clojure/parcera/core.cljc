@@ -37,12 +37,21 @@
                  (assoc-in metadata [::start :message]
                            (str "name cannot contain more than one /"))))
 
-    (:map)
+    :map
     (let [forms (remove (comp #{:whitespace :discard} first) children)]
       (when (odd? (count forms))
         (with-meta (list ::failure (cons rule children))
                    (assoc-in metadata [::start :message]
                              "Map literal must contain an even number of forms"))))
+
+    :set
+    (let [forms         (remove (comp #{:whitespace :discard} first) children)
+          set-length    (count forms)
+          unique-length (count (distinct forms))]
+      (when (not= set-length unique-length)
+        (with-meta (list ::failure (cons rule children))
+                   (assoc-in metadata [::start :message]
+                             "Set literal contains duplicate keys"))))
 
     nil))
 
@@ -272,11 +281,8 @@
                                [clojure.string :as str])))))
 
 #_(time (ast "(ns parcera.core
-              (:require [instaparse.core :as #::{:hello \"world\" instaparse}]
+              (:require [instaparse.core :as #{:hello \"world\" :hello}]
                         [clojure.data :as data]
                         [clojure.string :as str]))"))
-
-
-
 ;; TODO
 ;(ast "\"hello/world")
