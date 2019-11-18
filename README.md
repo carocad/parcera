@@ -19,31 +19,31 @@ full explanation of the options available for a parser please visit Instaparse w
             [instaparse.core :as instaparse]))
 
 ;;parse clojure code from a string
-(parcera/clojure (str '(ns parcera.core
-                         (:require [instaparse.core :as instaparse]
-                                   [clojure.data :as data]
-                                   [clojure.string :as str]))))
+(parcera/ast (str '(ns parcera.core
+                     (:require [instaparse.core :as instaparse]
+                               [clojure.data :as data]
+                               [clojure.string :as str]))))
 
 ;; => returns a data structure with the result from the parser
-[:code
- [:list
-  [:symbol "ns"]
-  [:whitespace " "]
-  [:symbol "parcera.core"]
-  [:whitespace " "]
-  [:list
-   [:simple-keyword ":require"]
-   [:whitespace " "]
-   [:vector
-    [:symbol "instaparse.core"]
-    [:whitespace " "]
-    [:simple-keyword ":as"]
-    [:whitespace " "]
-    [:symbol "instaparse"]]
-   [:whitespace " "]
-   [:vector [:symbol "clojure.data"] [:whitespace " "] [:simple-keyword ":as"] [:whitespace " "] [:symbol "data"]]
-   [:whitespace " "]
-   [:vector [:symbol "clojure.string"] [:whitespace " "] [:simple-keyword ":as"] [:whitespace " "] [:symbol "str"]]]]]
+(:code
+ (:list
+  (:symbol "ns")
+  (:whitespace " ")
+  (:symbol "parcera.core")
+  (:whitespace " ")
+  (:list
+   (:simple_keyword "require")
+   (:whitespace " ")
+   (:vector
+    (:symbol "instaparse.core")
+    (:whitespace " ")
+    (:simple_keyword "as")
+    (:whitespace " ")
+    (:symbol "instaparse"))
+   (:whitespace " ")
+   (:vector (:symbol "clojure.data") (:whitespace " ") (:simple_keyword "as") (:whitespace " ") (:symbol "data"))
+   (:whitespace " ")
+   (:vector (:symbol "clojure.string") (:whitespace " ") (:simple_keyword "as") (:whitespace " ") (:symbol "str")))))
 
 ;; convert an AST back into a string
 (parcera/code [:symbol "ns"])
