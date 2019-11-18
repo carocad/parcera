@@ -40,23 +40,42 @@
       (vswap! reports conj report))))
 
 
+;; start and end are tokens not positions.
+;; So '(hello/world)' has '(' 'hello/world' and ')' as tokens
 (extend-type ParserRuleContext
   antlr/ParserRule
   (children [^ParserRuleContext this] (.-children this))
   (rule-index [^ParserRuleContext this] (.getRuleIndex this))
-  (start [^ParserRuleContext this] (.getStart this))
-  (end [^ParserRuleContext this] (.getStop this)))
+  antlr/LocationInfo
+  (span [^ParserRuleContext this]
+    (let [start (.getStart this)
+          stop  (.getStop this)]
+      (cond
+        ;; happens when the parser rule is a single lexer rule
+        (= start stop)
+        {::start {:row    (.getLine start)
+                  :column (.getCharPositionInLine start)}
+         ::end   {:row    (.getLine start)
+                  :column (.getStopIndex start)}}
+
+        ;; no end found - happens on errors
+        (nil? stop)
+        {::start {:row    (.getLine start)
+                  :column (.getCharPositionInLine start)}}
+
+        :else
+        {::start {:row    (.getLine start)
+                  :column (.getCharPositionInLine start)}
+         ::end   {:row    (.getLine stop)
+                  :column (.getCharPositionInLine stop)}}))))
 
 
 (extend-type ErrorNodeImpl
-  antlr/ErrorNode
-  (token [^ErrorNodeImpl this] (.-symbol this)))
-
-
-(extend-type Token
-  antlr/Token
-  (row [^Token this] (.getLine this))
-  (column [^Token this] (.getCharPositionInLine this)))
+  antlr/LocationInfo
+  (span [^ErrorNodeImpl this]
+    (let [token (.-symbol this)]
+      {::start {:row    (.getLine token)
+                :column (.getCharPositionInLine token)}})))
 
 
 (extend-type ClojureParser

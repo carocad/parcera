@@ -8,16 +8,14 @@
   (rules [this])
   (tree [this]))
 
+
 (defprotocol ParserRule
   (children [this])
-  (rule-index [this])
-  (start [this])
-  (end [this]))
+  (rule-index [this]))
 
+(defprotocol LocationInfo
+  (span [this]))
 
-(defprotocol Token
-  (row [this])
-  (column [this]))
 
 (defprotocol ErrorNode
   (token [this]))

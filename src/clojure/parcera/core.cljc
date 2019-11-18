@@ -9,32 +9,6 @@
                      :literals #{"(" ")" "[" "]" "{" "}" "#{" "#" "^" "`" "'" "~"
                                  "~@" "@" "#(" "#'" "#_" "#?(" "#?@(" "##" ":" "::"}})
 
-;; start and end are tokens not positions.
-;; So '(hello/world)' has '(' 'hello/world' and ')' as tokens
-(defn- meta-data
-  "extract the match meta data information from the ast node"
-  [ast]
-  (let [start (antlr/start ast)
-        end   (antlr/end ast)]
-    (cond
-      ;; happens when the parser rule is a single lexer rule
-      (= start end)
-      {::start {:row    (antlr/row start)
-                :column (antlr/column start)}
-       ::end   {:row    (antlr/row start)
-                :column (.getStopIndex start)}}
-
-      ;; no end found - happens on errors
-      (nil? end)
-      {::start {:row    (antlr/row start)
-                :column (antlr/column start)}}
-
-      :else
-      {::start {:row    (antlr/row start)
-                :column (antlr/column start)}
-       ::end   {:row    (antlr/row end)
-                  :column (antlr/column end)}})))
-
 
 ;; for some reason cljs doesnt accept escaping the / characters
 (def name-pattern #?(:clj  #"^([^\s\/]+\/)?(\/|[^\s\/]+)$"
@@ -85,7 +59,7 @@
                          :when (not (nil? child))]
                      child)
           ;; attach meta data ... ala instaparse
-          ast-meta (meta-data tree)
+          ast-meta (antlr/span tree)
           ;; extra validation rules
           fail     (failure rule children ast-meta)]
       ;; parcera hidden tags are always "or" statements, so just take the single children
@@ -94,11 +68,8 @@
         (or fail (with-meta (cons rule children) ast-meta))))
 
     (boolean (satisfies? antlr/ErrorNode tree))
-    (let [token (antlr/token tree)
-          ;; error metadata
-          info  {::start {:row    (antlr/row token)
-                          :column (antlr/column token)}}]
-      (with-meta (list ::failure (str tree)) info))
+    (with-meta (list ::failure (str tree))
+               (antlr/span tree))
 
     :else
     (let [text (str tree)]
