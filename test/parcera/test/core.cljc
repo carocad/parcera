@@ -136,7 +136,10 @@
   (testing "symbols"
     (as-> "hello/world/" input (is (not (valid? input))))
     (as-> ":hello/world/" input (is (not (valid? input))))
-    (as-> "::hello/world/" input (is (not (valid? input))))))
+    (as-> "::hello/world/" input (is (not (valid? input)))))
+
+  (testing "strings"
+    (as-> "hello \"world" input (is (not (valid? input))))))
 
 
 (deftest macros
