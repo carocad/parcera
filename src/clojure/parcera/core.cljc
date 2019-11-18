@@ -34,7 +34,15 @@
     (:symbol :simple_keyword :macro_keyword)
     (when (nil? (re-find name-pattern (first children)))
       (with-meta (list ::failure (cons rule children))
-                 metadata))
+                 (assoc-in metadata [::start :message]
+                           (str "name cannot contain more than one /"))))
+
+    (:map)
+    (let [forms (remove (comp #{:whitespace :discard} first) children)]
+      (when (odd? (count forms))
+        (with-meta (list ::failure (cons rule children))
+                   (assoc-in metadata [::start :message]
+                             "Map literal must contain an even number of forms"))))
 
     nil))
 
@@ -52,15 +60,20 @@
                           :let [child (hiccup child rule-names hide-tags hide-literals)]
                           :when (not (nil? child))]
                       child)
-          ;; flatten out first children level in case of hidden tags
-          ast       (if (contains? hide-tags rule)
-                      (apply concat children)
-                      (cons rule children))
           ;; attach meta data ... ala instaparse
           ast-meta  (meta-data tree)
+          ;; extra validation rules
           conformed (conform rule children ast-meta)]
-      (with-meta (if (some? conformed) conformed ast)
-                 ast-meta))
+      ;; flatten out first children level in case of hidden tags
+      (if (contains? hide-tags rule)
+        (first children)
+        (or conformed (with-meta (cons rule children)
+                                 ast-meta))
+        #_(clojure.pprint/pprint {:conformed conformed
+                                  :rule      rule
+                                  :children  children
+                                  :ast       ast
+                                  :meta      (or (meta conformed) ast-meta)})))
 
     (boolean (satisfies? antlr/ErrorNode tree))
     (let [token (antlr/token tree)
@@ -232,6 +245,7 @@
     (code* ast string-builder)
     (. string-builder (toString))))
 
+
 (defn failure?
   "Checks if ast contains any `::failure` instances.
 
@@ -256,3 +270,13 @@
                      (:require [instaparse.core :as instaparse]
                                [clojure.data :as data]
                                [clojure.string :as str])))))
+
+#_(time (ast "(ns parcera.core
+              (:require [instaparse.core :as #::{:hello \"world\" instaparse}]
+                        [clojure.data :as data]
+                        [clojure.string :as str]))"))
+
+
+
+;; TODO
+;(ast "\"hello/world")
