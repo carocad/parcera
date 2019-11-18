@@ -5,21 +5,15 @@
             :url  "https://github.com/carocad/parcera/blob/master/LICENSE.md"}
   :source-paths ["src/clojure" "src/javascript"]
   :java-source-paths ["src/java"]
-  :dependencies [[org.clojure/clojure "1.10.1"]
-                 [org.antlr/antlr4-runtime "4.7.1"]]
   :profiles {:dev      {:dependencies   [[criterium/criterium "0.4.5"] ;; benchmark
-                                         [org.clojure/test.check "0.10.0"] ;; generative testing
-                                         ;; todo: bump version to 0.2.4
-                                         ;; https://github.com/bhauman/figwheel-main/issues/161
-                                         [com.bhauman/figwheel-main "0.2.0"]] ;; cljs repl
+                                         [org.clojure/test.check "0.10.0"]] ;; generative testing
                         :plugins        [[jonase/eastwood "0.3.5"]] ;; linter
                         :resource-paths ["target"]
                         :clean-targets  ^{:protect false} ["target"]}
              ;; java reloader
              ;[lein-virgil "0.1.9"]]
-             :provided {:dependencies [[org.clojure/clojurescript "1.10.520"]]}}
-
-  :aliases {"fig" ["trampoline" "run" "-m" "figwheel.main"]}
+             :provided {:dependencies [[org.clojure/clojure "1.10.1"]
+                                       [org.antlr/antlr4-runtime "4.7.1"]]}}
 
   :test-selectors {:default     (fn [m] (not (some #{:benchmark} (keys m))))
                    :benchmark   :benchmark}
