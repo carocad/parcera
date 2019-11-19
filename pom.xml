@@ -3,9 +3,9 @@
   <groupId>carocad</groupId>
   <artifactId>parcera</artifactId>
   <packaging>jar</packaging>
-  <version>0.3.1</version>
+  <version>0.4.0</version>
   <name>parcera</name>
-  <description>Grammar-based Clojure(script) parser</description>
+  <description>Grammar-based Clojure parser</description>
   <url>https://github.com/carocad/parcera</url>
   <licenses>
     <license>
@@ -17,10 +17,10 @@
     <url>https://github.com/carocad/parcera</url>
     <connection>scm:git:git://github.com/carocad/parcera.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/carocad/parcera.git</developerConnection>
-    <tag>b4ca5c659e55f00781e37bee1dc6bb400460e307</tag>
+    <tag>4ff04f242eddc4791cfdf2df572f91890c202e6c</tag>
   </scm>
   <build>
-    <sourceDirectory>src</sourceDirectory>
+    <sourceDirectory>src/clojure</sourceDirectory>
     <testSourceDirectory>test</testSourceDirectory>
     <resources>
       <resource>
@@ -29,12 +29,36 @@
     </resources>
     <testResources>
       <testResource>
+        <directory>target</directory>
+      </testResource>
+      <testResource>
         <directory>resources</directory>
       </testResource>
     </testResources>
     <directory>target</directory>
     <outputDirectory>target/classes</outputDirectory>
-    <plugins/>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>1.7</version>
+        <executions>
+          <execution>
+            <id>add-source</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>src/javascript</source>
+                <source>src/java</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
   <repositories>
     <repository>
@@ -68,14 +92,9 @@
       <version>1.10.1</version>
     </dependency>
     <dependency>
-      <groupId>instaparse</groupId>
-      <artifactId>instaparse</artifactId>
-      <version>1.4.10</version>
-    </dependency>
-    <dependency>
-      <groupId>org.clojure</groupId>
-      <artifactId>clojurescript</artifactId>
-      <version>1.10.520</version>
+      <groupId>org.antlr</groupId>
+      <artifactId>antlr4-runtime</artifactId>
+      <version>4.7.1</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

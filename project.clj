@@ -1,9 +1,9 @@
 (defproject carocad/parcera "0.4.0"
-  :description "Grammar-based Clojure(script) parser"
+  :description "Grammar-based Clojure parser"
   :url "https://github.com/carocad/parcera"
   :license {:name "LGPLv3"
             :url  "https://github.com/carocad/parcera/blob/master/LICENSE.md"}
-  :source-paths ["src/clojure" "src/javascript"]
+  :source-paths ["src/clojure"]
   :java-source-paths ["src/java"]
   :dependencies [[org.clojure/clojure "1.10.1"]]
   :profiles {:dev      {:dependencies   [[criterium/criterium "0.4.5"] ;; benchmark

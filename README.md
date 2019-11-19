@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.com/carocad/parcera.svg?branch=master)](https://travis-ci.com/carocad/parcera)
 [![Clojars Project](https://img.shields.io/clojars/v/carocad/parcera.svg)](https://clojars.org/carocad/parcera)
 
-Grammar-based Clojure(script) parser.
+Grammar-based Clojure parser.
 
 Parcera can safely read any Clojure file without any code evaluation.
 
