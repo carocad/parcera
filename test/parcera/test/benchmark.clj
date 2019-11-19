@@ -6,25 +6,27 @@
             [parcera.core :as parcera]))
 
 (deftest ^:benchmark parsing
-  (println "Benchmark: Time parsing Clojure values ⌛")
+  (newline)
+  (newline)
+  (println "Benchmark: Parsing automatically generated values")
   (criterium/quick-bench (tc/quick-check 30 pt/validity)
-                         :os :runtime :verbose))
-
-(deftest ^:benchmark roundtrip
+                         :os :runtime :verbose)
   (newline)
   (newline)
-  (println "Benchmark: Round trip of Clojure values 🚀")
+  (println "Benchmark: Round trip of automatically generated values")
   (criterium/quick-bench (tc/quick-check 30 pt/symmetric)
                          :os :runtime :verbose))
 
 
-;; execute last ... hopefully
-(deftest ^:benchmark z-known-namespace
-  (newline)
-  (newline)
-  (println "Benchmark: Parsing parcera namespace with traces 👮")
-  (criterium/quick-bench (parcera/clojure (str '(ns parcera.core
-                                                  (:require [instaparse.core :as instaparse]
-                                                            [clojure.data :as data]
-                                                            [clojure.string :as str]))))
-                         :os :runtime :verbose))
+(deftest ^:benchmark clojure.core-roundtrip
+  (let [core-content (slurp "https://raw.githubusercontent.com/clojure/clojure/master/src/clj/clojure/core.clj")]
+    (newline)
+    (newline)
+    (println "Benchmark: Parsing Clojure's core namespace 🚧")
+    (criterium/quick-bench (parcera/ast core-content :optimize :memory)
+                           :os :runtime :verbose)
+    (newline)
+    (newline)
+    (println "Benchmark: Rountrip Clojure's core namespace 🚧")
+    (criterium/quick-bench (parcera/code (parcera/ast core-content :optimize :memory))
+                           :os :runtime :verbose)))

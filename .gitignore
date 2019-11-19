@@ -11,3 +11,12 @@ pom.xml.asc
 /.idea/
 /nashorn_code_cache
 /.cljs_nashorn_repl
+/build/
+/yarn-error.log
+/node_modules/
+/out/
+/src/java/
+/src/javascript
+/figwheel_server.log
+package*.json
+/.eastwood

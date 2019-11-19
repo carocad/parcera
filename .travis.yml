@@ -14,16 +14,17 @@ jobs:
   include:
     - stage: Tests
       script:
+        - curl -O https://www.antlr.org/download/antlr-4.7.1-complete.jar
+        # generate java
+        - java -jar antlr-4.7.1-complete.jar -Xexact-output-dir -o src/java/parcera/antlr -package parcera.antlr -Dlanguage=Java -no-listener -no-visitor src/Clojure.g4
+        # now we can actually proceed with clojure code
         - lein do clean, compile, check, eastwood
         - lein trampoline test
-        - nvm install 10.10 && nvm use 10.10 && lein trampoline cljsbuild test
-
-    # only run the benchmark if we are trying to merge to master
-    # otherwise the build takes too long
-    - stage: Benchmark
-      if: branch = master
-      script:
         - lein trampoline test :benchmark
+        # todo - re-enable js
+        # generate javascript - todo
+        #- java -jar antlr-4.7.1-complete.jar -Xexact-output-dir -o src/javascript/parcera/antlr -package parcera.antlr -Dlanguage=JavaScript -no-listener -no-visitor src/Clojure.g4
+        #- nvm install 10.10 && nvm use 10.10 && lein trampoline cljsbuild test
 
     - stage: Release
       if: tag IS present
