@@ -7,11 +7,13 @@ Grammar-based Clojure parser.
 
 Parcera can safely read any Clojure file without any code evaluation.
 
-Parcera uses the wonderful [Instaparse](https://github.com/Engelberg/instaparse) as its
-parsing engine and focuses entirely on the grammar definition instead. For a
-full explanation of the options available for a parser please visit Instaparse website.
+Parcera uses the wonderful [Antlr4](https://github.com/antlr/antlr4/) as its
+parsing engine and focuses entirely on the grammar definition instead.
 
 ## usage
+
+Add `[org.antlr/antlr4-runtime "4.7.1"]` to your dependencies in addition to parcera. Parcera assumes that
+this dependency will be in the classpath to avoid collisions.
 
 ```clojure
 (ns example.core
