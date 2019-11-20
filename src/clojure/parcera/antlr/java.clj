@@ -52,11 +52,12 @@
           stop  (.getStop this)]
       (cond
         ;; happens when the parser rule is a single lexer rule
-        (= start stop)
+        (identical? start stop)
         {::start {:row    (.getLine start)
                   :column (.getCharPositionInLine start)}
          ::end   {:row    (.getLine start)
-                  :column (.getStopIndex start)}}
+                  :column (Math/addExact (.getCharPositionInLine start)
+                                         (.length (.getText start)))}}
 
         ;; no end found - happens on errors
         (nil? stop)
@@ -67,7 +68,8 @@
         {::start {:row    (.getLine start)
                   :column (.getCharPositionInLine start)}
          ::end   {:row    (.getLine stop)
-                  :column (.getCharPositionInLine stop)}}))))
+                  :column (Math/addExact (.getCharPositionInLine stop)
+                                         (.length (.getText stop)))}}))))
 
 
 (extend-type ErrorNodeImpl
