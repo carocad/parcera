@@ -5,6 +5,7 @@
             :url  "https://github.com/carocad/parcera/blob/master/LICENSE.md"}
   :source-paths ["src/clojure"]
   :java-source-paths ["src/java"]
+  :javac-options ["-target" "1.8"]
   :dependencies [[org.clojure/clojure "1.10.1"]]
   :profiles {:dev      {:dependencies   [[criterium/criterium "0.4.5"] ;; benchmark
                                          [org.clojure/test.check "0.10.0"]] ;; generative testing
