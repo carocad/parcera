@@ -7,8 +7,6 @@ branches:
     - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
 
 language: generic
-jdk:
-  - openjdk8
 
 jobs:
   include:
