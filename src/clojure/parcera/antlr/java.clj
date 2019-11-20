@@ -53,31 +53,31 @@
       (cond
         ;; happens when the parser rule is a single lexer rule
         (identical? start stop)
-        {::start {:row    (.getLine start)
-                  :column (.getCharPositionInLine start)}
-         ::end   {:row    (.getLine start)
-                  :column (Math/addExact (.getCharPositionInLine start)
-                                         (.length (.getText start)))}}
+        {:parcera.core/start {:row    (.getLine start)
+                              :column (.getCharPositionInLine start)}
+         :parcera.core/end   {:row    (.getLine start)
+                              :column (Math/addExact (.getCharPositionInLine start)
+                                                     (.length (.getText start)))}}
 
         ;; no end found - happens on errors
         (nil? stop)
-        {::start {:row    (.getLine start)
-                  :column (.getCharPositionInLine start)}}
+        {:parcera.core/start {:row    (.getLine start)
+                              :column (.getCharPositionInLine start)}}
 
         :else
-        {::start {:row    (.getLine start)
-                  :column (.getCharPositionInLine start)}
-         ::end   {:row    (.getLine stop)
-                  :column (Math/addExact (.getCharPositionInLine stop)
-                                         (.length (.getText stop)))}}))))
+        {:parcera.core/start {:row    (.getLine start)
+                              :column (.getCharPositionInLine start)}
+         :parcera.core/end   {:row    (.getLine stop)
+                              :column (Math/addExact (.getCharPositionInLine stop)
+                                                     (.length (.getText stop)))}}))))
 
 
 (extend-type ErrorNodeImpl
   antlr/LocationInfo
   (span [^ErrorNodeImpl this]
     (let [token (.-symbol this)]
-      {::start {:row    (.getLine token)
-                :column (.getCharPositionInLine token)}})))
+      {:parcera.core/start {:row    (.getLine token)
+                            :column (.getCharPositionInLine token)}})))
 
 
 (extend-type ClojureParser
