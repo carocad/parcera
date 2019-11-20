@@ -28,6 +28,11 @@ jobs:
 
     - stage: Release
       if: tag IS present
+      script:
+        - curl -O https://www.antlr.org/download/antlr-4.7.1-complete.jar
+        # generate java
+        - java -jar antlr-4.7.1-complete.jar -Xexact-output-dir -o src/java/parcera/antlr -package parcera.antlr -Dlanguage=Java -no-listener -no-visitor src/Clojure.g4
+        - lein do javac, compile, check
       deploy:
         - provider: script
           script: lein deploy clojars

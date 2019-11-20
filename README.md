@@ -50,3 +50,12 @@ this dependency will be in the classpath to avoid collisions.
 (parcera/code [:symbol "ns"])
 ;; "ns"
 ```
+
+## contributing
+
+- To get you setup check the [travis](./.travis.yml) file which
+already contains a full setup from scratch.
+- The project contains a benchmark which should be the decision factor for
+  performance issues inside `parcera`.
+- Please follow [Clojure's Etiquete](https://www.clojure.org/community/etiquette)
+  for issues and pull requests
