@@ -72,7 +72,25 @@
     ;(is (clear input))))
     (as-> "\\ϕ" input (and (is (valid? input))
                            (is (roundtrip input))))))
-;(is (clear input))))))
+
+
+(deftest metadata
+  (testing "simple definitions"
+    (let [input    ":bar"
+          ast      (parcera/ast input)
+          location (meta (second ast))]
+      (is (= (:row (::parcera/start location)) 1))
+      (is (= (:column (::parcera/start location)) 0))
+      (is (= (:row (::parcera/start location)) 1))
+      (is (= (:column (::parcera/end location))
+             (count input)))))
+
+  (testing "syntax error"
+    (let [input    "hello/world/"
+          ast      (parcera/ast input)
+          location (meta (second ast))]
+      (is (parcera/failure? ast))
+      (is (some? (:message (::parcera/start location)))))))
 
 
 (deftest data-structures
