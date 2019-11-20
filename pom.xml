@@ -3,7 +3,7 @@
   <groupId>carocad</groupId>
   <artifactId>parcera</artifactId>
   <packaging>jar</packaging>
-    <version>0.4.1-SNAPSHOT</version>
+    <version>0.4.2</version>
   <name>parcera</name>
   <description>Grammar-based Clojure parser</description>
   <url>https://github.com/carocad/parcera</url>
@@ -17,7 +17,7 @@
     <url>https://github.com/carocad/parcera</url>
     <connection>scm:git:git://github.com/carocad/parcera.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/carocad/parcera.git</developerConnection>
-      <tag>3d33c541bd0f49e46db7db12b23b4e2035eb9fd5</tag>
+      <tag>faf7cc8631e665c408bb94cb806059008135104a</tag>
   </scm>
   <build>
     <sourceDirectory>src/clojure</sourceDirectory>
