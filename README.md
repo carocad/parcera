@@ -17,12 +17,11 @@ this dependency will be in the classpath to avoid collisions.
 
 ```clojure
 (ns example.core
-  (:require [parcera.core :as parcera]
-            [instaparse.core :as instaparse]))
+  (:require [parcera.core :as parcera]))
 
 ;;parse clojure code from a string
 (parcera/ast (str '(ns parcera.core
-                     (:require [instaparse.core :as instaparse]
+                     (:require [foo.bar :as bar]
                                [clojure.data :as data]
                                [clojure.string :as str]))))
 
@@ -37,11 +36,11 @@ this dependency will be in the classpath to avoid collisions.
    (:simple_keyword "require")
    (:whitespace " ")
    (:vector
-    (:symbol "instaparse.core")
+    (:symbol "foo.bar")
     (:whitespace " ")
     (:simple_keyword "as")
     (:whitespace " ")
-    (:symbol "instaparse"))
+    (:symbol "bar"))
    (:whitespace " ")
    (:vector (:symbol "clojure.data") (:whitespace " ") (:simple_keyword "as") (:whitespace " ") (:symbol "data"))
    (:whitespace " ")
