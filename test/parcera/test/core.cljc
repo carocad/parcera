@@ -64,8 +64,8 @@
 
 
 (def monotonic
-  "The read <-> write process of parcera MUST be symmetrical. Meaning
-  that the AST and the text representation are equivalent"
+  "for any given AST the children of a parser rule are always
+  inside its row/column range"
   (prop/for-all [input (gen/fmap pr-str gen/any)]
     (let [ast (parcera/ast input)]
       (map monotonic* (filter nested? (tree-seq seq? seq ast))))))
