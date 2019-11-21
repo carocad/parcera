@@ -8,6 +8,30 @@
             #?(:cljs [parcera.slurp :refer [slurp]])))
 
 
+(defn- nested?
+  [coll]
+  (not= 1 (count (tree-seq coll? (fn [entry] (filter coll? entry)) coll))))
+
+
+(defn- monotonic*
+  "given a nested ast check that the parent node contains the inner nodes
+  that is, for every child its row/column information must be inside the
+  parent row/column range"
+  [nested-ast]
+  (let [start  (::parcera/start (meta nested-ast))
+        end    (::parcera/end (meta nested-ast))
+        starts (map ::parcera/start (map meta (rest nested-ast)))
+        ends   (map ::parcera/end (map meta (rest nested-ast)))]
+    (and (apply <= (map :row starts))
+         (apply <= (map :column starts))
+         (apply <= (map :row ends))
+         (apply <= (map :column ends))
+         (<= (:row start) (:row (first starts)))
+         (<= (:column start) (:column (first starts)))
+         (<= (:row end) (:row (last ends)))
+         (<= (:column end) (:column (last ends))))))
+
+
 (defn- roundtrip
   "checks parcera can parse and write back the exact same input code"
   [input]
@@ -37,6 +61,15 @@
   that the AST and the text representation are equivalent"
   (prop/for-all [input (gen/fmap pr-str gen/any)]
     (roundtrip input)))
+
+
+(def monotonic
+  "The read <-> write process of parcera MUST be symmetrical. Meaning
+  that the AST and the text representation are equivalent"
+  (prop/for-all [input (gen/fmap pr-str gen/any)]
+    (let [ast (parcera/ast input)]
+      (map monotonic* (filter nested? (tree-seq seq? seq ast))))))
+
 
 
 #_(def unambiguous
@@ -106,6 +139,11 @@
           (str "read <-> write process yield different result. Failed at\n"
                (with-out-str (pprint/pprint result))))))
 
+  (testing "parsed metadata"
+    (let [result (tc/quick-check 200 monotonic)]
+      (is (:pass? result)
+          (str "inconsistent meta data found. Failed at\n"
+               (with-out-str (pprint/pprint result))))))
   #_(testing "very little ambiguity"
       (let [result (tc/quick-check 200 unambiguous)]
         (is (:pass? result)
