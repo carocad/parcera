@@ -250,10 +250,10 @@
     ;; ast is root node but "doesnt know" about the failure -> conformed
     (some #{::failure} (filter keyword? (tree-seq seq? identity ast)))))
 
-(time (ast (str '(ns parcera.core
-                   (:require [instaparse.core :as instaparse]
-                             [clojure.data :as data]
-                             [clojure.string :as str])))))
+#_(time (ast (str '(ns parcera.core
+                     (:require [instaparse.core :as instaparse]
+                               [clojure.data :as data]
+                               [clojure.string :as str])))))
 
 #_(time (ast "(ns parcera.core
               (:require [instaparse.core :as #{:hello \"world\" :hello}]
