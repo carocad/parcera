@@ -1,8 +1,9 @@
 (ns parcera.antlr.java
-  (:require [parcera.antlr.protocols :as antlr])
+  (:require [parcera.antlr.protocols :as common]
+            [clojure.core.protocols :as clojure])
   (:import (parcera.antlr ClojureParser ClojureLexer)
-           (org.antlr.v4.runtime ParserRuleContext Token CommonTokenStream CharStreams ANTLRErrorListener Parser)
-           (org.antlr.v4.runtime.tree ErrorNodeImpl)))
+           (org.antlr.v4.runtime ParserRuleContext CommonTokenStream CharStreams ANTLRErrorListener Parser)
+           (org.antlr.v4.runtime.tree ErrorNodeImpl TerminalNode)))
 
 (set! *warn-on-reflection* true)
 
@@ -40,53 +41,59 @@
       (vswap! reports conj report))))
 
 
+(defn- parser-rule-meta
+  [^ParserRuleContext this]
+  (let [start (.getStart this)
+        stop  (.getStop this)]
+    (cond
+      ;; happens when the parser rule is a single lexer rule
+      (identical? start stop)
+      {:parcera.core/start {:row    (.getLine start)
+                            :column (.getCharPositionInLine start)}
+       :parcera.core/end   {:row    (.getLine start)
+                            :column (Math/addExact (.getCharPositionInLine start)
+                                                   (.length (.getText start)))}}
+
+      ;; no end found - happens on errors
+      (nil? stop)
+      {:parcera.core/start {:row    (.getLine start)
+                            :column (.getCharPositionInLine start)}}
+
+      :else
+      {:parcera.core/start {:row    (.getLine start)
+                            :column (.getCharPositionInLine start)}
+       :parcera.core/end   {:row    (.getLine stop)
+                            :column (Math/addExact (.getCharPositionInLine stop)
+                                                   (.length (.getText stop)))}})))
+
 ;; start and end are tokens not positions.
 ;; So '(hello/world)' has '(' 'hello/world' and ')' as tokens
 (extend-type ParserRuleContext
-  antlr/ParserRule
-  (children [^ParserRuleContext this] (.-children this))
-  (rule-index [^ParserRuleContext this] (.getRuleIndex this))
-  antlr/LocationInfo
-  (span [^ParserRuleContext this]
-    (let [start (.getStart this)
-          stop  (.getStop this)]
-      (cond
-        ;; happens when the parser rule is a single lexer rule
-        (identical? start stop)
-        {:parcera.core/start {:row    (.getLine start)
-                              :column (.getCharPositionInLine start)}
-         :parcera.core/end   {:row    (.getLine start)
-                              :column (Math/addExact (.getCharPositionInLine start)
-                                                     (.length (.getText start)))}}
-
-        ;; no end found - happens on errors
-        (nil? stop)
-        {:parcera.core/start {:row    (.getLine start)
-                              :column (.getCharPositionInLine start)}}
-
-        :else
-        {:parcera.core/start {:row    (.getLine start)
-                              :column (.getCharPositionInLine start)}
-         :parcera.core/end   {:row    (.getLine stop)
-                              :column (Math/addExact (.getCharPositionInLine stop)
-                                                     (.length (.getText stop)))}}))))
+  clojure/Datafiable
+  (datafy [this]
+    (common/map->Node {:metadata (parser-rule-meta this)
+                       :type     :parcera.core/rule
+                       :rule-id  (.getRuleIndex this)
+                       :content  (.-children this)})))
 
 
 (extend-type ErrorNodeImpl
-  antlr/LocationInfo
-  (span [^ErrorNodeImpl this]
+  clojure/Datafiable
+  (datafy [this]
     (let [token (.-symbol this)]
-      {:parcera.core/start {:row    (.getLine token)
-                            :column (.getCharPositionInLine token)}})))
+      (common/map->Node {:type     :parcera.core/failure
+                         :content  (str this)
+                         :metadata {:parcera.core/start {:row    (.getLine token)
+                                                         :column (.getCharPositionInLine token)}}}))))
 
 
-(extend-type ClojureParser
-  antlr/AntlrParser
-  (rules [^ClojureParser this] (into [] (map keyword) (.getRuleNames this)))
-  (tree [^ClojureParser this] (. this (code))))
+(extend-type TerminalNode
+  clojure/Datafiable
+  (datafy [this] (common/map->Node {:type    :parcera.core/terminal
+                                    :content (str this)})))
 
 
-(defn parser
+(defn parse
   [input]
   (let [listener (->AntlrFailure (volatile! ()))
         chars    (CharStreams/fromString input)
@@ -98,4 +105,6 @@
                    (.setBuildParseTree true)
                    (.removeErrorListeners)
                    (.addErrorListener listener))]
-    {:parser parser :errors {:parser listener}}))
+    {:rules  (into [] (map keyword) (.getRuleNames parser))
+     :tree   (.code parser)
+     :errors {:parser listener}}))
