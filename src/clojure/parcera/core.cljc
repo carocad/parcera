@@ -1,6 +1,5 @@
 (ns parcera.core
   (:require [clojure.core.protocols :as clojure]
-            [parcera.antlr.protocols :as antlr]
             #?(:clj [parcera.antlr.java :as platform]))
   ; todo: re-enable once we have javscript support
   ;:cljs [parcera.antlr.javascript :as platform]))

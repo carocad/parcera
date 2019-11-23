@@ -1,9 +1,13 @@
 (ns parcera.antlr.java
-  (:require [parcera.antlr.protocols :as common]
+  "mapping functions between Antlr's Java implementation
+  and Parcera AST representation"
+  (:require [parcera.antlr.common :as common]
             [clojure.core.protocols :as clojure])
   (:import (parcera.antlr ClojureParser ClojureLexer)
-           (org.antlr.v4.runtime ParserRuleContext CommonTokenStream CharStreams ANTLRErrorListener Parser)
+           (org.antlr.v4.runtime ParserRuleContext CommonTokenStream
+                                 CharStreams ANTLRErrorListener Parser)
            (org.antlr.v4.runtime.tree ErrorNodeImpl TerminalNode)))
+
 
 (set! *warn-on-reflection* true)
 

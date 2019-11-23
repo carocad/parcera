@@ -1,3 +1,3 @@
-(ns parcera.antlr.protocols)
+(ns parcera.antlr.common)
 
 (defrecord Node [metadata type rule-id content])
