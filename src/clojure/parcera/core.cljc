@@ -1,5 +1,5 @@
 (ns parcera.core
-  (:require [parcera.antlr.protocols :as antlr]
+  (:require [clojure.core.protocols :as clojure]
             #?(:clj [parcera.antlr.java :as platform]))
   ; todo: re-enable once we have javscript support
   ;:cljs [parcera.antlr.javascript :as platform]))
@@ -52,29 +52,28 @@
   Yields a lazy sequence to avoid expensive computation whenever
   the user is not interested in the full content."
   [tree rule-names hide-tags hide-literals]
-  (cond
-    (boolean (satisfies? antlr/ParserRule tree))
-    (let [rule     (get rule-names (antlr/rule-index tree))
-          children (for [child (antlr/children tree)
-                         :let [child (hiccup child rule-names hide-tags hide-literals)]
-                         :when (not (nil? child))]
-                     child)
+  (let [node (clojure/datafy tree)]
+    (case (:type node)
+      ::rule
+      (let [rule     (get rule-names (:rule-id node))
+            children (for [child (:content node)
+                           :let [child (hiccup child rule-names hide-tags hide-literals)]
+                           :when (not (nil? child))]
+                       child)
+            ;; extra validation rules
+            fail     (failure rule children (:metadata node))]
+        (if (contains? hide-tags rule)
+          ;; parcera hidden tags are always "or" statements, so just take the single children
+          (first children)
           ;; attach meta data ... ala instaparse
-          ast-meta (antlr/span tree)
-          ;; extra validation rules
-          fail     (failure rule children ast-meta)]
-      ;; parcera hidden tags are always "or" statements, so just take the single children
-      (if (contains? hide-tags rule)
-        (first children)
-        (or fail (with-meta (cons rule children) ast-meta))))
+          (or fail (with-meta (cons rule children) (:metadata node)))))
 
-    (boolean (satisfies? antlr/ErrorNode tree))
-    (with-meta (list ::failure (str tree))
-               (antlr/span tree))
+      ::failure
+      (with-meta (list ::failure (:content node))
+                 (:metadata node))
 
-    :else
-    (let [text (str tree)]
-      (if (contains? hide-literals text) nil text))))
+      ::terminal
+      (if (contains? hide-literals (:content node)) nil (:content node)))))
 
 
 (defn- unhide
@@ -99,10 +98,8 @@
        those through Clojure's immutable data structures"
   [input & {:as options}]
   (let [hidden     (unhide options)
-        {:keys [parser errors]} (platform/parser input)
-        rule-names (antlr/rules parser)
-        tree       (antlr/tree parser)
-        result     (hiccup tree rule-names (:tags hidden) (:literals hidden))
+        {:keys [rules tree errors]} (platform/parse input)
+        result     (hiccup tree rules (:tags hidden) (:literals hidden))
         reports    @(:reports (:parser errors))]
     (vary-meta result assoc ::errors reports)))
 
