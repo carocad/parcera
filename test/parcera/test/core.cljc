@@ -230,7 +230,10 @@
     ;; NOT a number ;)
     (let [input ":1"]
       (is (valid? input))
-      (is (roundtrip input)))))
+      (is (roundtrip input)))
+    ;; ::/ is valid according to parcera's lexer but not for Clojure
+    (let [input "::/"]
+      (is (not (valid? input))))))
 
 
 (deftest macros

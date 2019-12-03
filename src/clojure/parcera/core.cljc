@@ -15,35 +15,47 @@
 (def name-pattern #?(:clj  #"^:?:?([^\s\/]+\/)?(\/|[^\s\/]+)$"
                      :cljs #"^:?:?([^\s/]+/)?(/|[^\s/]+)$"))
 
+(defn- invalid-name?
+  "check that keywords and symbols conform to the name pattern"
+  [children]
+  ;; when keywords fail on lexer they become ((::failure "message") "rest")
+  (and (string? (first children))
+       (nil? (re-find name-pattern (first children)))))
 
+
+(defn- report
+  "utility to avoid repeating this code over and over again"
+  [rule children metadata message]
+  (with-meta (list ::failure (cons rule children))
+             (assoc-in metadata [::start :message] message)))
+
+;; TODO: it might be worth making these checks with clojure.spec 🤔 ?
 (defn- failure
   "Checks that `rule` conforms to additional rules which are too difficult
   to represent with pure Antlr4 syntax"
   [rule children metadata]
   (case rule
-    (:symbol :simple_keyword :macro_keyword)
-    ;; when keywords fail on lexer they become ((::failure "message") "rest")
-    (when (and (not= ::failure (ffirst children))
-               (nil? (re-find name-pattern (first children))))
-      (with-meta (list ::failure (cons rule children))
-                 (assoc-in metadata [::start :message]
-                           (str "name cannot contain more than one /"))))
+    (:symbol :simple_keyword)
+    (when (invalid-name? children)
+      (report rule children metadata "name cannot contain more than one /"))
+
+    :macro_keyword
+    (if (invalid-name? children)
+      (report rule children metadata "name cannot contain more than one /")
+      (when (= "::/" (first children))
+        (report rule children metadata "macro keyword name cannot be /")))
 
     :map
     (let [forms (remove (comp #{:whitespace :discard} first) children)]
       (when (odd? (count forms))
-        (with-meta (list ::failure (cons rule children))
-                   (assoc-in metadata [::start :message]
-                             "Map literal must contain an even number of forms"))))
+        (report rule children metadata "Map literal must contain an even number of forms")))
 
     :set
     (let [forms         (remove (comp #{:whitespace :discard} first) children)
           set-length    (count forms)
           unique-length (count (distinct forms))]
       (when (not= set-length unique-length)
-        (with-meta (list ::failure (cons rule children))
-                   (assoc-in metadata [::start :message]
-                             "Set literal contains duplicate forms"))))
+        (report rule children metadata "Set literal contains duplicate forms")))
 
     nil))
 
