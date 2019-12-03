@@ -101,7 +101,7 @@ var_quote: '#\'' symbol;
 
 discard: '#_' form;
 
-tag: '#' symbol whitespace? (literal | collection);
+tag: '#' symbol whitespace? (literal | collection | tag);
 
 conditional: '#?(' form* ')';
 

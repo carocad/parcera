@@ -217,7 +217,12 @@
 
   (testing "strings"
     (let [input "hello \"world"]
-      (is (not (valid? input))))))
+      (is (not (valid? input)))))
+
+  (testing "tag literals"
+    ;; nested tag literals
+    (let [input "#a #b 1"]
+      (is (valid? input)))))
 
 
 (deftest macros
