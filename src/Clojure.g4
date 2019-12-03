@@ -32,7 +32,11 @@ map: '{' form* '}';
 
 literal: keyword | string | number | character | symbol;
 
-keyword: KEYWORD;
+keyword: simple_keyword | macro_keyword;
+
+simple_keyword: SIMPLE_KEYWORD;
+
+macro_keyword: MACRO_KEYWORD;
 
 string: STRING;
 
@@ -118,8 +122,9 @@ SPACE: [\r\n\t\f, ]+;
 
 CHARACTER: '\\' (UNICODE_CHAR | NAMED_CHAR | UNICODE);
 
-// either a qualified keyword or a simple one
-KEYWORD: ':' ':'? KEYWORD_HEAD SYMBOL_BODY*;
+MACRO_KEYWORD: '::' KEYWORD_HEAD SYMBOL_BODY*;
+
+SIMPLE_KEYWORD: ':' KEYWORD_HEAD SYMBOL_BODY*;
 
 SYMBOL: NAME_HEAD SYMBOL_BODY*;
 
