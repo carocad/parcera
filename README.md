@@ -46,6 +46,11 @@ this dependency will be in the classpath to avoid collisions.
    (:whitespace " ")
    (:vector (:symbol "clojure.string") (:whitespace " ") (:simple_keyword "as") (:whitespace " ") (:symbol "str")))))
 
+
+;; get meta data from the parsed code
+(meta (second (parcera/ast (str :hello))))
+
+
 ;; convert an AST back into a string
 (parcera/code [:symbol "ns"])
 ;; "ns"
