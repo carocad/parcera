@@ -12,8 +12,8 @@
 
 
 ;; for some reason cljs doesnt accept escaping the / characters
-(def name-pattern #?(:clj  #"^([^\s\/]+\/)?(\/|[^\s\/]+)$"
-                     :cljs #"^([^\s/]+/)?(/|[^\s/]+)$"))
+(def name-pattern #?(:clj  #"^:?:?([^\s\/]+\/)?(\/|[^\s\/]+)$"
+                     :cljs #"^:?:?([^\s/]+/)?(/|[^\s/]+)$"))
 
 
 (defn- failure
@@ -140,7 +140,7 @@
         (doseq [child (rest ast)] (code* child string-builder))
         (. string-builder (append "}")))
 
-    (:number :whitespace :symbol :character :string)
+    (:number :whitespace :symbol :character :string :simple_keyword :macro_keyword)
     (. string-builder (append (second ast)))
 
     :symbolic
@@ -153,14 +153,6 @@
 
     :auto_resolve
     (. string-builder (append "::"))
-
-    :simple_keyword
-    (do (. string-builder (append ":"))
-        (. string-builder (append (second ast))))
-
-    :macro_keyword
-    (do (. string-builder (append "::"))
-        (. string-builder (append (second ast))))
 
     :metadata
     (do (doseq [child (rest (butlast ast))] (code* child string-builder))
