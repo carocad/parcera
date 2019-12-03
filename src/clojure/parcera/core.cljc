@@ -22,7 +22,9 @@
   [rule children metadata]
   (case rule
     (:symbol :simple_keyword :macro_keyword)
-    (when (nil? (re-find name-pattern (first children)))
+    ;; when keywords fail on lexer they become ((::failure "message") "rest")
+    (when (and (not= ::failure (ffirst children))
+               (nil? (re-find name-pattern (first children))))
       (with-meta (list ::failure (cons rule children))
                  (assoc-in metadata [::start :message]
                            (str "name cannot contain more than one /"))))
