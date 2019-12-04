@@ -47,37 +47,25 @@
   (with-meta (list ::failure (cons rule children))
              (assoc-in metadata [::start :message] message)))
 
-
 (defn- failure
   "Checks that `rule` conforms to additional rules which are too difficult
   to represent with pure Antlr4 syntax"
   [rule children metadata]
   (case rule
-    :symbol
+    (:symbol :simple_keyword :macro_keyword)
     (when (string? (first children))
-      (when (not (s/valid? ::symbol (first children)))
+      (when (not (s/valid? (keyword "parcera.core" (name rule))
+                           (first children)))
         (report rule children metadata
-                (s/explain-str ::symbol (first children)))))
+                (s/explain-str (keyword "parcera.core" (name rule))
+                               (first children)))))
 
-    :simple_keyword
-    (when (string? (first children))
-      (when (not (s/valid? ::simple_keyword (first children)))
-        (report rule children metadata
-                (s/explain-str ::simple_keyword (first children)))))
-
-    :macro_keyword
-    (when (string? (first children))
-      (when (not (s/valid? ::macro_keyword (first children)))
-        (report rule children metadata
-                (s/explain-str ::macro_keyword (first children)))))
-
-    :map
-    (when (not (s/valid? ::map children))
-      (report rule children metadata (s/explain-str ::map children)))
-
-    :set
-    (when (not (s/valid? ::set children))
-      (report rule children metadata (s/explain-str ::set children)))
+    (:map :set)
+    (when (not (s/valid? (keyword "parcera.core" (name rule))
+                         children))
+      (report rule children metadata
+              (s/explain-str (keyword "parcera.core" (name rule))
+                             children)))
 
     nil))
 
