@@ -98,7 +98,7 @@ regex: '#' STRING;
 
 set: '#{' form* '}';
 
-namespaced_map: '#' ( keyword |  auto_resolve) map;
+namespaced_map: '#' ( keyword |  auto_resolve) whitespace? map;
 
 auto_resolve: '::';
 
@@ -150,11 +150,11 @@ fragment NAME_HEAD: ~[\r\n\t\f ()[\]{}"@~^;`\\,:#'];
 
 fragment DOUBLE_SUFFIX: ((('.' DIGIT*)? ([eE][-+]?DIGIT+)?) 'M'?);
 
-fragment LONG_SUFFIX: ('0'[xX]((DIGIT|[A-Fa-f])+) |
-                       '0'([0-7]+) |
-                       ([1-9]DIGIT?)[rR](DIGIT[a-zA-Z]+) |
-                       '0'DIGIT+
-                      )?'N'?;
+// check LispReader for the pattern used by Clojure
+fragment LONG_SUFFIX: ( [xX][0-9A-Fa-f]+
+                      | [0-7]+
+                      | [rR][0-9a-zA-Z]+
+                      )? 'N'?;
 
 fragment RATIO_SUFFIX: '/' DIGIT+;
 

@@ -232,7 +232,23 @@
       (is (roundtrip input)))
     ;; ::/ is valid according to parcera's lexer but not for Clojure
     (let [input "::/"]
-      (is (not (valid? input))))))
+      (is (not (valid? input)))))
+  (testing "numbers"
+    (let [input "0x1f"]
+      (is (valid? input))
+      (is (roundtrip input)))
+    (let [input "2r101010"]
+      (is (valid? input))
+      (is (roundtrip input)))
+    (let [input "8r52"]
+      (is (valid? input))
+      (is (roundtrip input)))
+    (let [input "36r16"]
+      (is (valid? input))
+      (is (roundtrip input)))
+    (let [input "22/7"]
+      (is (valid? input))
+      (is (roundtrip input)))))
 
 
 (deftest macros
@@ -455,3 +471,13 @@
   (testing "parcera should be able to parse clojurescript core"
     (let [core-content (slurp "https://raw.githubusercontent.com/clojure/clojurescript/master/src/main/clojure/cljs/core.cljc")]
       (time (is (= core-content (parcera/code (parcera/ast core-content :optimize :memory))))))))
+
+
+;; when in doubt enable the test below. I parses clojure reader test suite so, if we
+;; expect something to work it probably will be tested there.
+#_(testing "parcera should be able to parse clojurescript core"
+    (let [core-content (slurp "https://raw.githubusercontent.com/clojure/clojure/master/test/clojure/test_clojure/reader.cljc")]
+      (for [form (tree-seq seq? seq (parcera/ast core-content :optimize :memory))
+            :when (coll? form)
+            :when (contains? #{::parcera/failure} (first form))]
+        [form (meta form)])))
