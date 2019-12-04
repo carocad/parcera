@@ -11,37 +11,59 @@
                                  "~@" "@" "#(" "#'" "#_" "#?(" "#?@(" "##" ":" "::"}})
 
 
-;; for some reason cljs doesnt accept escaping the / characters
-(def name-pattern #?(:clj  #"^([^\s\/]+\/)?(\/|[^\s\/]+)$"
-                     :cljs #"^([^\s/]+/)?(/|[^\s/]+)$"))
+;; a name can contain a maximum of 1 /
+(def qualified-name #?(:clj  #"^([^\s\/]+\/)?(\/|[^\s\/]+)$"
+                       ;; for some reason cljs doesnt accept escaping the / characters
+                       :cljs #"^([^\s/]+/)?(/|[^\s/]+)$"))
 
 
+;; a symbol cannot start with a number
+(def forbidden-symbol-start #"^[+-]?\d+")
+
+
+(defn- report
+  "utility to avoid repeating this code over and over again"
+  [rule children metadata message]
+  (with-meta (list ::failure (cons rule children))
+             (assoc-in metadata [::start :message] message)))
+
+
+;; TODO: it might be worth making these checks with clojure.spec 🤔 ?
 (defn- failure
   "Checks that `rule` conforms to additional rules which are too difficult
   to represent with pure Antlr4 syntax"
   [rule children metadata]
   (case rule
-    (:symbol :simple_keyword :macro_keyword)
-    (when (nil? (re-find name-pattern (first children)))
-      (with-meta (list ::failure (cons rule children))
-                 (assoc-in metadata [::start :message]
-                           (str "name cannot contain more than one /"))))
+    :symbol
+    (when (string? (first children))
+      (if (nil? (re-find qualified-name (first children)))
+        (report rule children metadata "symbol name cannot contain more than one /")
+        (when (not (nil? (re-find forbidden-symbol-start (first children))))
+          (report rule children metadata "symbol name cannot start with a number"))))
+
+    :simple_keyword
+    (when (string? (first children))
+      (when (nil? (re-find qualified-name (first children)))
+        (report rule children metadata "keyword name cannot contain more than one /")))
+
+    :macro_keyword
+    (when (string? (first children))
+      (if (nil? (re-find qualified-name (first children)))
+        (report rule children metadata "macro keyword name cannot contain more than one /")
+        (when (= "/" (first children))
+          (report rule children metadata "macro keyword name cannot be /"))))
 
     :map
     (let [forms (remove (comp #{:whitespace :discard} first) children)]
       (when (odd? (count forms))
-        (with-meta (list ::failure (cons rule children))
-                   (assoc-in metadata [::start :message]
-                             "Map literal must contain an even number of forms"))))
+        (report rule children metadata "Map literal must contain an even number of forms")))
 
     :set
     (let [forms         (remove (comp #{:whitespace :discard} first) children)
           set-length    (count forms)
           unique-length (count (distinct forms))]
       (when (not= set-length unique-length)
-        (with-meta (list ::failure (cons rule children))
-                   (assoc-in metadata [::start :message]
-                             "Set literal contains duplicate forms"))))
+        (report rule children metadata "Set literal contains duplicate forms")))
 
     nil))
 
@@ -141,6 +163,14 @@
     (:number :whitespace :symbol :character :string)
     (. string-builder (append (second ast)))
 
+    :simple_keyword
+    (do (. string-builder (append ":"))
+        (. string-builder (append (second ast))))
+
+    :macro_keyword
+    (do (. string-builder (append "::"))
+        (. string-builder (append (second ast))))
+
     :symbolic
     (do (. string-builder (append "##"))
         (. string-builder (append (second ast))))
@@ -151,14 +181,6 @@
 
     :auto_resolve
     (. string-builder (append "::"))
-
-    :simple_keyword
-    (do (. string-builder (append ":"))
-        (. string-builder (append (second ast))))
-
-    :macro_keyword
-    (do (. string-builder (append "::"))
-        (. string-builder (append (second ast))))
 
     :metadata
     (do (doseq [child (rest (butlast ast))] (code* child string-builder))

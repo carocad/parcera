@@ -222,7 +222,17 @@
   (testing "tag literals"
     ;; nested tag literals
     (let [input "#a #b 1"]
-      (is (valid? input)))))
+      (is (valid? input))))
+
+  (testing "keywords"
+    ;; a keyword can be a simple number because its first character is : which is
+    ;; NOT a number ;)
+    (let [input ":1"]
+      (is (valid? input))
+      (is (roundtrip input)))
+    ;; ::/ is valid according to parcera's lexer but not for Clojure
+    (let [input "::/"]
+      (is (not (valid? input))))))
 
 
 (deftest macros
