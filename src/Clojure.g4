@@ -33,7 +33,14 @@ map: '{' form* '}';
 literal: keyword | string | number | character | symbol;
 
 keyword: simple_keyword | macro_keyword;
-
+/**
+ * keywords are treated like symbols prepended by : this was 'borrowed' from
+ * Clojure's Lisp Reader which uses a single regex to match both and then
+ * checks if it starts with :
+ *
+ * I am not fully sure if it would be better to make keywords Lexer rules but
+ * at least for the time being this approach seems to work quite well
+ */
 simple_keyword: ':' (NAME | NUMBER);
 
 macro_keyword: '::' (NAME | NUMBER);
@@ -122,8 +129,10 @@ SPACE: [\r\n\t\f, ]+;
 
 CHARACTER: '\\' (UNICODE_CHAR | NAMED_CHAR | UNICODE);
 
-// note: certain patterns are allowed on purpose because it would be too difficult
-// to validate those with antlr; parcera takes care of those special cases
+/**
+ * note: certain patterns are allowed on purpose because it would be too difficult
+ * to validate those with antlr; parcera takes care of those special cases
+ */
 NAME: NAME_HEAD NAME_BODY*;
 
 fragment UNICODE_CHAR: ~[\u0300-\u036F\u1DC0-\u1DFF\u20D0-\u20FF];
