@@ -1,5 +1,6 @@
 (ns parcera.core
   (:require [clojure.core.protocols :as clojure]
+            [parcera.spec :as spec]
             #?(:clj [parcera.antlr.java :as platform]))
   ; todo: re-enable once we have javscript support
   ;:cljs [parcera.antlr.javascript :as platform]))
@@ -9,63 +10,6 @@
 (def default-hidden {:tags     #{:form :collection :literal :keyword :reader_macro :dispatch}
                      :literals #{"(" ")" "[" "]" "{" "}" "#{" "#" "^" "`" "'" "~"
                                  "~@" "@" "#(" "#'" "#_" "#?(" "#?@(" "##" ":" "::"}})
-
-
-;; a name can contain a maximum of 1 /
-(def qualified-name #?(:clj  #"^([^\s\/]+\/)?(\/|[^\s\/]+)$"
-                       ;; for some reason cljs doesnt accept escaping the / characters
-                       :cljs #"^([^\s/]+/)?(/|[^\s/]+)$"))
-
-
-;; a symbol cannot start with a number
-(def forbidden-symbol-start #"^[+-]?\d+")
-
-
-(defn- report
-  "utility to avoid repeating this code over and over again"
-  [rule children metadata message]
-  (with-meta (list ::failure (cons rule children))
-             (assoc-in metadata [::start :message] message)))
-
-
-;; TODO: it might be worth making these checks with clojure.spec 🤔 ?
-(defn- failure
-  "Checks that `rule` conforms to additional rules which are too difficult
-  to represent with pure Antlr4 syntax"
-  [rule children metadata]
-  (case rule
-    :symbol
-    (when (string? (first children))
-      (if (nil? (re-find qualified-name (first children)))
-        (report rule children metadata "symbol name cannot contain more than one /")
-        (when (not (nil? (re-find forbidden-symbol-start (first children))))
-          (report rule children metadata "symbol name cannot start with a number"))))
-
-    :simple_keyword
-    (when (string? (first children))
-      (when (nil? (re-find qualified-name (first children)))
-        (report rule children metadata "keyword name cannot contain more than one /")))
-
-    :macro_keyword
-    (when (string? (first children))
-      (if (nil? (re-find qualified-name (first children)))
-        (report rule children metadata "macro keyword name cannot contain more than one /")
-        (when (= "/" (first children))
-          (report rule children metadata "macro keyword name cannot be /"))))
-
-    :map
-    (let [forms (remove (comp #{:whitespace :discard} first) children)]
-      (when (odd? (count forms))
-        (report rule children metadata "Map literal must contain an even number of forms")))
-
-    :set
-    (let [forms         (remove (comp #{:whitespace :discard} first) children)
-          set-length    (count forms)
-          unique-length (count (distinct forms))]
-      (when (not= set-length unique-length)
-        (report rule children metadata "Set literal contains duplicate forms")))
-
-    nil))
 
 
 (defn- hiccup
@@ -83,7 +27,7 @@
                            :when (not (nil? child))]
                        child)
             ;; extra validation rules
-            fail     (failure rule children (:metadata node))]
+            fail     (spec/failure rule children (:metadata node))]
         (if (contains? hide-tags rule)
           ;; parcera hidden tags are always "or" statements, so just take the single children
           (first children)
