@@ -151,10 +151,9 @@ fragment NAME_HEAD: ~[\r\n\t\f ()[\]{}"@~^;`\\,:#'];
 fragment DOUBLE_SUFFIX: ((('.' DIGIT*)? ([eE][-+]?DIGIT+)?) 'M'?);
 
 // check LispReader for the pattern used by Clojure
-// static Pattern intPat = Pattern.compile("([-+]?)(?:(0)|([1-9][0-9]*)|0[xX]([0-9A-Fa-f]+)|0([0-7]+)|([1-9][0-9]?)[rR]([0-9A-Za-z]+)|0[0-9]+)(N)?");
-fragment LONG_SUFFIX: ( [xX](DIGIT|[A-Fa-f])+
+fragment LONG_SUFFIX: ( [xX][0-9A-Fa-f]+
                       | [0-7]+
-                      | [rR]DIGIT[a-zA-Z]+
+                      | [rR][0-9a-zA-Z]+
                       )? 'N'?;
 
 fragment RATIO_SUFFIX: '/' DIGIT+;
