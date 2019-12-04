@@ -49,7 +49,7 @@ this dependency will be in the classpath to avoid collisions.
 
 ;; get meta data from the parsed code
 (meta (second (parcera/ast (str :hello))))
-
+#:parcera.core{:start {:row 1, :column 0}, :end {:row 1, :column 6}}
 
 ;; convert an AST back into a string
 (parcera/code [:symbol "ns"])
