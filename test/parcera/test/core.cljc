@@ -222,8 +222,7 @@
   (testing "tag literals"
     ;; nested tag literals
     (let [input "#a #b 1"]
-      (is (valid? input))
-      (is (not (valid? input)))))
+      (is (valid? input))))
 
   (testing "keywords"
     ;; a keyword can be a simple number because its first character is : which is
