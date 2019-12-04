@@ -471,11 +471,3 @@
   (testing "parcera should be able to parse clojurescript core"
     (let [core-content (slurp "https://raw.githubusercontent.com/clojure/clojurescript/master/src/main/clojure/cljs/core.cljc")]
       (time (is (= core-content (parcera/code (parcera/ast core-content :optimize :memory))))))))
-
-
-#_(testing "parcera should be able to parse clojurescript core"
-    (let [core-content (slurp "https://raw.githubusercontent.com/clojure/clojure/master/test/clojure/test_clojure/reader.cljc")]
-      (for [form (tree-seq seq? seq (parcera/ast core-content :optimize :memory))
-            :when (coll? form)
-            :when (contains? #{::parcera/failure} (first form))]
-        [form (meta form)])))
