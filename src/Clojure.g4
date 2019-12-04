@@ -34,9 +34,9 @@ literal: keyword | string | number | character | symbol;
 
 keyword: simple_keyword | macro_keyword;
 
-simple_keyword: SIMPLE_KEYWORD;
+simple_keyword: ':' (NAME | NUMBER);
 
-macro_keyword: MACRO_KEYWORD;
+macro_keyword: '::' (NAME | NUMBER);
 
 string: STRING;
 
@@ -44,7 +44,7 @@ number: NUMBER;
 
 character: CHARACTER;
 
-symbol: SYMBOL;
+symbol: NAME;
 
 reader_macro: ( unquote
               | metadata
@@ -122,11 +122,9 @@ SPACE: [\r\n\t\f, ]+;
 
 CHARACTER: '\\' (UNICODE_CHAR | NAMED_CHAR | UNICODE);
 
-MACRO_KEYWORD: '::' KEYWORD_HEAD SYMBOL_BODY*;
-
-SIMPLE_KEYWORD: ':' KEYWORD_HEAD SYMBOL_BODY*;
-
-SYMBOL: NAME_HEAD SYMBOL_BODY*;
+// note: certain patterns are allowed on purpose because it would be too difficult
+// to validate those with antlr; parcera takes care of those special cases
+NAME: NAME_HEAD NAME_BODY*;
 
 fragment UNICODE_CHAR: ~[\u0300-\u036F\u1DC0-\u1DFF\u20D0-\u20FF];
 
@@ -134,15 +132,12 @@ fragment NAMED_CHAR: 'newline' | 'return' | 'space' | 'tab' | 'formfeed' | 'back
 
 fragment UNICODE: 'u' [0-9d-fD-F] [0-9d-fD-F] [0-9d-fD-F] [0-9d-fD-F];
 
-// symbols can contain : as part of their names
-fragment SYMBOL_BODY: KEYWORD_HEAD | [:];
-
-// the first character of a keyword cannot be :
-fragment KEYWORD_HEAD: NAME_HEAD | [#'0-9];
+// symbols can contain : # ' as part of their names
+fragment NAME_BODY: NAME_HEAD | [#':0-9];
 
 // these is the set of characters that are allowed by all symbols and keywords
 // however, this is more strict that necessary so that we can re-use it for both
-fragment NAME_HEAD: ~[\r\n\t\f ()[\]{}"@~^;`\\,:#'0-9];
+fragment NAME_HEAD: ~[\r\n\t\f ()[\]{}"@~^;`\\,:#'];
 
 fragment DOUBLE_SUFFIX: ((('.' DIGIT*)? ([eE][-+]?DIGIT+)?) 'M'?);
 
