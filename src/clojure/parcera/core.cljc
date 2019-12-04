@@ -64,9 +64,8 @@
        those through Clojure's immutable data structures"
   [input & {:as options}]
   (let [hidden     (unhide options)
-        {:keys [rules tree errors]} (platform/parse input)
-        result     (hiccup tree rules (:tags hidden) (:literals hidden))
-        reports    @(:reports (:parser errors))]
+        {:keys [rules tree reports]} (platform/parse input)
+        result     (hiccup tree rules (:tags hidden) (:literals hidden))]
     (vary-meta result assoc ::errors reports)))
 
 

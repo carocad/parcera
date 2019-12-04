@@ -109,6 +109,6 @@
                    (.setBuildParseTree true)
                    (.removeErrorListeners)
                    (.addErrorListener listener))]
-    {:rules  (into [] (map keyword) (.getRuleNames parser))
-     :tree   (.code parser)
-     :errors {:parser listener}}))
+    {:rules   (into [] (map keyword) (.getRuleNames parser))
+     :tree    (.code parser)
+     :reports @(:reports listener)}))
