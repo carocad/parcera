@@ -232,7 +232,11 @@
       (is (roundtrip input)))
     ;; ::/ is valid according to parcera's lexer but not for Clojure
     (let [input "::/"]
-      (is (not (valid? input))))))
+      (is (not (valid? input)))))
+  (testing "numbers"
+    (let [input "0x1f"]
+      (is (valid? input))
+      (is (roundtrip input)))))
 
 
 (deftest macros
