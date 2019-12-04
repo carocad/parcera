@@ -1,5 +1,6 @@
 (ns parcera.core
   (:require [clojure.core.protocols :as clojure]
+            [clojure.spec.alpha :as s]
             #?(:clj [parcera.antlr.java :as platform]))
   ; todo: re-enable once we have javscript support
   ;:cljs [parcera.antlr.javascript :as platform]))
@@ -17,9 +18,28 @@
                        :cljs #"^([^\s/]+/)?(/|[^\s/]+)$"))
 
 
-;; a symbol cannot start with a number
-(def forbidden-symbol-start #"^[+-]?\d+")
+(defn- qualified-name? [text] (re-find qualified-name text))
 
+;; a symbol cannot start with a number
+(defn- symbol-number-start? [text] (re-find #"^[+-]?\d+" text))
+
+(defn- keep-forms [coll] (remove (comp #{:whitespace :discard} first) coll))
+
+(s/def ::symbol (s/and string?
+                       qualified-name?
+                       (complement symbol-number-start?)))
+
+(s/def ::simple_keyword (s/and string? qualified-name?))
+
+(s/def ::macro_keyword (s/and string?
+                              qualified-name?
+                              (complement #{"/"})))
+
+(s/def ::map (s/and (s/conformer keep-forms)
+                    #(even? (count %))))
+
+(s/def ::set (s/and (s/conformer keep-forms)
+                    #(= (count %) (count (distinct %)))))
 
 (defn- report
   "utility to avoid repeating this code over and over again"
@@ -28,7 +48,6 @@
              (assoc-in metadata [::start :message] message)))
 
 
-;; TODO: it might be worth making these checks with clojure.spec 🤔 ?
 (defn- failure
   "Checks that `rule` conforms to additional rules which are too difficult
   to represent with pure Antlr4 syntax"
@@ -36,34 +55,29 @@
   (case rule
     :symbol
     (when (string? (first children))
-      (if (nil? (re-find qualified-name (first children)))
-        (report rule children metadata "symbol name cannot contain more than one /")
-        (when (not (nil? (re-find forbidden-symbol-start (first children))))
-          (report rule children metadata "symbol name cannot start with a number"))))
+      (when (not (s/valid? ::symbol (first children)))
+        (report rule children metadata
+                (s/explain-str ::symbol (first children)))))
 
     :simple_keyword
     (when (string? (first children))
-      (when (nil? (re-find qualified-name (first children)))
-        (report rule children metadata "keyword name cannot contain more than one /")))
+      (when (not (s/valid? ::simple_keyword (first children)))
+        (report rule children metadata
+                (s/explain-str ::simple_keyword (first children)))))
 
     :macro_keyword
     (when (string? (first children))
-      (if (nil? (re-find qualified-name (first children)))
-        (report rule children metadata "macro keyword name cannot contain more than one /")
-        (when (= "/" (first children))
-          (report rule children metadata "macro keyword name cannot be /"))))
+      (when (not (s/valid? ::macro_keyword (first children)))
+        (report rule children metadata
+                (s/explain-str ::macro_keyword (first children)))))
 
     :map
-    (let [forms (remove (comp #{:whitespace :discard} first) children)]
-      (when (odd? (count forms))
-        (report rule children metadata "Map literal must contain an even number of forms")))
+    (when (not (s/valid? ::map children))
+      (report rule children metadata (s/explain-str ::map children)))
 
     :set
-    (let [forms         (remove (comp #{:whitespace :discard} first) children)
-          set-length    (count forms)
-          unique-length (count (distinct forms))]
-      (when (not= set-length unique-length)
-        (report rule children metadata "Set literal contains duplicate forms")))
+    (when (not (s/valid? ::set children))
+      (report rule children metadata (s/explain-str ::set children)))
 
     nil))
 
