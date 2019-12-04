@@ -98,7 +98,7 @@ regex: '#' STRING;
 
 set: '#{' form* '}';
 
-namespaced_map: '#' ( keyword |  auto_resolve) map;
+namespaced_map: '#' ( keyword |  auto_resolve) whitespace? map;
 
 auto_resolve: '::';
 
