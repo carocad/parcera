@@ -8,8 +8,13 @@
 
 
 (def default-hidden {:tags     #{:form :collection :literal :keyword :reader_macro :dispatch}
-                     :literals #{"(" ")" "[" "]" "{" "}" "#{" "#" "^" "`" "'" "~"
-                                 "~@" "@" "#(" "#'" "#_" "#?(" "#?@(" "##" ":" "::"}})
+                     :literals #{"(" ")"
+                                 "[" "]"
+                                 "{" "}"
+                                 "#{" "#" "#(" "#'" "#_" "#?(" "#?@(" "##" "#^"
+                                 "^" "`" "'" "~"
+                                 "~@" "@"
+                                 ":" "::"}})
 
 
 (defn- hiccup
@@ -132,6 +137,11 @@
     :metadata_entry
     (doseq [child (rest ast)]
       (. string-builder (append "^"))
+      (code* child string-builder))
+
+    :deprecated_metadata_entry
+    (doseq [child (rest ast)]
+      (. string-builder (append "#^"))
       (code* child string-builder))
 
     :quote
