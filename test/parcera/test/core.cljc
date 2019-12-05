@@ -80,7 +80,33 @@
       (clear input)))
 
 
-(deftest simple
+(deftest data-structures
+  (testing "grammar definitions"
+    (let [result (tc/quick-check 200 validity)]
+      (is (:pass? result)
+          (str "read process failed at\n"
+               (with-out-str (pprint/pprint result))))))
+
+  (testing "clojure values"
+    (let [result (tc/quick-check 200 symmetric)]
+      (is (:pass? result)
+          (str "read <-> write process yield different result. Failed at\n"
+               (with-out-str (pprint/pprint result))))))
+
+  (testing "parsed metadata"
+    (let [result (tc/quick-check 200 monotonic)]
+      (is (:pass? result)
+          (str "inconsistent meta data found. Failed at\n"
+               (with-out-str (pprint/pprint result))))))
+  #_(testing "very little ambiguity"
+      (let [result (tc/quick-check 200 unambiguous)]
+        (is (:pass? result)
+            (str "high ambiguity case found. Please check the grammar to ensure "
+                 "high accuracy\n"
+                 (with-out-str (pprint/pprint result)))))))
+
+
+(deftest unit-tests
   (testing "character literals"
     (let [input "\\t"]
       (is (valid? input))
@@ -118,11 +144,9 @@
       (is (roundtrip input)))
     (let [input "\u000a"]
       (is (valid? input))
-      (is (roundtrip input)))))
+      (is (roundtrip input))))
 
-
-(deftest metadata
-  (testing "simple definitions"
+  (testing "AST metadata"
     (let [input    ":bar"
           ast      (parcera/ast input)
           location (meta (second ast))]
@@ -132,42 +156,14 @@
       (is (= (:column (::parcera/end location))
              (count input)))))
 
-  (testing "syntax error"
+  (testing "AST metadata failure message"
     (let [input    "hello/world/"
           ast      (parcera/ast input)
           location (meta (second ast))]
       (is (parcera/failure? ast))
-      (is (some? (:message (::parcera/start location)))))))
+      (is (some? (:message (::parcera/start location))))))
 
-
-(deftest data-structures
-  (testing "grammar definitions"
-    (let [result (tc/quick-check 200 validity)]
-      (is (:pass? result)
-          (str "read process failed at\n"
-               (with-out-str (pprint/pprint result))))))
-
-  (testing "clojure values"
-    (let [result (tc/quick-check 200 symmetric)]
-      (is (:pass? result)
-          (str "read <-> write process yield different result. Failed at\n"
-               (with-out-str (pprint/pprint result))))))
-
-  (testing "parsed metadata"
-    (let [result (tc/quick-check 200 monotonic)]
-      (is (:pass? result)
-          (str "inconsistent meta data found. Failed at\n"
-               (with-out-str (pprint/pprint result))))))
-  #_(testing "very little ambiguity"
-      (let [result (tc/quick-check 200 unambiguous)]
-        (is (:pass? result)
-            (str "high ambiguity case found. Please check the grammar to ensure "
-                 "high accuracy\n"
-                 (with-out-str (pprint/pprint result)))))))
-
-
-(deftest unit-tests
-  (testing "names"
+  (testing "symbols"
     (let [input "foo"]
       (is (valid? input))
       (is (roundtrip input)))
@@ -202,24 +198,21 @@
     ;(is (clear input))))
     (let [input "❤️"]
       (is (valid? input))
-      (is (roundtrip input)))))
-;(is (clear input))))))
-
-
-(deftest edge-cases
-  (testing "comments"
-    (let [input "{:hello ;2}
-                   2}"]
-      (is (valid? input))
-      (is (roundtrip input))))
-  ;(is (clear input)))))
-  (testing "symbols"
+      (is (roundtrip input)))
     (let [input "hello/world/"]
       (is (not (valid? input))))
     (let [input ":hello/world/"]
       (is (not (valid? input))))
     (let [input "::hello/world/"]
       (is (not (valid? input)))))
+  ;(is (clear input))))))
+
+  (testing "comments"
+    (let [input "{:hello ;2}
+                   2}"]
+      (is (valid? input))
+      (is (roundtrip input))))
+  ;(is (clear input)))))
 
   (testing "strings"
     (let [input "hello \"world"]
@@ -238,7 +231,15 @@
       (is (roundtrip input)))
     ;; ::/ is valid according to parcera's lexer but not for Clojure
     (let [input "::/"]
-      (is (not (valid? input)))))
+      (is (not (valid? input))))
+    (let [input "::hello/world [1 a \"3\"]"]
+      (is (valid? input))
+      (is (roundtrip input)))
+    ;(is (clear input))))
+    (let [input "::hello"]
+      (is (valid? input))
+      (is (roundtrip input))))
+
   (testing "numbers"
     (let [input "0x1f"]
       (is (valid? input))
@@ -254,10 +255,8 @@
       (is (roundtrip input)))
     (let [input "22/7"]
       (is (valid? input))
-      (is (roundtrip input)))))
+      (is (roundtrip input))))
 
-
-(deftest macros
   (testing "metadata"
     (let [input "^String [a b 2]"]
       (is (valid? input))
@@ -338,16 +337,6 @@
       (is (roundtrip input)))
     ;(is (clear input))))
     (let [input "#hello/world {1 \"3\"}"]
-      (is (valid? input))
-      (is (roundtrip input))))
-  ;(is (clear input)))))
-
-  (testing "keyword"
-    (let [input "::hello/world [1 a \"3\"]"]
-      (is (valid? input))
-      (is (roundtrip input)))
-    ;(is (clear input))))
-    (let [input "::hello"]
       (is (valid? input))
       (is (roundtrip input))))
   ;(is (clear input)))))
