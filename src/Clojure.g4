@@ -64,14 +64,23 @@ reader_macro: ( unquote
 
 unquote: '~' form;
 
-metadata: (metadata_entry whitespace?)+ ( symbol
-                                        | collection
-                                        | tag
-                                        | unquote
-                                        | unquote_splicing
-                                        );
+metadata: ((metadata_entry | deprecated_metadata_entry) whitespace?)+ ( symbol
+                                                                      | collection
+                                                                      | tag
+                                                                      | unquote
+                                                                      | unquote_splicing
+                                                                      );
 
 metadata_entry: '^' ( map | symbol | string | keyword );
+
+/**
+ * According to https://github.com/clojure/clojure-site/blob/7493bdb10222719923519bfd6d2699a26677ee82/content/guides/weird_characters.adoc#-and----metadata
+ * the declaration `#^` is deprecated
+ *
+ * In order to support roundtrip of parser rules it is required to exactly identify the
+ * character used which would not be possible with something like `'#'? '^'`
+ */
+deprecated_metadata_entry: '#^' ( map | symbol | string | keyword );
 
 backtick: '`' form;
 

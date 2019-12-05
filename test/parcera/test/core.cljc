@@ -276,6 +276,10 @@
     ;(is (clear input))))
     (let [input "^:hello ^\"World\" ^{:a 1} [a b 2]"]
       (is (valid? input))
+      (is (roundtrip input)))
+    ;; DEPRECATED meta data macro style
+    (let [input "(meta #^{:a 10} #^String {})"]
+      (is (valid? input))
       (is (roundtrip input))))
   ;(is (clear input)))))
 
