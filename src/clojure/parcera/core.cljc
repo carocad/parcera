@@ -7,7 +7,8 @@
   #?(:cljs (:import goog.string.StringBuffer)))
 
 
-(def default-hidden {:tags     #{:form :collection :literal :keyword :reader_macro :dispatch}
+(def default-hidden {:tags     #{:form :collection :literal :keyword
+                                 :reader_macro :dispatch :input}
                      :literals #{"(" ")"
                                  "[" "]"
                                  "{" "}"
@@ -150,7 +151,7 @@
 
     :var_quote
     (do (. string-builder (append "#'"))
-        (code* (second ast) string-builder))
+        (doseq [child (rest ast)] (code* child string-builder)))
 
     :discard
     (do (. string-builder (append "#_"))

@@ -16,19 +16,22 @@ grammar Clojure;
  * https://tomassetti.me/antlr-mega-tutorial/#lexers-and-parser
 */
 
-code: form*;
+code: input*;
 
-form: whitespace | literal | collection | reader_macro;
+// useful rule to differentiate actual clojure content from anything else
+input: whitespace | form;
+
+form: literal | collection | reader_macro;
 
 // sets and namespaced map are not considerd collection from grammar perspective
 // since they start with # -> dispatch macro
 collection: list | vector | map;
 
-list: '(' form* ')';
+list: '(' input* ')';
 
-vector: '[' form* ']';
+vector: '[' input* ']';
 
-map: '{' form* '}';
+map: '{' input* '}';
 
 literal: keyword | string | number | character | symbol;
 
@@ -62,8 +65,6 @@ reader_macro: ( unquote
               | deref
               );
 
-unquote: '~' form;
-
 metadata: ((metadata_entry | deprecated_metadata_entry) whitespace?)+ ( symbol
                                                                       | collection
                                                                       | tag
@@ -82,13 +83,15 @@ metadata_entry: '^' ( map | symbol | string | keyword );
  */
 deprecated_metadata_entry: '#^' ( map | symbol | string | keyword );
 
-backtick: '`' form;
+backtick: '`' whitespace? form;
 
-quote: '\'' form;
+quote: '\'' whitespace? form;
 
-unquote_splicing: '~@' form;
+unquote: '~' whitespace? form;
 
-deref: '@' form;
+unquote_splicing: '~@' whitespace? form;
+
+deref: '@' whitespace? form;
 
 dispatch: function
           | regex
@@ -101,25 +104,25 @@ dispatch: function
           | tag
           | symbolic;
 
-function: '#(' form* ')';
+function: '#(' input* ')';
 
 regex: '#' STRING;
 
-set: '#{' form* '}';
+set: '#{' input* '}';
 
 namespaced_map: '#' ( keyword |  auto_resolve) whitespace? map;
 
 auto_resolve: '::';
 
-var_quote: '#\'' symbol;
+var_quote: '#\'' whitespace? form;
 
-discard: '#_' form;
+discard: '#_' whitespace? form;
 
 tag: '#' symbol whitespace? (literal | collection | tag);
 
-conditional: '#?(' form* ')';
+conditional: '#?(' input* ')';
 
-conditional_splicing: '#?@(' form* ')';
+conditional_splicing: '#?@(' input* ')';
 
 symbolic: '##' ('Inf' | '-Inf' | 'NaN');
 
