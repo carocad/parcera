@@ -434,6 +434,11 @@
     ;(is (clear input))))
     (let [input "[1 2 #?@(:clj [3 4] :cljs [5 6])]"]
       (is (valid? input))
+      (is (roundtrip input))))
+
+  (testing "whitespace"
+    (let [input "(defmacro x [a] `   #'  ~  '  a)"]
+      (is (valid? input))
       (is (roundtrip input)))))
 ;(is (clear input))))))
 
