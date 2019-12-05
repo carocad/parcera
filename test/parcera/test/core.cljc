@@ -112,6 +112,12 @@
     ;(is (clear input))))
     (let [input "\\ϕ"]
       (is (valid? input))
+      (is (roundtrip input)))
+    (let [input "\ua000"]
+      (is (valid? input))
+      (is (roundtrip input)))
+    (let [input "\u000a"]
+      (is (valid? input))
       (is (roundtrip input)))))
 
 
