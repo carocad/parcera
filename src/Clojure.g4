@@ -19,7 +19,7 @@ grammar Clojure;
 code: input*;
 
 // useful rule to differentiate actual clojure content from anything else
-input: whitespace | form;
+input: whitespace | form | discard;
 
 form: literal | collection | reader_macro;
 
@@ -100,7 +100,6 @@ dispatch: function
           | conditional_splicing
           | namespaced_map
           | var_quote
-          | discard
           | tag
           | symbolic;
 
@@ -116,7 +115,7 @@ auto_resolve: '::';
 
 var_quote: '#\'' whitespace? form;
 
-discard: '#_' whitespace? form;
+discard: '#_' (whitespace? discard)* whitespace? form;
 
 tag: '#' symbol whitespace? (literal | collection | tag);
 
