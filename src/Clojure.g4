@@ -19,7 +19,7 @@ grammar Clojure;
 code: input*;
 
 // useful rule to differentiate actual clojure content from anything else
-input: whitespace | comment | shebang | form ;
+input: whitespace | comment | form ;
 
 form: literal | collection | reader_macro;
 
@@ -130,17 +130,13 @@ whitespace: WHITESPACE;
 
 comment: COMMENT;
 
-shebang: SHEBANG;
-
 NUMBER: [+-]? DIGIT+ (DOUBLE_SUFFIX | LONG_SUFFIX | RATIO_SUFFIX);
 
 STRING: '"' ~["\\]* ('\\' . ~["\\]*)* '"';
 
 WHITESPACE: [\r\n\t\f, ]+;
 
-COMMENT: ';' ~[\r\n]*;
-
-SHEBANG: '#!' ~[\r\n]*;
+COMMENT: (';' | '#!') ~[\r\n]*;
 
 CHARACTER: '\\' (UNICODE_CHAR | NAMED_CHAR | UNICODE);
 
