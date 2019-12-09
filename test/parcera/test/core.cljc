@@ -326,6 +326,12 @@
     ;(is (clear input))))
     (let [input " :hello ;; \"[a b 2]\""]
       (is (valid? input))
+      (is (roundtrip input)))
+    (let [input " :hello #! \"[a b 2]\""]
+      (is (valid? input))
+      (is (roundtrip input)))
+    (let [input "#! invalid { input '"]
+      (is (valid? input))
       (is (roundtrip input))))
   ;(is (clear input)))))
 
