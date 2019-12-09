@@ -19,7 +19,7 @@ grammar Clojure;
 code: input*;
 
 // useful rule to differentiate actual clojure content from anything else
-input: whitespace | comment | form ;
+input: whitespace | comment | discard | form ;
 
 form: literal | collection | reader_macro;
 
@@ -100,7 +100,6 @@ dispatch: function
           | conditional_splicing
           | namespaced_map
           | var_quote
-          | discard
           | tag
           | symbolic;
 

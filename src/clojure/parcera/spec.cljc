@@ -14,7 +14,7 @@
 ;; a symbol cannot start with a number
 (defn- symbol-number-start? [text] (re-find #"^[+-]?\d+" text))
 
-(defn- keep-forms [coll] (remove (comp #{:whitespace :discard} first) coll))
+(defn- keep-forms [coll] (remove (comp #{:whitespace :discard :comment} first) coll))
 
 
 (s/def ::symbol (s/and string? qualified-name? (complement symbol-number-start?)))

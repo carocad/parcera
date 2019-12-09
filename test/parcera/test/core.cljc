@@ -207,13 +207,6 @@
       (is (not (valid? input)))))
   ;(is (clear input))))))
 
-  (testing "comments"
-    (let [input "{:hello ;2}
-                   2}"]
-      (is (valid? input))
-      (is (roundtrip input))))
-  ;(is (clear input)))))
-
   (testing "strings"
     (let [input "hello \"world"]
       (is (not (valid? input)))))
@@ -302,8 +295,9 @@
     ;; discard statements can be "nested"
     (let [input "#_#_:a :b"]
       (is (valid? input))
-      (is (roundtrip input))))
-  ;(is (clear input)))))
+      (is (roundtrip input)))
+    (let [input "#_#_ :a"]
+      (is (not (valid? input)))))
 
   (testing "regex"
     (let [input "#_\"[a b 2]\""]
@@ -312,6 +306,10 @@
   ;(is (clear input)))))
 
   (testing "comments"
+    (let [input "{:hello ;2}
+                   2}"]
+      (is (valid? input))
+      (is (roundtrip input)))
     (let [input ";[a b 2]"]
       (is (valid? input))
       (is (roundtrip input)))
