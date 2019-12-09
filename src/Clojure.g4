@@ -19,7 +19,7 @@ grammar Clojure;
 code: input*;
 
 // useful rule to differentiate actual clojure content from anything else
-input: whitespace | form ;
+input: whitespace | comment | discard | form ;
 
 form: literal | collection | reader_macro;
 
@@ -100,7 +100,6 @@ dispatch: function
           | conditional_splicing
           | namespaced_map
           | var_quote
-          | discard
           | tag
           | symbolic;
 
@@ -126,18 +125,17 @@ conditional_splicing: '#?@(' input* ')';
 
 symbolic: '##' ('Inf' | '-Inf' | 'NaN');
 
-// whitespace or comment
 whitespace: WHITESPACE;
+
+comment: COMMENT;
 
 NUMBER: [+-]? DIGIT+ (DOUBLE_SUFFIX | LONG_SUFFIX | RATIO_SUFFIX);
 
 STRING: '"' ~["\\]* ('\\' . ~["\\]*)* '"';
 
-WHITESPACE: (SPACE | COMMENT)+;
+WHITESPACE: [\r\n\t\f, ]+;
 
-COMMENT: ';' ~[\r\n]*;
-
-SPACE: [\r\n\t\f, ]+;
+COMMENT: (';' | '#!') ~[\r\n]*;
 
 CHARACTER: '\\' (UNICODE_CHAR | NAMED_CHAR | UNICODE);
 

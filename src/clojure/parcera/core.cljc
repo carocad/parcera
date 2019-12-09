@@ -109,7 +109,7 @@
         (doseq [child (rest ast)] (code* child string-builder))
         (. string-builder (append "}")))
 
-    (:number :whitespace :symbol :character :string)
+    (:number :whitespace :comment :symbol :character :string)
     (. string-builder (append (second ast)))
 
     :simple_keyword
