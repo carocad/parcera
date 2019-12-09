@@ -298,6 +298,10 @@
     ;(is (clear input))))
     (let [input "#_macros"]
       (is (valid? input))
+      (is (roundtrip input)))
+    ;; discard statements can be "nested"
+    (let [input "#_#_:a :b"]
+      (is (valid? input))
       (is (roundtrip input))))
   ;(is (clear input)))))
 
