@@ -93,7 +93,7 @@ unquote_splicing: '~@' whitespace? form;
 
 deref: '@' whitespace? form;
 
-dispatch: function
+dispatch: ( function
           | regex
           | set
           | conditional
@@ -101,7 +101,9 @@ dispatch: function
           | namespaced_map
           | var_quote
           | tag
-          | symbolic;
+          | symbolic
+          | eval
+          );
 
 function: '#(' input* ')';
 
@@ -124,6 +126,9 @@ conditional: '#?(' input* ')';
 conditional_splicing: '#?@(' input* ')';
 
 symbolic: '##' ('Inf' | '-Inf' | 'NaN');
+
+// I assume symbol and list from lisp reader, but tools.reader seems to indicate something else
+eval: '#=' whitespace? (symbol | list);
 
 whitespace: WHITESPACE;
 
