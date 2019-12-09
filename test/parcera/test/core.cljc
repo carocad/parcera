@@ -447,6 +447,14 @@
   (testing "whitespace"
     (let [input "(defmacro x [a] `   #'  ~  '  a)"]
       (is (valid? input))
+      (is (roundtrip input))))
+
+  (testing "eval"
+    (let [input "#=  (inc 1)"]
+      (is (valid? input))
+      (is (roundtrip input)))
+    (let [input "#=inc"]
+      (is (valid? input))
       (is (roundtrip input)))))
 ;(is (clear input))))))
 

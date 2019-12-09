@@ -12,7 +12,7 @@
                      :literals #{"(" ")"
                                  "[" "]"
                                  "{" "}"
-                                 "#{" "#" "#(" "#'" "#_" "#?(" "#?@(" "##" "#^"
+                                 "#{" "#" "#(" "#'" "#_" "#?(" "#?@(" "##" "#^" "#="
                                  "^" "`" "'" "~"
                                  "~@" "@"
                                  ":" "::"}})
@@ -190,7 +190,11 @@
     :function
     (do (. string-builder (append "#("))
         (doseq [child (rest ast)] (code* child string-builder))
-        (. string-builder (append ")")))))
+        (. string-builder (append ")")))
+
+    :eval
+    (do (. string-builder (append "#="))
+        (doseq [child (rest ast)] (code* child string-builder)))))
 
 
 (defn code
