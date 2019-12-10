@@ -16,7 +16,7 @@ grammar Clojure;
  * https://tomassetti.me/antlr-mega-tutorial/#lexers-and-parser
 */
 
-code: input*;
+code: input* EOF;
 
 // useful rule to differentiate actual clojure content from anything else
 input: whitespace | comment | discard | form ;
