@@ -117,7 +117,7 @@ auto_resolve: '::';
 
 var_quote: '#\'' whitespace? form;
 
-discard: '#_' (whitespace? discard)* whitespace? form;
+discard: '#_' (whitespace? discard)? whitespace? form;
 
 tag: '#' symbol whitespace? (literal | collection | tag);
 
