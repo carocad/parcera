@@ -455,7 +455,11 @@
       (is (roundtrip input)))
     (let [input "#=inc"]
       (is (valid? input))
-      (is (roundtrip input)))))
+      (is (roundtrip input))))
+
+  (testing "EOF"
+    (let [input ":hello \"  "]
+      (is (not (valid? input))))))
 ;(is (clear input))))))
 
 
