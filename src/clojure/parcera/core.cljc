@@ -1,18 +1,18 @@
 (ns parcera.core
   (:require [clojure.core.protocols :as clojure]
-            [parcera.spec :as spec]
             #?(:clj [parcera.antlr.java :as platform]))
   ; todo: re-enable once we have javscript support
   ;:cljs [parcera.antlr.javascript :as platform]))
   #?(:cljs (:import goog.string.StringBuffer)))
 
 
-(def default-hidden {:tags     #{:form :collection :literal :keyword
-                                 :reader_macro :dispatch :input}
+(def default-hidden {:tags     #{:form :collection :literal
+                                 :reader_macro :dispatch :input
+                                 :keyword}
                      :literals #{"(" ")"
                                  "[" "]"
                                  "{" "}"
-                                 "#{" "#" "#(" "#'" "#_" "#?(" "#?@(" "##" "#^" "#="
+                                 "#{" "#" "#'" "#_" "#?" "#?@" "##" "#^" "#="
                                  "^" "`" "'" "~"
                                  "~@" "@"
                                  ":" "::"
@@ -32,14 +32,12 @@
             children (for [child (:content node)
                            :let [child (hiccup child rule-names hide-tags hide-literals)]
                            :when (not (nil? child))]
-                       child)
-            ;; extra validation rules
-            fail     (spec/failure rule children (:metadata node))]
+                       child)]
         (if (contains? hide-tags rule)
           ;; parcera hidden tags are always "or" statements, so just take the single children
           (first children)
           ;; attach meta data ... ala instaparse
-          (or fail (with-meta (cons rule children) (:metadata node)))))
+          (with-meta (cons rule children) (:metadata node))))
 
       ::failure
       (with-meta (list ::failure (:content node))
@@ -110,16 +108,10 @@
         (doseq [child (rest ast)] (code* child string-builder))
         (. string-builder (append "}")))
 
-    (:number :whitespace :comment :symbol :character :string)
+    (:number :whitespace :comment :symbol :character :string
+      :simple_keyword :macro_keyword)
     (. string-builder (append (second ast)))
 
-    :simple_keyword
-    (do (. string-builder (append ":"))
-        (. string-builder (append (second ast))))
-
-    :macro_keyword
-    (do (. string-builder (append "::"))
-        (. string-builder (append (second ast))))
 
     :symbolic
     (do (. string-builder (append "##"))
@@ -175,23 +167,20 @@
         (doseq [child (rest ast)] (code* child string-builder)))
 
     :conditional
-    (do (. string-builder (append "#?("))
-        (doseq [child (rest ast)] (code* child string-builder))
-        (. string-builder (append ")")))
+    (do (. string-builder (append "#?"))
+        (doseq [child (rest ast)] (code* child string-builder)))
 
     :conditional_splicing
-    (do (. string-builder (append "#?@("))
-        (doseq [child (rest ast)] (code* child string-builder))
-        (. string-builder (append ")")))
+    (do (. string-builder (append "#?@"))
+        (doseq [child (rest ast)] (code* child string-builder)))
 
     :deref
     (do (. string-builder (append "@"))
         (doseq [child (rest ast)] (code* child string-builder)))
 
     :function
-    (do (. string-builder (append "#("))
-        (doseq [child (rest ast)] (code* child string-builder))
-        (. string-builder (append ")")))
+    (do (. string-builder (append "#"))
+        (doseq [child (rest ast)] (code* child string-builder)))
 
     :eval
     (do (. string-builder (append "#="))

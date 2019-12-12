@@ -43,12 +43,6 @@
   (not (parcera/failure? (parcera/ast input))))
 
 
-;; todo: is this even possible with antlr ? 🤔
-#_(defn- clear
-    [input]
-    (= 1 (count (instaparse/parses parcera/ast input :unhide :all))))
-
-
 (def validity
   "The grammar definition of parcera is valid for any clojure value. Meaning
   that for any clojure value, parcera can create an AST for it"
@@ -71,15 +65,6 @@
       (map monotonic* (filter nested? (tree-seq seq? seq ast))))))
 
 
-
-#_(def unambiguous
-    "The process of parsing clojure code yields consistent results. Meaning
-  that any input should (but must not) only have 1 AST representation ... however
-  I have found this is not always possible"
-    (prop/for-all [input (gen/fmap pr-str gen/any)]
-      (clear input)))
-
-
 (deftest data-structures
   (testing "grammar definitions"
     (let [result (tc/quick-check 200 validity)]
@@ -97,13 +82,7 @@
     (let [result (tc/quick-check 200 monotonic)]
       (is (:pass? result)
           (str "inconsistent meta data found. Failed at\n"
-               (with-out-str (pprint/pprint result))))))
-  #_(testing "very little ambiguity"
-      (let [result (tc/quick-check 200 unambiguous)]
-        (is (:pass? result)
-            (str "high ambiguity case found. Please check the grammar to ensure "
-                 "high accuracy\n"
-                 (with-out-str (pprint/pprint result)))))))
+               (with-out-str (pprint/pprint result)))))))
 
 
 (deftest unit-tests
@@ -156,13 +135,6 @@
       (is (= (:column (::parcera/end location))
              (count input)))))
 
-  (testing "AST metadata failure message"
-    (let [input    "hello/world/"
-          ast      (parcera/ast input)
-          location (meta (second ast))]
-      (is (parcera/failure? ast))
-      (is (some? (:message (::parcera/start location))))))
-
   (testing "symbols"
     (let [input "foo"]
       (is (valid? input))
@@ -199,17 +171,13 @@
     (let [input "❤️"]
       (is (valid? input))
       (is (roundtrip input)))
-    (let [input "hello/world/"]
-      (is (not (valid? input))))
-    (let [input ":hello/world/"]
-      (is (not (valid? input))))
-    (let [input "::hello/world/"]
-      (is (not (valid? input)))))
+    #_(let [input "hello/world/"]
+        (is (not (valid? input))))
+    #_(let [input ":hello/world/"]
+        (is (not (valid? input))))
+    #_(let [input "::hello/world/"]
+        (is (not (valid? input)))))
   ;(is (clear input))))))
-
-  (testing "strings"
-    (let [input "hello \"world"]
-      (is (not (valid? input)))))
 
   (testing "tag literals"
     ;; nested tag literals
@@ -222,14 +190,23 @@
     (let [input ":1"]
       (is (valid? input))
       (is (roundtrip input)))
-    ;; ::/ is valid according to parcera's lexer but not for Clojure
+    (let [input ":/"]
+      (is (valid? input))
+      (is (roundtrip input)))
     (let [input "::/"]
       (is (not (valid? input))))
     (let [input "::hello/world [1 a \"3\"]"]
       (is (valid? input))
       (is (roundtrip input)))
-    ;(is (clear input))))
     (let [input "::hello"]
+      (is (valid? input))
+      (is (roundtrip input)))
+    (let [input ":#hello"]
+      (is (valid? input))
+      (is (roundtrip input)))
+    ;; this is NOT a valid literal keyword but it is "supported" by the current
+    ;; reader
+    (let [input ":http://www.department0.university0.edu/GraduateCourse52"]
       (is (valid? input))
       (is (roundtrip input))))
 
