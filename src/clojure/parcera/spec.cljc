@@ -17,11 +17,7 @@
 
 (s/def ::symbol (s/and qualified-name? (complement symbol-number-start?)))
 
-(s/def ::simple_keyword qualified-name?)
-
-(s/def ::deprecated_keyword (complement #(str/ends-with? % "/")))
-
-(s/def ::macro_keyword (s/and qualified-name? (complement #{"/"})))
+(s/def ::macro_keyword qualified-name?)
 
 
 (defn- report
@@ -36,7 +32,7 @@
   to represent with pure Antlr4 syntax"
   [rule children metadata]
   (case rule
-    (:symbol :simple_keyword :macro_keyword :deprecated_keyword)
+    (:symbol :macro_keyword)
     (when (string? (first children))
       (let [rule-spec (keyword "parcera.spec" (name rule))]
         (when (not (s/valid? rule-spec (first children)))

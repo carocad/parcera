@@ -35,13 +35,11 @@ map: '{' input* '}';
 
 literal: keyword | string | number | character | symbol;
 
-keyword: simple_keyword | macro_keyword | deprecated_keyword;
+keyword: simple_keyword | macro_keyword;
 
-simple_keyword: KEYWORD;
+simple_keyword: SIMPLE_KEYWORD;
 
 macro_keyword: MACRO_KEYWORD;
-
-deprecated_keyword: DEPRECATED_KEYWORD;
 
 string: STRING;
 
@@ -60,12 +58,13 @@ reader_macro: ( unquote
               | deref
               );
 
-metadata: ((metadata_entry | deprecated_metadata_entry) whitespace?)+ ( symbol
-                                                                      | collection
-                                                                      | tag
-                                                                      | unquote
-                                                                      | unquote_splicing
-                                                                      );
+metadata: ((metadata_entry | deprecated_metadata_entry) whitespace?)+
+          ( symbol
+          | collection
+          | tag
+          | unquote
+          | unquote_splicing
+          );
 
 metadata_entry: '^' ( map | symbol | string | keyword );
 
@@ -124,7 +123,8 @@ conditional_splicing: '#?@' whitespace? list;
 
 symbolic: '##' ('Inf' | '-Inf' | 'NaN');
 
-// I assume symbol and list from lisp reader, but tools.reader seems to indicate something else
+// I assume symbol and list from lisp reader, but tools.reader seems to
+// indicate something else
 eval: '#=' whitespace? (symbol | list);
 
 whitespace: WHITESPACE;
@@ -141,9 +141,7 @@ COMMENT: (';' | '#!') ~[\r\n]*;
 
 CHARACTER: '\\' (UNICODE_CHAR | NAMED_CHAR | UNICODE);
 
-MACRO_KEYWORD: '::' (KEYWORD_HEAD KEYWORD_BODY* '/')? ('/' | (KEYWORD_HEAD KEYWORD_BODY*));
-
-KEYWORD: ':' (KEYWORD_HEAD KEYWORD_BODY* '/')? ('/' | (KEYWORD_HEAD KEYWORD_BODY*));
+MACRO_KEYWORD: '::' (KEYWORD_HEAD KEYWORD_BODY* '/')? KEYWORD_HEAD KEYWORD_BODY*;
 
 /*
  * Example -> :http://www.department0.university0.edu/GraduateCourse52
@@ -151,7 +149,7 @@ KEYWORD: ':' (KEYWORD_HEAD KEYWORD_BODY* '/')? ('/' | (KEYWORD_HEAD KEYWORD_BODY
  * technically this is NOT a valid keyword. However in orde to maintain
  * backwards compatibility the Clojure team didnt remove it from LispReader
  */
-DEPRECATED_KEYWORD: ':' KEYWORD_HEAD (KEYWORD_BODY | [/])*;
+SIMPLE_KEYWORD: ':' ((KEYWORD_HEAD KEYWORD_BODY*) | '/');
 
 SYMBOL: (NAME_HEAD NAME_BODY* '/')? ('/' | (NAME_HEAD NAME_BODY*));
 
@@ -161,7 +159,7 @@ fragment NAMED_CHAR: 'newline' | 'return' | 'space' | 'tab' | 'formfeed' | 'back
 
 fragment UNICODE: 'u' [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F];
 
-fragment KEYWORD_BODY: NAME_HEAD | [#':];
+fragment KEYWORD_BODY: KEYWORD_HEAD | [:/];
 
 fragment KEYWORD_HEAD: NAME_HEAD | [#'];
 
