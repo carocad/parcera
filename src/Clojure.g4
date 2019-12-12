@@ -47,6 +47,11 @@ number: NUMBER;
 
 character: CHARACTER;
 
+/*
+ * custom rules NOT used here:
+ * - a symbol cannot start with a number "9.5hello"
+ * - a symbol cannot be followed by another symbol "hello/world/" -> "hello/world" "/"
+ */
 symbol: SYMBOL;
 
 reader_macro: ( unquote
