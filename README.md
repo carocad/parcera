@@ -33,19 +33,13 @@ this dependency will be in the classpath to avoid collisions.
   (:symbol "parcera.core")
   (:whitespace " ")
   (:list
-   (:simple_keyword "require")
+   (:simple_keyword ":require")
    (:whitespace " ")
-   (:vector
-    (:symbol "foo.bar")
-    (:whitespace " ")
-    (:simple_keyword "as")
-    (:whitespace " ")
-    (:symbol "bar"))
+   (:vector (:symbol "foo.bar") (:whitespace " ") (:simple_keyword ":as") (:whitespace " ") (:symbol "bar"))
    (:whitespace " ")
-   (:vector (:symbol "clojure.data") (:whitespace " ") (:simple_keyword "as") (:whitespace " ") (:symbol "data"))
+   (:vector (:symbol "clojure.data") (:whitespace " ") (:simple_keyword ":as") (:whitespace " ") (:symbol "data"))
    (:whitespace " ")
-   (:vector (:symbol "clojure.string") (:whitespace " ") (:simple_keyword "as") (:whitespace " ") (:symbol "str")))))
-
+   (:vector (:symbol "clojure.string") (:whitespace " ") (:simple_keyword ":as") (:whitespace " ") (:symbol "str")))))
 
 ;; get meta data from the parsed code
 (meta (second (parcera/ast (str :hello))))
