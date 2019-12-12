@@ -78,7 +78,7 @@ metadata_entry: '^' ( map | symbol | string | keyword );
  * the declaration `#^` is deprecated
  *
  * In order to support roundtrip of parser rules it is required to exactly identify the
- * character used which would not be possible with something like `'#'? '^'`
+ * character used which would not be possible with something like '#'? '^'
  */
 deprecated_metadata_entry: '#^' ( map | symbol | string | keyword );
 
@@ -146,17 +146,28 @@ COMMENT: (';' | '#!') ~[\r\n]*;
 
 CHARACTER: '\\' (UNICODE_CHAR | NAMED_CHAR | UNICODE);
 
-MACRO_KEYWORD: '::' (KEYWORD_HEAD KEYWORD_BODY* '/')? KEYWORD_HEAD KEYWORD_BODY*;
+// note: ::/ is NOT a valid macro keyword, unlike :/
+MACRO_KEYWORD: '::' KEYWORD_HEAD KEYWORD_BODY*;
 
 /*
  * Example -> :http://www.department0.university0.edu/GraduateCourse52
  *
- * technically this is NOT a valid keyword. However in orde to maintain
+ * technically that is NOT a valid keyword. However in order to maintain
  * backwards compatibility the Clojure team didnt remove it from LispReader
  */
 SIMPLE_KEYWORD: ':' ((KEYWORD_HEAD KEYWORD_BODY*) | '/');
 
-SYMBOL: (NAME_HEAD NAME_BODY* '/')? ('/' | (NAME_HEAD NAME_BODY*));
+/**
+ * a symbol must start with a valid character and can be followed
+ * by more "relaxed" character restrictions
+ *
+ * This pattern matches things like: hello, hello/world, /hello/world/
+ * that is by design. Parcera's grammar is more permissive than Clojure's
+ * since otherwise Antlr would parse hello/world/ as
+ * [:symbol "hello/world"] [:symbol "/"]
+ * which is also wrong but more difficult to identify when looking at the AST
+ */
+SYMBOL: NAME_HEAD NAME_BODY*;
 
 fragment UNICODE_CHAR: ~[\u0300-\u036F\u1DC0-\u1DFF\u20D0-\u20FF];
 
@@ -166,14 +177,16 @@ fragment UNICODE: 'u' [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F];
 
 fragment KEYWORD_BODY: KEYWORD_HEAD | [:/];
 
-fragment KEYWORD_HEAD: NAME_HEAD | [#'];
+fragment KEYWORD_HEAD: ALLOWED_NAME_CHARACTER | [#'];
 
 // symbols can contain : # ' as part of their names
-fragment NAME_BODY: NAME_HEAD | [:#'/];
+fragment NAME_BODY: NAME_HEAD | [:#'];
+
+fragment NAME_HEAD: ALLOWED_NAME_CHARACTER | [/];
 
 // these is the set of characters that are allowed by all symbols and keywords
 // however, this is more strict that necessary so that we can re-use it for both
-fragment NAME_HEAD: ~[\r\n\t\f ()[\]{}"@~^;`\\,:#'/];
+fragment ALLOWED_NAME_CHARACTER: ~[\r\n\t\f ()[\]{}"@~^;`\\,:#'/];
 
 fragment DOUBLE_SUFFIX: ((('.' DIGIT*)? ([eE][-+]?DIGIT+)?) 'M'?);
 
