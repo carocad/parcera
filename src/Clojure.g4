@@ -35,18 +35,13 @@ map: '{' input* '}';
 
 literal: keyword | string | number | character | symbol;
 
-keyword: simple_keyword | macro_keyword;
-/**
- * keywords are treated like symbols prepended by : this was 'borrowed' from
- * Clojure's Lisp Reader which uses a single regex to match both and then
- * checks if it starts with :
- *
- * I am not fully sure if it would be better to make keywords Lexer rules but
- * at least for the time being this approach seems to work quite well
- */
-simple_keyword: ':' (NAME | NUMBER);
+keyword: simple_keyword | macro_keyword | deprecated_keyword;
 
-macro_keyword: '::' (NAME | NUMBER);
+simple_keyword: KEYWORD;
+
+macro_keyword: MACRO_KEYWORD;
+
+deprecated_keyword: DEPRECATED_KEYWORD;
 
 string: STRING;
 
@@ -54,7 +49,7 @@ number: NUMBER;
 
 character: CHARACTER;
 
-symbol: NAME;
+symbol: SYMBOL;
 
 reader_macro: ( unquote
               | metadata
@@ -105,13 +100,15 @@ dispatch: ( function
           | eval
           );
 
-function: '#(' input* ')';
+function: '#' list; // no whitespace allowed
 
 regex: '#' STRING;
 
-set: '#{' input* '}';
+set: '#{' input* '}'; // no whitespace allowed
 
-namespaced_map: '#' ( keyword |  auto_resolve) whitespace? map;
+namespaced_map: '#' (keyword | auto_resolve)
+                    whitespace?
+                    map;
 
 auto_resolve: '::';
 
@@ -121,9 +118,9 @@ discard: '#_' (whitespace? discard)? whitespace? form;
 
 tag: '#' symbol whitespace? (literal | collection | tag);
 
-conditional: '#?(' input* ')';
+conditional: '#?' whitespace? list;
 
-conditional_splicing: '#?@(' input* ')';
+conditional_splicing: '#?@' whitespace? list;
 
 symbolic: '##' ('Inf' | '-Inf' | 'NaN');
 
@@ -144,11 +141,19 @@ COMMENT: (';' | '#!') ~[\r\n]*;
 
 CHARACTER: '\\' (UNICODE_CHAR | NAMED_CHAR | UNICODE);
 
-/**
- * note: certain patterns are allowed on purpose because it would be too difficult
- * to validate those with antlr; parcera takes care of those special cases
+MACRO_KEYWORD: '::' (KEYWORD_HEAD KEYWORD_BODY* '/')? ('/' | (KEYWORD_HEAD KEYWORD_BODY*));
+
+KEYWORD: ':' (KEYWORD_HEAD KEYWORD_BODY* '/')? ('/' | (KEYWORD_HEAD KEYWORD_BODY*));
+
+/*
+ * Example -> :http://www.department0.university0.edu/GraduateCourse52
+ *
+ * technically this is NOT a valid keyword. However in orde to maintain
+ * backwards compatibility the Clojure team didnt remove it from LispReader
  */
-NAME: NAME_HEAD NAME_BODY*;
+DEPRECATED_KEYWORD: ':' KEYWORD_HEAD (KEYWORD_BODY | [/])*;
+
+SYMBOL: (NAME_HEAD NAME_BODY* '/')? ('/' | (NAME_HEAD NAME_BODY*));
 
 fragment UNICODE_CHAR: ~[\u0300-\u036F\u1DC0-\u1DFF\u20D0-\u20FF];
 
@@ -156,12 +161,16 @@ fragment NAMED_CHAR: 'newline' | 'return' | 'space' | 'tab' | 'formfeed' | 'back
 
 fragment UNICODE: 'u' [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F];
 
+fragment KEYWORD_BODY: NAME_HEAD | [#':];
+
+fragment KEYWORD_HEAD: NAME_HEAD | [#'];
+
 // symbols can contain : # ' as part of their names
-fragment NAME_BODY: NAME_HEAD | [#':0-9];
+fragment NAME_BODY: NAME_HEAD | [:#'/];
 
 // these is the set of characters that are allowed by all symbols and keywords
 // however, this is more strict that necessary so that we can re-use it for both
-fragment NAME_HEAD: ~[\r\n\t\f ()[\]{}"@~^;`\\,:#'];
+fragment NAME_HEAD: ~[\r\n\t\f ()[\]{}"@~^;`\\,:#'/];
 
 fragment DOUBLE_SUFFIX: ((('.' DIGIT*)? ([eE][-+]?DIGIT+)?) 'M'?);
 

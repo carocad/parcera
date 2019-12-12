@@ -1,12 +1,13 @@
 (ns parcera.spec
   "Specifications for the **content** of some Antlr parser rules
   which would otherwise be too difficult to express"
-  (:require [clojure.spec.alpha :as s]))
+  (:require [clojure.spec.alpha :as s]
+            [clojure.string :as str]))
 
 ;; a name can contain a maximum of 1 /
-(def qualified-name #?(:clj  #"^([^\s\/]+\/)?(\/|[^\s\/]+)$"
+(def qualified-name #?(:clj  #"^:?:?([^\s\/]+\/)?(\/|[^\s\/]+)$"
                        ;; for some reason cljs doesnt accept escaping the / characters
-                       :cljs #"^([^\s/]+/)?(/|[^\s/]+)$"))
+                       :cljs #"^:?:?([^\s/]+/)?(/|[^\s/]+)$"))
 
 
 (defn- qualified-name? [text] (re-find qualified-name text))
@@ -14,18 +15,13 @@
 ;; a symbol cannot start with a number
 (defn- symbol-number-start? [text] (re-find #"^[+-]?\d+" text))
 
-(defn- keep-forms [coll] (remove (comp #{:whitespace :discard :comment} first) coll))
+(s/def ::symbol (s/and qualified-name? (complement symbol-number-start?)))
 
+(s/def ::simple_keyword qualified-name?)
 
-(s/def ::symbol (s/and string? qualified-name? (complement symbol-number-start?)))
+(s/def ::deprecated_keyword (complement #(str/ends-with? % "/")))
 
-(s/def ::simple_keyword (s/and string? qualified-name?))
-
-(s/def ::macro_keyword (s/and string? qualified-name? (complement #{"/"})))
-
-(s/def ::map (s/and (s/conformer keep-forms) #(even? (count %))))
-
-(s/def ::set (s/and (s/conformer keep-forms) #(= (count %) (count (distinct %)))))
+(s/def ::macro_keyword (s/and qualified-name? (complement #{"/"})))
 
 
 (defn- report
@@ -40,18 +36,11 @@
   to represent with pure Antlr4 syntax"
   [rule children metadata]
   (case rule
-    (:symbol :simple_keyword :macro_keyword)
+    (:symbol :simple_keyword :macro_keyword :deprecated_keyword)
     (when (string? (first children))
       (let [rule-spec (keyword "parcera.spec" (name rule))]
         (when (not (s/valid? rule-spec (first children)))
           (report rule children metadata
                   (s/explain-str rule-spec (first children))))))
-
-    (:map :set)
-    (let [rule-spec (keyword "parcera.spec" (name rule))]
-      (when (not (s/valid? rule-spec children))
-        (report rule children metadata
-                (s/explain-str rule-spec children))))
-
     nil))
 

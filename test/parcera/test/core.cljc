@@ -79,7 +79,6 @@
     (prop/for-all [input (gen/fmap pr-str gen/any)]
       (clear input)))
 
-
 (deftest data-structures
   (testing "grammar definitions"
     (let [result (tc/quick-check 200 validity)]
@@ -230,6 +229,9 @@
       (is (roundtrip input)))
     ;(is (clear input))))
     (let [input "::hello"]
+      (is (valid? input))
+      (is (roundtrip input)))
+    (let [input ":http://www.department0.university0.edu/GraduateCourse52"]
       (is (valid? input))
       (is (roundtrip input))))
 
