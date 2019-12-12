@@ -1,4 +1,4 @@
-(defproject carocad/parcera "0.9.2"
+(defproject carocad/parcera "0.10.0"
   :description "Grammar-based Clojure reader"
   :url "https://github.com/carocad/parcera"
   :license {:name "LGPLv3"

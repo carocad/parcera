@@ -56,6 +56,12 @@ this dependency will be in the classpath to avoid collisions.
 ;; "ns"
 ```
 
+**note**: parcera is a bit permissive for symbols and keywords, you should be
+ able to parse any valid Clojure file however, I cannot guarantee that an
+ *invalid* symbol/keyword will yield a failure. This is because Clojure's
+ reader is very stateful and embedding all those rules into the grammar
+ would make it prohibitively complex. 
+
 ## contributing
 
 - to get you setup check the [travis](./.travis.yml) file which

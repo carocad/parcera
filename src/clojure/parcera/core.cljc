@@ -1,6 +1,5 @@
 (ns parcera.core
   (:require [clojure.core.protocols :as clojure]
-            [parcera.spec :as spec]
             #?(:clj [parcera.antlr.java :as platform]))
   ; todo: re-enable once we have javscript support
   ;:cljs [parcera.antlr.javascript :as platform]))
@@ -33,14 +32,12 @@
             children (for [child (:content node)
                            :let [child (hiccup child rule-names hide-tags hide-literals)]
                            :when (not (nil? child))]
-                       child)
-            ;; extra validation rules
-            fail     (spec/failure rule children (:metadata node))]
+                       child)]
         (if (contains? hide-tags rule)
           ;; parcera hidden tags are always "or" statements, so just take the single children
           (first children)
           ;; attach meta data ... ala instaparse
-          (or fail (with-meta (cons rule children) (:metadata node)))))
+          (with-meta (cons rule children) (:metadata node))))
 
       ::failure
       (with-meta (list ::failure (:content node))
@@ -112,7 +109,7 @@
         (. string-builder (append "}")))
 
     (:number :whitespace :comment :symbol :character :string
-      :simple_keyword :macro_keyword :deprecated_keyword)
+      :simple_keyword :macro_keyword)
     (. string-builder (append (second ast)))
 
 
