@@ -1,5 +1,5 @@
 (ns parcera.antlr.javascript
-  (:require [parcera.antlr.protocols :as antlr]
+  (:require [parcera.antlr.common :as common]
             [antlr4 :refer [CharStreams CommonTokenStream]]
             [parcera.antlr.ClojureLexer :refer [ClojureLexer]]
             [parcera.antlr.ClojureParser :refer [ClojureParser]]))

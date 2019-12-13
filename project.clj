@@ -8,7 +8,10 @@
   :javac-options ["-target" "1.8" "-source" "1.8"]
   :dependencies [[org.clojure/clojure "1.10.1"]]
   :profiles {:dev      {:dependencies   [[criterium/criterium "0.4.5"] ;; benchmark
-                                         [org.clojure/test.check "0.10.0"]] ;; generative testing
+                                         ;; generative testing
+                                         [org.clojure/test.check "0.10.0"]
+                                         ;; https://github.com/bhauman/figwheel-main/issues/161
+                                         [com.bhauman/figwheel-main "0.2.0"]] ;; cljs repl
                         :plugins        [[jonase/eastwood "0.3.5"] ;; linter
                                          ;; java reloader
                                          [lein-virgil "0.1.9"]]

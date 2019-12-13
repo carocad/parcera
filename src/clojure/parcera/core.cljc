@@ -1,6 +1,7 @@
 (ns parcera.core
   (:require [clojure.core.protocols :as clojure]
-            #?(:clj [parcera.antlr.java :as platform]))
+            #?(:clj  [parcera.antlr.java :as platform]
+               :cljs [parcera.antlr.javascript :as platform]))
   ; todo: re-enable once we have javscript support
   ;:cljs [parcera.antlr.javascript :as platform]))
   #?(:cljs (:import goog.string.StringBuffer)))
