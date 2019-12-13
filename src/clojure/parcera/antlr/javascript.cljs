@@ -32,9 +32,9 @@
     (tree [^clojureParser this] (. this (code))))
 
 
-(defn parser
+(defn parse
   [input]
-  {:parser input})
+  {:tree input})
 
 #_(defn parser
     [input listener]
