@@ -3,7 +3,7 @@
   :url "https://github.com/carocad/parcera"
   :license {:name "LGPLv3"
             :url  "https://github.com/carocad/parcera/blob/master/LICENSE.md"}
-  :source-paths ["src/clojure"]
+  :source-paths ["src/clojure" "src/javascript"]
   :java-source-paths ["src/java"]
   :javac-options ["-target" "1.8" "-source" "1.8"]
   :dependencies [[org.clojure/clojure "1.10.1"]]
@@ -15,7 +15,10 @@
                         :resource-paths ["target"]
                         :clean-targets  ^{:protect false} ["target"]}
 
-             :provided {:dependencies [[org.antlr/antlr4-runtime "4.7.1"]]}}
+             :provided {:dependencies [[org.clojure/clojurescript "1.10.520"]
+                                       [org.antlr/antlr4-runtime "4.7.1"]]}}
+
+  :aliases {"fig" ["trampoline" "run" "-m" "figwheel.main"]}
 
   :test-selectors {:default     (fn [m] (not (some #{:benchmark} (keys m))))
                    :benchmark   :benchmark}
