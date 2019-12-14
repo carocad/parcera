@@ -1,9 +1,8 @@
 (ns parcera.antlr.javascript
   (:require [parcera.antlr.common :as common]
             [antlr4 :as antlr4]))
-;[antlr4 :refer [CharStreams CommonTokenStream]]
-;[parcera.antlr.ClojureLexer :refer [ClojureLexer]]
-;[parcera.antlr.ClojureParser :refer [ClojureParser]]))
+;[parcera.antlr.ClojureLexer :as ClojureLexer]))
+;[parcera.antlr.ClojureParser :as ClojureParser]))
 
 (set! *warn-on-infer* true)
 
