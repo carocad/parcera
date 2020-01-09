@@ -63,7 +63,14 @@ reader_macro: ( unquote
               | deref
               );
 
-metadata: ((metadata_entry | deprecated_metadata_entry) whitespace?)+ form;
+metadata: ((metadata_entry | deprecated_metadata_entry) whitespace?)+
+          ( symbol
+          | collection
+          | set
+          | namespaced_map
+          | tag
+          | function
+          );
 
 metadata_entry: '^' ( map | symbol | string | keyword );
 
