@@ -434,6 +434,18 @@
       (is (valid? input))
       (is (roundtrip input))))
 
+  (testing "symbolic"
+    (let [input "##Inf"]
+      (is (valid? input))
+      (is (roundtrip input)))
+    (let [input "##-Inf"]
+      (is (valid? input))
+      (is (roundtrip input)))
+    ;; symbolic names are valid symbols
+    (let [input "Inf"]
+      (is (valid? input))
+      (is (roundtrip input))))
+
   (testing "EOF"
     (let [input ":hello \"  "]
       (is (not (valid? input))))))

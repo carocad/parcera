@@ -48,7 +48,7 @@ number: NUMBER;
 character: CHARACTER;
 
 /*
- * custom rules NOT used here:
+ * rules NOT captured in this statement:
  * - a symbol cannot start with a number "9.5hello"
  * - a symbol cannot be followed by another symbol "hello/world/" -> "hello/world" "/"
  */
@@ -63,13 +63,7 @@ reader_macro: ( unquote
               | deref
               );
 
-metadata: ((metadata_entry | deprecated_metadata_entry) whitespace?)+
-          ( symbol
-          | collection
-          | tag
-          | unquote
-          | unquote_splicing
-          );
+metadata: ((metadata_entry | deprecated_metadata_entry) whitespace?)+ form;
 
 metadata_entry: '^' ( map | symbol | string | keyword );
 
@@ -126,7 +120,11 @@ conditional: '#?' whitespace? list;
 
 conditional_splicing: '#?@' whitespace? list;
 
-symbolic: '##' ('Inf' | '-Inf' | 'NaN');
+/* This definition allows arbitrary symbolic values; following
+ * on LispReader to just read the form and throw if the symbol
+ * is not known.
+ */
+symbolic: '##' SYMBOL;
 
 // I assume symbol and list from lisp reader, but tools.reader seems to
 // indicate something else
