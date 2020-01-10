@@ -14,20 +14,17 @@
 
 ;; A custom Error Listener to avoid Antlr printing the errors on the terminal
 ;; by default. This is also useful to mimic Instaparse :total parse mechanism
-;; such that if we get an error, we can report it as the result instead
+;; such that if we get an error, we can report it as the result instead.
+;; Besides `syntaxError` all other methods are overridden only to get ambiguity
+;; reports during development. If this is somehow shown on your application
+;; please report it :)
 (defrecord AntlrFailure [reports]
   ANTLRErrorListener
-  ;; I am not sure how to use these methods. If you came here wondering why
-  ;; is this being printed, please open an issue so that we can all benefit
-  ;; from your findings ;)
   (reportAmbiguity [this parser dfa start-index stop-index exact ambig-alts configs]
-    ;; TODO
     (println "report ambiguity: " parser dfa start-index stop-index exact ambig-alts configs))
   (reportAttemptingFullContext [this parser dfa start-index stop-index conflicting-alts configs]
-    ;; TODO
     (println "report attempting full context: " parser dfa start-index stop-index conflicting-alts configs))
   (reportContextSensitivity [this parser dfa start-index stop-index prediction configs]
-    ;; TODO
     (println "report context sensitivity: " parser dfa start-index stop-index prediction configs))
   (syntaxError [this recognizer offending-symbol line char message error]
     ;; recognizer is either clojureParser or clojureLexer

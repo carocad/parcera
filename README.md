@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.com/carocad/parcera.svg?branch=master)](https://travis-ci.com/carocad/parcera)
 [![Clojars Project](https://img.shields.io/clojars/v/carocad/parcera.svg)](https://clojars.org/carocad/parcera)
 
-Grammar-based Clojure reader.
+Grammar-based Clojure parser.
 
 Parcera can safely read any Clojure file without any code evaluation.
 
@@ -47,11 +47,7 @@ this dependency will be in the classpath to avoid collisions.
 ;; "ns"
 ```
 
-**note**: parcera is a bit permissive for symbols and keywords, you should be
- able to parse any valid Clojure file however, I cannot guarantee that an
- *invalid* symbol/keyword will yield a failure. This is because Clojure's
- reader is very stateful and embedding all those rules into the grammar
- would make it prohibitively complex. 
+If you are interested in the grammar definition check [Clojure.g4](./src/Clojure.g4).
 
 ## contributing
 
