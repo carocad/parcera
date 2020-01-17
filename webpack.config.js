@@ -1,5 +1,5 @@
 module.exports = {
-  mode: "development",
+  mode: "production",
   entry: './clojureReader.js',
   output: {
     filename: 'index.bundle.js',

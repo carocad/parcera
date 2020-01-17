@@ -1,6 +1,6 @@
 (ns parcera.antlr.javascript
   (:require [parcera.antlr.common :as common]
-            [reader :as reader]))
+            [antlr.clojure.reader :as reader]))
 
 ;(common/map->Node {})
 
@@ -45,3 +45,4 @@
 
 
 ;(.getText (.code (parse "hello/world")))
+;(js-keys (.code (parse "hello/world")))
