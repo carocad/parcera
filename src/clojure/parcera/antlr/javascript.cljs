@@ -35,14 +35,15 @@
   [input]
   (let [chars  (reader/charStreams input)
         lexer  (doto (reader/lexer chars)
-                 (.removeErrorListeners))
-        ;(.addErrorListener listener))
-        tokens (reader/tokens lexer)]
-    (doto (reader/parser tokens)
-      ;(.setBuildParseTree true)
-      (.removeErrorListeners))))
-;(.addErrorListener listener))))
-
+                 (.removeErrorListeners)
+                 #_(.addErrorListener listener))            ;todo
+        tokens (reader/tokens lexer)
+        parser (reader/parser tokens)]
+    (.removeErrorListeners parser)
+    (set! (.-buildParseTrees parser) true)
+    {:rules (into [] (map keyword) (.-ruleNames parser))
+     :tree  (.code parser)}))
+;:reports @(:reports listener)})) todo
 
 ;(.getText (.code (parse "hello/world")))
 ;(js-keys (.code (parse "hello/world")))
