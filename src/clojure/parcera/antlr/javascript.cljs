@@ -45,5 +45,20 @@
      :tree  (.code parser)}))
 ;:reports @(:reports listener)})) todo
 
-;(.getText (.code (parse "hello/world")))
-;(js-keys (.code (parse "hello/world")))
+;; It seems that by passing antlr4 through webpack we lost the type
+;; information. So now we get things like #object[p], #object[h], etc :(
+;(type (:tree (parse "hello/world")))
+
+
+(defn datafy
+  [tree]
+  (cond
+    (some? (.-children tree))
+    (common/map->Node {;:metadata (parser-rule-meta this) todo
+                       :type    :parcera.core/rule
+                       :rule-id (.-ruleIndex tree)
+                       :content (.-children tree)})
+
+    :else
+    (common/map->Node {:type    :parcera.core/terminal
+                       :content (str tree)})))
