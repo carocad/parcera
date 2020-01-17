@@ -1,8 +1,15 @@
-{:main         parcera.core
- :target       :nodejs
- :npm-deps     {"antlr4" "^4.7.2"}
- :install-deps true
- :foreign-libs [{:file        "src/javascript/parcera/antlr/ClojureLexer.js"
-                 :provides    ["parcera.antlr.ClojureLexer"]}
-                {:file        "src/javascript/parcera/antlr/ClojureParser.js"
-                 :provides    ["parcera.antlr.ClojureParser"]}]}
+{:main          parcera.core
+ :npm-deps      false
+ ;:npm-deps     {"antlr4" "^4.7.2"}
+ ;:install-deps false
+ :infer-externs true
+ :foreign-libs  [{:file        "dist/index.bundle.js"
+                  :provides    ["reader"]
+                  :module-type :commonjs}]}
+;:global-exports {reader ClojureReader}}]}
+;:foreign-libs [{:file        "src/javascript/parcera/antlr/ClojureLexer.js"
+;                :provides    ["parcera.antlr.ClojureLexer"]
+;                :module-type :commonjs}
+;               {:file        "src/javascript/parcera/antlr/ClojureParser.js"
+;                :provides    ["parcera.antlr.ClojureParser"]
+;                :module-type :commonjs}]}

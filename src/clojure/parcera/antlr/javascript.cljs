@@ -1,10 +1,10 @@
 (ns parcera.antlr.javascript
   (:require [parcera.antlr.common :as common]
-            [antlr4 :as antlr4]))
-;[parcera.antlr.ClojureLexer :as ClojureLexer]))
-;[parcera.antlr.ClojureParser :as ClojureParser]))
+            [reader :as reader]))
 
-(set! *warn-on-infer* true)
+;(common/map->Node {})
+
+;(set! *warn-on-infer* true)
 
 #_(extend-type ParserRuleContext
     antlr/ParserRule
@@ -33,17 +33,15 @@
 
 (defn parse
   [input]
-  {:tree input})
+  (let [chars  (reader/charStreams input)
+        lexer  (doto (reader/lexer chars)
+                 (.removeErrorListeners))
+        ;(.addErrorListener listener))
+        tokens (reader/tokens lexer)]
+    (doto (reader/parser tokens)
+      ;(.setBuildParseTree true)
+      (.removeErrorListeners))))
+;(.addErrorListener listener))))
 
-#_(defn parser
-    [input listener]
-    (let [chars  (antlr4/CharStreams.fromString input)
-          ;lexer  (doto (new clojureLexer chars)
-          ;         (.removeErrorListeners))
-          ;; todo: how to handle lexer errors ?
-          ;(.addErrorListener listener))
-          tokens (new antlr4/CommonTokenStream lexer)]
-      #_(doto (new clojureParser tokens)
-          (.setBuildParseTree true)
-          (.removeErrorListeners)
-          (.addErrorListener listener))))
+
+;(.getText (.code (parse "hello/world")))
