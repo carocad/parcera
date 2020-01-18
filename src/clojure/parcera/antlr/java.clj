@@ -94,6 +94,9 @@
                                     :content (str this)})))
 
 
+;; just an utility to allow js to use the same code
+(defn datafy [tree] (clojure/datafy tree))
+
 (defn parse
   [input]
   (let [listener (->AntlrFailure (volatile! ()))

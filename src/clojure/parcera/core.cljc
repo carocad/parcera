@@ -1,9 +1,6 @@
 (ns parcera.core
-  (:require [clojure.core.protocols :as clojure]
-            #?(:clj  [parcera.antlr.java :as platform]
-               :cljs [parcera.antlr.javascript :as platform]))
-  ; todo: re-enable once we have javscript support
-  ;:cljs [parcera.antlr.javascript :as platform]))
+  (:require [#?(:clj  parcera.antlr.java
+                :cljs parcera.antlr.javascript) :as platform])
   #?(:cljs (:import goog.string.StringBuffer)))
 
 
@@ -26,7 +23,7 @@
   Yields a lazy sequence to avoid expensive computation whenever
   the user is not interested in the full content."
   [tree rule-names hide-tags hide-literals]
-  (let [node (clojure/datafy tree)]
+  (let [node (platform/datafy tree)]
     (case (:type node)
       ::rule
       (let [rule     (get rule-names (:rule-id node))
@@ -234,3 +231,6 @@
                      (tree-seq seq? seq (ast "
       (ns
         parcera.core))"))))
+
+
+;(meta (ast "hello/world"))
