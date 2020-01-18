@@ -9,12 +9,15 @@
  * On the other hand, if I pass the module as node.js target then the Closure
  * compiler corrupts the source code which makes it unusable :(
  */
+
+const path = require('path')
+
 module.exports = {
   mode: "production",
-  entry: '../src/javascript/clojureReader.js',
+  entry: path.resolve(__dirname, '../src/javascript/clojureReader.js'),
   output: {
     filename: 'clojure.reader.bundle.js',
-    path: '../src/javascript'
+    path: path.resolve(__dirname, '../src/javascript'),
     // the url to the output directory resolved relative to the HTML page
     library: "ClojureReader",
     // the name of the exported library
