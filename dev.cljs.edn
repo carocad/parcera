@@ -1,3 +1,6 @@
+^{;:extra-main-files {:testing {:main parcera.test-runner}}
+  :auto-testing true                                        ;; https://figwheel.org/docs/testing.html
+  :watch-dirs   ["src/clojure" "test"]}
 {:main          parcera.core
  :npm-deps      {"antlr4" "^4.7.2"}
  :install-deps  true

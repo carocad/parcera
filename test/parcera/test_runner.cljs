@@ -1,11 +1,10 @@
 (ns parcera.test-runner
-  (:require [cljs.nodejs :as nodejs]
-            [cljs.test :refer-macros [run-tests]]
+  (:require [cljs.test :refer-macros [run-tests]]
+            [figwheel.main.testing :as tester]
+    ;; require all the namespaces that have tests in them
             [parcera.test.core :as ct]))
 
-(nodejs/enable-util-print!)
-
 (defn -main []
-  (run-tests 'parcera.test.core))
+  (tester/run-tests 'parcera.test.core))
 
-(set! *main-cli-fn* -main)
+;(set! *main-cli-fn* -main)

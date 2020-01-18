@@ -59,11 +59,11 @@
   [input]
   (let [chars  (reader/charStreams input)
         lexer  (doto (reader/lexer chars)
-                 (.removeErrorListeners)
+                 ;(.removeErrorListeners)
                  #_(.addErrorListener listener))            ;todo
         tokens (reader/tokens lexer)
         parser (reader/parser tokens)]
-    (.removeErrorListeners parser)
+    ;(.removeErrorListeners parser) todo
     (set! (.-buildParseTrees parser) true)
     {:rules (into [] (map keyword) (.-ruleNames parser))
      :tree  (.code parser)}))
