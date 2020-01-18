@@ -479,15 +479,16 @@
       (is (valid? input))
       (is (roundtrip input)))))
 
-(deftest clojure$cript
+(defonce clojure (slurp "https://raw.githubusercontent.com/clojure/clojure/master/src/clj/clojure/core.clj"))
+(defonce clojure$script (slurp "https://raw.githubusercontent.com/clojure/clojurescript/master/src/main/clojure/cljs/core.cljc"))
+
+(deftest clojure$cript-bootstrap
 
   (testing "parcera should be able to parse clojure core"
-    (let [core-content (slurp "https://raw.githubusercontent.com/clojure/clojure/master/src/clj/clojure/core.clj")]
-      (time (is (= core-content (parcera/code (parcera/ast core-content :optimize :memory)))))))
+    (time (is (= clojure (parcera/code (parcera/ast clojure :optimize :memory))))))
 
   (testing "parcera should be able to parse clojurescript core"
-    (let [core-content (slurp "https://raw.githubusercontent.com/clojure/clojurescript/master/src/main/clojure/cljs/core.cljc")]
-      (time (is (= core-content (parcera/code (parcera/ast core-content :optimize :memory))))))))
+    (time (is (= clojure$script (parcera/code (parcera/ast clojure$script :optimize :memory)))))))
 
 
 ;; when in doubt enable the test below. I parses clojure reader test suite so, if we
