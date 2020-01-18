@@ -21,3 +21,4 @@ pom.xml.asc
 package*.json
 /.eastwood
 /dist/index.bundle.js
+!/src/javascript/clojureReader.js
