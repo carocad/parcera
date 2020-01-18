@@ -5,7 +5,7 @@
             [clojure.test.check.properties :as prop]
             [clojure.test.check :as tc]
             [parcera.core :as parcera]
-            #?(:cljs [parcera.slurp :refer [slurp]])))
+            #?(:cljs [parcera.test.slurp :refer [slurp]])))
 
 
 (defn- nested?
@@ -457,23 +457,18 @@
   (testing "parcera should be able to parse itself"
     (let [input (slurp "./src/clojure/parcera/core.cljc")]
       (is (valid? input))
-      (is (roundtrip input)))
-    ;(is (clear input))))
-    (let [input (slurp "./src/clojure/parcera/slurp.cljc")]
-      (is (valid? input))
       (is (roundtrip input))))
-  ;(is (clear input)))))
 
   (testing "parcera should be able to parse its own test suite"
     (let [input (slurp "./test/parcera/test/core.cljc")]
       (is (valid? input))
       (is (roundtrip input)))
-    ;(is (clear input))))
     (let [input (slurp "./test/parcera/test/benchmark.clj")]
       (is (valid? input))
+      (is (roundtrip input)))
+    (let [input (slurp "./test/parcera/test/slurp.cljc")]
+      (is (valid? input))
       (is (roundtrip input)))))
-;(is (clear input))))))
-
 
 (deftest clojure$cript
 
