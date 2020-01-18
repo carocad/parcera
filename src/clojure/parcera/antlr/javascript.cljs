@@ -34,7 +34,6 @@
                                        (count (.-text stop)))}})))
 
 
-
 (defn datafy
   [tree]
   (cond
@@ -44,9 +43,17 @@
                        :rule-id  (.-ruleIndex tree)
                        :content  (.-children tree)})
 
+    (.-isErrorNode tree)
+    (let [token (.-symbol tree)]
+      (common/map->Node {:type     :parcera.core/failure
+                         :content  (str tree)
+                         :metadata {:parcera.core/start {:row    (.-line token)
+                                                         :column (.-column token)}}}))
+
     :else
     (common/map->Node {:type    :parcera.core/terminal
                        :content (str tree)})))
+
 
 (defn parse
   [input]

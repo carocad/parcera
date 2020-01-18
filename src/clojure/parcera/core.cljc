@@ -231,6 +231,3 @@
                      (tree-seq seq? seq (ast "
       (ns
         parcera.core))"))))
-
-
-;(meta (ast "hello/world"))
