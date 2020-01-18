@@ -1,10 +1,12 @@
-^{;:extra-main-files {:testing {:main parcera.test-runner}}
-  :auto-testing true                                        ;; https://figwheel.org/docs/testing.html
+^{:auto-testing true                                        ;; https://figwheel.org/docs/testing.html
   :watch-dirs   ["src/clojure" "test"]}
 {:main          parcera.core
  :npm-deps      {"antlr4" "^4.7.2"}
  :install-deps  true
  :infer-externs true
+ ;; For some reason setting the target as nodejs breaks the complete
+ ;; process :(
+ ;:target :nodejs
  :foreign-libs  [{:file        "src/javascript/clojure.reader.bundle.js"
                   :provides    ["antlr.clojure.reader"]
                   :module-type :commonjs}]}

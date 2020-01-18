@@ -1,5 +1,5 @@
-(defproject carocad/parcera "0.10.2"
-  :description "Grammar-based Clojure parser"
+(defproject carocad/parcera "0.11.0"
+  :description "Grammar-based Clojure(script) parser"
   :url "https://github.com/carocad/parcera"
   :license {:name "LGPLv3"
             :url  "https://github.com/carocad/parcera/blob/master/LICENSE.md"}
@@ -21,7 +21,9 @@
              :provided {:dependencies [[org.clojure/clojurescript "1.10.597"]
                                        [org.antlr/antlr4-runtime "4.7.1"]]}}
 
-  :aliases {"fig" ["trampoline" "run" "-m" "figwheel.main"]}
+  :aliases {"test-runner" ["trampoline" "run" "-m" "figwheel.main"
+                           "-co" "tests.cljs.edn"
+                           "-m" "parcera.test-runner"]}
 
   :test-selectors {:default     (fn [m] (not (some #{:benchmark} (keys m))))
                    :benchmark   :benchmark}
