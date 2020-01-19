@@ -69,7 +69,7 @@ metadata: ((metadata_entry | deprecated_metadata_entry) whitespace?)+
           | set
           | namespaced_map
           | tag
-          | function
+          | fn
           );
 
 metadata_entry: '^' ( map | symbol | string | keyword );
@@ -93,7 +93,7 @@ unquote_splicing: '~@' whitespace? form;
 
 deref: '@' whitespace? form;
 
-dispatch: ( function
+dispatch: ( fn
           | regex
           | set
           | conditional
@@ -105,7 +105,7 @@ dispatch: ( function
           | eval
           );
 
-function: '#' list; // no whitespace allowed
+fn: '#' list; // no whitespace allowed
 
 regex: '#' STRING;
 

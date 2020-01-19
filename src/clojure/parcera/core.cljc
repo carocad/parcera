@@ -176,7 +176,7 @@
     (do (. string-builder (append "@"))
         (doseq [child (rest ast)] (code* child string-builder)))
 
-    :function
+    :fn
     (do (. string-builder (append "#"))
         (doseq [child (rest ast)] (code* child string-builder)))
 
