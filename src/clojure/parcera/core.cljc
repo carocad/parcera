@@ -27,10 +27,9 @@
     (case (:type node)
       ::rule
       (let [rule     (get rule-names (:rule-id node))
-            children (for [child (:content node)
-                           :let [child (hiccup child rule-names hide-tags hide-literals)]
-                           :when (not (nil? child))]
-                       child)]
+            children (sequence (comp (map #(hiccup % rule-names hide-tags hide-literals))
+                                     (remove nil?))
+                               (:content node))]
         (if (contains? hide-tags rule)
           ;; parcera hidden tags are always "or" statements, so just take the single children
           (first children)

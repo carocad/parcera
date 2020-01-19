@@ -62,26 +62,29 @@
 (extend-type ParserRuleContext
   clojure/Datafiable
   (datafy [this]
-    (common/map->Node {:metadata (parser-rule-meta this)
-                       :type     :parcera.core/rule
-                       :rule-id  (.getRuleIndex this)
-                       :content  (.-children this)})))
+    (common/->Node (parser-rule-meta this)
+                   :parcera.core/rule
+                   (.getRuleIndex this)
+                   (.-children this))))
 
 
 (extend-type ErrorNodeImpl
   clojure/Datafiable
   (datafy [this]
     (let [token (.-symbol this)]
-      (common/map->Node {:type     :parcera.core/failure
-                         :content  (str this)
-                         :metadata {:parcera.core/start {:row    (.getLine token)
-                                                         :column (.getCharPositionInLine token)}}}))))
+      (common/->Node {:parcera.core/start {:row    (.getLine token)
+                                           :column (.getCharPositionInLine token)}}
+                     :parcera.core/failure
+                     nil                                    ; rule id
+                     (str this)))))                         ; content
 
 
 (extend-type TerminalNode
   clojure/Datafiable
-  (datafy [this] (common/map->Node {:type    :parcera.core/terminal
-                                    :content (str this)})))
+  (datafy [this] (common/->Node nil                         ; meta
+                                :parcera.core/terminal      ;type
+                                nil                         ; rule id
+                                (str this))))               ; content
 
 
 ;; just an utility to allow js to use the same code
