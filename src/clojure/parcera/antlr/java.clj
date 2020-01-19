@@ -46,7 +46,8 @@
   [^ParserRuleContext this]
   (let [start (.getStart this)
         stop  (.getStop this)]
-    (if (nil? stop)                                         ;; no end found - happens on errors
+    (if (nil? stop)
+      ;; no end found - happens on errors
       {:parcera.core/start {:row    (.getLine start)
                             :column (.getCharPositionInLine start)}}
 

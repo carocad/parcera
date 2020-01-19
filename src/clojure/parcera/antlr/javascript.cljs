@@ -49,7 +49,8 @@
   [^ParserRuleContext this]
   (let [start ^Token (.-start this)
         stop  ^Token (.-stop this)]
-    (if (nil? stop)                                         ;; no end found - happens on errors
+    (if (nil? stop)
+      ;; no end found - happens on errors
       {:parcera.core/start {:row    (.-line start)
                             :column (.-column start)}}
       {:parcera.core/start {:row    (.-line start)
