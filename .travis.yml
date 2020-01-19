@@ -8,6 +8,9 @@ branches:
 
 language: generic
 
+addons:
+  chrome: stable
+
 jobs:
   include:
     #    - stage: Java tests
