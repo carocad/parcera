@@ -64,21 +64,24 @@
   [tree]
   (cond
     (some? (.-children tree))
-    (common/map->Node {:metadata (parser-rule-meta tree)
-                       :type     :parcera.core/rule
-                       :rule-id  (.-ruleIndex tree)
-                       :content  (.-children tree)})
+    (common/->Node (parser-rule-meta tree)
+                   :parcera.core/rule
+                   (.-ruleIndex tree)
+                   (.-children tree))
 
     (.-isErrorNode tree)
     (let [token (.-symbol tree)]
-      (common/map->Node {:type     :parcera.core/failure
-                         :content  (str tree)
-                         :metadata {:parcera.core/start {:row    (.-line token)
-                                                         :column (.-column token)}}}))
+      (common/->Node {:parcera.core/start {:row    (.-line token)
+                                           :column (.-column token)}}
+                     :parcera.core/failure
+                     nil                                    ; rule id
+                     (str tree)))
 
     :else
-    (common/map->Node {:type    :parcera.core/terminal
-                       :content (str tree)})))
+    (common/->Node nil                                      ; metadata
+                   :parcera.core/terminal
+                   nil                                      ; rule id
+                   (str tree))))
 
 
 (defn parse
