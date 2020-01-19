@@ -6,7 +6,6 @@
  :install-deps  true
  :infer-externs true
  ;:target :nodejs
- :target        :webworker
  :foreign-libs  [{:file        "src/javascript/clojure.reader.bundle.js"
                   :provides    ["antlr.clojure.reader"]
                   :module-type :commonjs}]}
