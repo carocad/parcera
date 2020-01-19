@@ -13,22 +13,22 @@ addons:
 
 jobs:
   include:
-    #    - stage: Java tests
-    #      script:
-    #        - curl -O https://www.antlr.org/download/antlr-4.7.1-complete.jar
-    #        # generate java
-    #        - java -jar antlr-4.7.1-complete.jar -Xexact-output-dir -o src/java/parcera/antlr -package parcera.antlr -Dlanguage=Java -no-listener -no-visitor src/Clojure.g4
-    #        # now we can actually proceed with clojure code
-    #        - lein do clean, compile, check, eastwood
-    #        - lein trampoline test
-    #        - lein trampoline test :benchmark
+    - stage: Java tests
+      script:
+        - curl -O https://www.antlr.org/download/antlr-4.7.1-complete.jar
+        # generate java
+        - java -jar antlr-4.7.1-complete.jar -Xexact-output-dir -o src/java/parcera/antlr -package parcera.antlr -Dlanguage=Java -no-listener -no-visitor src/Clojure.g4
+        # now we can actually proceed with clojure code
+        - lein do clean, compile, check, eastwood
+        - lein trampoline test
+        - lein trampoline test :benchmark
     - stage: Js tests
       script:
         - curl -O https://www.antlr.org/download/antlr-4.7.1-complete.jar
         # generate javascript
         - java -jar antlr-4.7.1-complete.jar -Xexact-output-dir -o src/javascript/parcera/antlr -package parcera.antlr -Dlanguage=JavaScript -no-listener -no-visitor src/Clojure.g4
         # pre-bundle javascript
-        - nvm install 10.10 && nvm use 10.10 && npm init --yes && npm add webpack webpack-cli antlr4 && cat package.json
+        - nvm install 10.10 && nvm use 10.10 && npm init --yes && npm add webpack webpack-cli antlr4
         - npx webpack --config ./resources/webpack.config.js
         - lein test-runner
 
