@@ -485,10 +485,10 @@
 (deftest clojure$cript-bootstrap
 
   (testing "parcera should be able to parse clojure core"
-    (time (is (= clojure (parcera/code (parcera/ast clojure :optimize :memory))))))
+    (time (is (= clojure (parcera/code (parcera/ast clojure))))))
 
   (testing "parcera should be able to parse clojurescript core"
-    (time (is (= clojure$script (parcera/code (parcera/ast clojure$script :optimize :memory)))))))
+    (time (is (= clojure$script (parcera/code (parcera/ast clojure$script)))))))
 
 
 ;; when in doubt enable the test below. I parses clojure reader test suite so, if we
