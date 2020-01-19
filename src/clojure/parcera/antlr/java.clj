@@ -46,21 +46,10 @@
   [^ParserRuleContext this]
   (let [start (.getStart this)
         stop  (.getStop this)]
-    (cond
-      ;; happens when the parser rule is a single lexer rule
-      (identical? start stop)
-      {:parcera.core/start {:row    (.getLine start)
-                            :column (.getCharPositionInLine start)}
-       :parcera.core/end   {:row    (.getLine start)
-                            :column (Math/addExact (.getCharPositionInLine start)
-                                                   (.length (.getText start)))}}
-
-      ;; no end found - happens on errors
-      (nil? stop)
+    (if (nil? stop)                                         ;; no end found - happens on errors
       {:parcera.core/start {:row    (.getLine start)
                             :column (.getCharPositionInLine start)}}
 
-      :else
       {:parcera.core/start {:row    (.getLine start)
                             :column (.getCharPositionInLine start)}
        :parcera.core/end   {:row    (.getLine stop)

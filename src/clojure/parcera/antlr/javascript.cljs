@@ -49,21 +49,9 @@
   [^ParserRuleContext this]
   (let [start ^Token (.-start this)
         stop  ^Token (.-stop this)]
-    (cond
-      ;; happens when the parser rule is a single lexer rule
-      (identical? start stop)
-      {:parcera.core/start {:row    (.-line start)
-                            :column (.-column start)}
-       :parcera.core/end   {:row    (.-line start)
-                            :column (+ (.-column start)
-                                       (count (.-text start)))}}
-
-      ;; no end found - happens on errors
-      (nil? stop)
+    (if (nil? stop)                                         ;; no end found - happens on errors
       {:parcera.core/start {:row    (.-line start)
                             :column (.-column start)}}
-
-      :else
       {:parcera.core/start {:row    (.-line start)
                             :column (.-column start)}
        :parcera.core/end   {:row    (.-line stop)
