@@ -28,7 +28,8 @@ jobs:
         # generate javascript
         - java -jar antlr-4.7.1-complete.jar -Xexact-output-dir -o src/javascript/parcera/antlr -package parcera.antlr -Dlanguage=JavaScript -no-listener -no-visitor src/Clojure.g4
         # pre-bundle javascript
-        - nvm install 10.10 && nvm use 10.10 && npm init --yes && npm add webpack webpack-cli antlr4
+        #- nvm install 10.10 && nvm use 10.10 &&
+        - npm init --yes && npm add webpack webpack-cli antlr4
         - npx webpack --config ./resources/webpack.config.js
         - lein test-runner
 
