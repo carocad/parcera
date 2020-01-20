@@ -5,8 +5,7 @@
 
 
 (def default-hidden {:tags     #{:form :collection :literal
-                                 :reader_macro :dispatch :input
-                                 :keyword}
+                                 :reader_macro :dispatch :input}
                      :literals #{"(" ")"
                                  "[" "]"
                                  "{" "}"
@@ -106,7 +105,7 @@
         (. string-builder (append "}")))
 
     (:number :whitespace :comment :symbol :character :string
-      :simple_keyword :macro_keyword)
+      :keyword :macro_keyword)
     (. string-builder (append (second ast)))
 
 

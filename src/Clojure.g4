@@ -33,11 +33,9 @@ vector: '[' input* ']';
 
 map: '{' input* '}';
 
-literal: keyword | string | number | character | symbol;
+literal: keyword | macro_keyword | string | number | character | symbol;
 
-keyword: simple_keyword | macro_keyword;
-
-simple_keyword: SIMPLE_KEYWORD;
+keyword: KEYWORD;
 
 macro_keyword: MACRO_KEYWORD;
 
@@ -72,7 +70,7 @@ metadata: ((metadata_entry | deprecated_metadata_entry) whitespace?)+
           | fn
           );
 
-metadata_entry: '^' ( map | symbol | string | keyword );
+metadata_entry: '^' ( map | symbol | string | keyword | macro_keyword );
 
 /**
  * According to https://github.com/clojure/clojure-site/blob/7493bdb10222719923519bfd6d2699a26677ee82/content/guides/weird_characters.adoc#-and----metadata
@@ -81,7 +79,7 @@ metadata_entry: '^' ( map | symbol | string | keyword );
  * In order to support roundtrip of parser rules it is required to exactly identify the
  * character used which would not be possible with something like '#'? '^'
  */
-deprecated_metadata_entry: '#^' ( map | symbol | string | keyword );
+deprecated_metadata_entry: '#^' ( map | symbol | string | keyword | macro_keyword );
 
 backtick: '`' whitespace? form;
 
@@ -111,7 +109,7 @@ regex: '#' STRING;
 
 set: '#{' input* '}'; // no whitespace allowed
 
-namespaced_map: '#' (keyword | auto_resolve)
+namespaced_map: '#' (keyword | macro_keyword | auto_resolve)
                     whitespace?
                     map;
 
@@ -160,7 +158,7 @@ MACRO_KEYWORD: '::' KEYWORD_HEAD KEYWORD_BODY*;
  * technically that is NOT a valid keyword. However in order to maintain
  * backwards compatibility the Clojure team didnt remove it from LispReader
  */
-SIMPLE_KEYWORD: ':' ((KEYWORD_HEAD KEYWORD_BODY*) | '/');
+KEYWORD: ':' ((KEYWORD_HEAD KEYWORD_BODY*) | '/');
 
 /**
  * a symbol must start with a valid character and can be followed
