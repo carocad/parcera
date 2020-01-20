@@ -19,6 +19,5 @@ pom.xml.asc
 /figwheel_server.log
 package*.json
 /.eastwood
-/src/javascript/parcera/antlr
-/src/javascript/clojure.reader.bundle.js
 pom.xml
+/src/clojure/parcera/antlr/js/

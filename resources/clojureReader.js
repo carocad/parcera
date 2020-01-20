@@ -6,8 +6,8 @@
  * bundle
  */
 const antlr4 = require('antlr4')
-const {ClojureLexer} = require('../src/javascript/parcera/antlr/ClojureLexer')
-const {ClojureParser} = require('../src/javascript/parcera/antlr/ClojureParser')
+const {ClojureLexer} = require('../src/clojure/parcera/antlr/js/ClojureLexer')
+const {ClojureParser} = require('../src/clojure/parcera/antlr/js/ClojureParser')
 
 const reader = {
     charStreams: (input) => new antlr4.CharStreams.fromString(input),
