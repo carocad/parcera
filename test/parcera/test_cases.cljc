@@ -5,7 +5,7 @@
             [clojure.test.check.properties :as prop]
             [clojure.test.check :as tc]
             [parcera.core :as parcera]
-            #?(:cljs [parcera.test.slurp :refer [slurp]])))
+            #?(:cljs [parcera.slurp :refer [slurp]])))
 
 
 (defn- nested?
