@@ -469,13 +469,13 @@
       (is (roundtrip input))))
 
   (testing "parcera should be able to parse its own test suite"
-    (let [input (slurp "./test/parcera/test/core.cljc")]
+    (let [input (slurp "./test/parcera/test_cases.cljc")]
       (is (valid? input))
       (is (roundtrip input)))
-    (let [input (slurp "./test/parcera/test/benchmark.clj")]
+    (let [input (slurp "./test/parcera/benchmark.clj")]
       (is (valid? input))
       (is (roundtrip input)))
-    (let [input (slurp "./test/parcera/test/slurp.cljc")]
+    (let [input (slurp "./test/parcera/slurp.cljc")]
       (is (valid? input))
       (is (roundtrip input)))))
 

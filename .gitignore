@@ -21,3 +21,4 @@ package*.json
 /.eastwood
 /src/javascript/parcera/antlr
 /src/javascript/clojure.reader.bundle.js
+pom.xml
