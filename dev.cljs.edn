@@ -4,12 +4,9 @@
 {:main          parcera.core
  :npm-deps      {"antlr4" "^4.7.2"}
  :install-deps  true
- :infer-externs true
+ :infer-externs true}
  ;:target :nodejs
- :foreign-libs  [{:file        "src/javascript/clojure.reader.bundle.js"
-                  :provides    ["antlr.clojure.reader"]
-                  :module-type :commonjs}]}
-; NOTE: I feel this more as a hack than as an actual solution.
+; NOTE: I feel this more as a hack than as an actual solution.}
 ; Ideally I should just let ClojureScript import the lexer and parser
 ; from a browser perspective. However it seems that the Closure compiler
 ; doesnt like conditional imports so it throws saying that 'fs' is not

@@ -6,7 +6,4 @@
 {:main          parcera.test-runner
  :npm-deps      {"antlr4" "^4.7.2"}
  :install-deps  true
- :infer-externs true
- :foreign-libs  [{:file        "src/javascript/clojure.reader.bundle.js"
-                  :provides    ["antlr.clojure.reader"]
-                  :module-type :commonjs}]}
+ :infer-externs true}
