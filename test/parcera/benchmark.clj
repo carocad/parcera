@@ -1,4 +1,4 @@
-(ns parcera.test.benchmark
+(ns parcera.benchmark
   (:require [clojure.test :refer [deftest is testing]]
             [clojure.test.check :as tc]
             [criterium.core :as criterium]

@@ -1,4 +1,4 @@
-(ns parcera.test.core
+(ns parcera.test-cases
   (:require [clojure.pprint :as pprint]
             [clojure.test :refer [deftest is testing]]
             [clojure.test.check.generators :as gen]

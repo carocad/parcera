@@ -20,7 +20,8 @@
              :provided {:dependencies [[org.clojure/clojurescript "1.10.597"]
                                        [org.antlr/antlr4-runtime "4.7.1"]]}}
 
-  :aliases {"test-runner" ["trampoline" "run" "-m" "figwheel.main"
+  :aliases {"test-runner" ["trampoline" "run"
+                           "-m" "figwheel.main"
                            "-co" "tests.cljs.edn"
                            "-m" "parcera.test-runner"]}
 

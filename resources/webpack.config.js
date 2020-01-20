@@ -2,7 +2,7 @@ const path = require('path')
 
 module.exports = {
   mode: "production",
-  entry: path.resolve(__dirname, '../src/javascript/clojureReader.js'),
+  entry: path.resolve(__dirname, './clojureReader.js'),
   output: {
     filename: 'clojure.reader.bundle.js',
     path: path.resolve(__dirname, '../src/javascript'),
