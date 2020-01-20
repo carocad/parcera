@@ -19,4 +19,4 @@ const reader = {
 module.exports = reader
 // global.ClojureReader = reader
 
-console.log(`DONE 💫`)
+// console.log(`DONE 💫`)
