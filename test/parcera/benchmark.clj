@@ -1,8 +1,8 @@
-(ns parcera.test.benchmark
+(ns parcera.benchmark
   (:require [clojure.test :refer [deftest is testing]]
             [clojure.test.check :as tc]
             [criterium.core :as criterium]
-            [parcera.test.core :as pt]
+            [parcera.test-cases :as pt]
             [parcera.core :as parcera]))
 
 (deftest ^:benchmark parsing

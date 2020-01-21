@@ -1,4 +1,4 @@
-(ns parcera.test.core
+(ns parcera.test-cases
   (:require [clojure.pprint :as pprint]
             [clojure.test :refer [deftest is testing]]
             [clojure.test.check.generators :as gen]
@@ -124,6 +124,7 @@
     (is (valid? input))
     (is (roundtrip input))))
 
+
 (deftest AST-metadata
   (let [input    ":bar"
         ast      (parcera/ast input)
@@ -133,6 +134,7 @@
     (is (= (:row (::parcera/start location)) 1))
     (is (= (:column (::parcera/end location))
            (count input)))))
+
 
 (deftest symbols
   (let [input "foo"]
@@ -183,6 +185,7 @@
   (let [input "#a #b 1"]
     (is (valid? input))))
 
+
 (deftest keywords
   ;; a keyword can be a simple number because its first character is : which is
   ;; NOT a number ;)
@@ -209,6 +212,7 @@
     (is (valid? input))
     (is (roundtrip input))))
 
+
 (deftest numbers
   (let [input "0x1f"]
     (is (valid? input))
@@ -225,6 +229,7 @@
   (let [input "22/7"]
     (is (valid? input))
     (is (roundtrip input))))
+
 
 (deftest metadata
   (let [input "^String [a b 2]"]
@@ -276,11 +281,12 @@
   (let [input "#_#_ :a"]
     (is (not (valid? input)))))
 
+
 (deftest regex
   (let [input "#_\"[a b 2]\""]
     (is (valid? input))
     (is (roundtrip input))))
-;(is (clear input)))))
+
 
 (deftest comments
   (let [input "{:hello ;2}
@@ -308,7 +314,7 @@
   (let [input "#! invalid { input '"]
     (is (valid? input))
     (is (roundtrip input))))
-;(is (clear input)))))
+
 
 (deftest var-quote
   (let [input "#'hello/world"]
@@ -318,7 +324,7 @@
   (let [input "#'/"]
     (is (valid? input))
     (is (roundtrip input))))
-;(is (clear input)))))
+
 
 (deftest tag
   (let [input "#hello/world [1 a \"3\"]"]
@@ -328,7 +334,7 @@
   (let [input "#hello/world {1 \"3\"}"]
     (is (valid? input))
     (is (roundtrip input))))
-;(is (clear input)))))
+
 
 (deftest quote
   (let [input "'hello/world"]
@@ -342,7 +348,7 @@
   (let [input "'/"]
     (is (valid? input))
     (is (roundtrip input))))
-;(is (clear input)))))
+
 
 (deftest backtick
   (let [input "`hello/world"]
@@ -356,7 +362,7 @@
   (let [input "`/"]
     (is (valid? input))
     (is (roundtrip input))))
-;(is (clear input)))))
+
 
 (deftest unquote-macro
   (let [input "~hello/world"]
@@ -370,7 +376,7 @@
   (let [input "~/"]
     (is (valid? input))
     (is (roundtrip input))))
-;(is (clear input)))))
+
 
 (deftest quote-splicing
   (let [input "~@hello/world"]
@@ -380,7 +386,7 @@
   (let [input "~@(hello 2 b)"]
     (is (valid? input))
     (is (roundtrip input))))
-;(is (clear input)))))
+
 
 (deftest deref-macro
   (let [input "@hello/world"]
@@ -394,13 +400,13 @@
   (let [input "@/"]
     (is (valid? input))
     (is (roundtrip input))))
-;(is (clear input)))))
+
 
 (deftest anonymous-function
   (let [input "#(= (str %1 %2 %&))"]
     (is (valid? input))
     (is (roundtrip input))))
-;(is (clear input)))))
+
 
 (deftest namespaced-map
   (let [input "#::{:a 1 b 3}"]
@@ -410,7 +416,7 @@
   (let [input "#::hello{:a 1 b 3}"]
     (is (valid? input))
     (is (roundtrip input))))
-;(is (clear input)))))
+
 
 (deftest reader-conditional-macro
   (let [input "#?(:clj Double/NaN :cljs js/NaN :default nil)"]
@@ -421,10 +427,12 @@
     (is (valid? input))
     (is (roundtrip input))))
 
+
 (deftest whitespace
   (let [input "(defmacro x [a] `   #'  ~  '  a)"]
     (is (valid? input))
     (is (roundtrip input))))
+
 
 (deftest eval-macro
   (let [input "#=  (inc 1)"]
@@ -433,6 +441,7 @@
   (let [input "#=inc"]
     (is (valid? input))
     (is (roundtrip input))))
+
 
 (deftest symbolic
   (let [input "##Inf"]
@@ -457,33 +466,29 @@
   (testing "parcera should be able to parse itself"
     (let [input (slurp "./src/clojure/parcera/core.cljc")]
       (is (valid? input))
-      (is (roundtrip input)))
-    ;(is (clear input))))
-    (let [input (slurp "./src/clojure/parcera/slurp.cljc")]
-      (is (valid? input))
       (is (roundtrip input))))
-  ;(is (clear input)))))
 
   (testing "parcera should be able to parse its own test suite"
-    (let [input (slurp "./test/parcera/test/core.cljc")]
+    (let [input (slurp "./test/parcera/test_cases.cljc")]
       (is (valid? input))
       (is (roundtrip input)))
-    ;(is (clear input))))
-    (let [input (slurp "./test/parcera/test/benchmark.clj")]
+    (let [input (slurp "./test/parcera/benchmark.clj")]
+      (is (valid? input))
+      (is (roundtrip input)))
+    (let [input (slurp "./test/parcera/slurp.cljc")]
       (is (valid? input))
       (is (roundtrip input)))))
-;(is (clear input))))))
 
+(defonce clojure (slurp "https://raw.githubusercontent.com/clojure/clojure/master/src/clj/clojure/core.clj"))
+(defonce clojure$script (slurp "https://raw.githubusercontent.com/clojure/clojurescript/master/src/main/clojure/cljs/core.cljc"))
 
-(deftest clojure$cript
+(deftest clojure$cript-bootstrap
 
   (testing "parcera should be able to parse clojure core"
-    (let [core-content (slurp "https://raw.githubusercontent.com/clojure/clojure/master/src/clj/clojure/core.clj")]
-      (time (is (= core-content (parcera/code (parcera/ast core-content :optimize :memory)))))))
+    (time (is (= clojure (parcera/code (parcera/ast clojure))))))
 
   (testing "parcera should be able to parse clojurescript core"
-    (let [core-content (slurp "https://raw.githubusercontent.com/clojure/clojurescript/master/src/main/clojure/cljs/core.cljc")]
-      (time (is (= core-content (parcera/code (parcera/ast core-content :optimize :memory))))))))
+    (time (is (= clojure$script (parcera/code (parcera/ast clojure$script)))))))
 
 
 ;; when in doubt enable the test below. I parses clojure reader test suite so, if we

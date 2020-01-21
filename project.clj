@@ -1,5 +1,5 @@
-(defproject carocad/parcera "0.10.2"
-  :description "Grammar-based Clojure parser"
+(defproject carocad/parcera "0.11.0"
+  :description "Grammar-based Clojure(script) parser"
   :url "https://github.com/carocad/parcera"
   :license {:name "LGPLv3"
             :url  "https://github.com/carocad/parcera/blob/master/LICENSE.md"}
@@ -8,14 +8,22 @@
   :javac-options ["-target" "1.8" "-source" "1.8"]
   :dependencies [[org.clojure/clojure "1.10.1"]]
   :profiles {:dev      {:dependencies   [[criterium/criterium "0.4.5"] ;; benchmark
-                                         [org.clojure/test.check "0.10.0"]] ;; generative testing
-                        :plugins        [[jonase/eastwood "0.3.5"] ;; linter
-                                         ;; java reloader
-                                         [lein-virgil "0.1.9"]]
+                                         [org.clojure/test.check "0.10.0"] ;; generative testing
+                                         ;; https://github.com/bhauman/figwheel-main/issues/161
+                                         [com.bhauman/figwheel-main "0.2.0"]] ;; cljs repl
+                        :plugins        [[jonase/eastwood "0.3.5"]] ;; linter
+                        ;; java reloader
+                        ;[lein-virgil "0.1.9"]]
                         :resource-paths ["target"]
                         :clean-targets  ^{:protect false} ["target"]}
 
-             :provided {:dependencies [[org.antlr/antlr4-runtime "4.7.1"]]}}
+             :provided {:dependencies [[org.clojure/clojurescript "1.10.597"]
+                                       [org.antlr/antlr4-runtime "4.7.1"]]}}
+
+  :aliases {"test-runner" ["trampoline" "run"
+                           "-m" "figwheel.main"
+                           "-co" "tests.cljs.edn"
+                           "-m" "parcera.test-runner"]}
 
   :test-selectors {:default     (fn [m] (not (some #{:benchmark} (keys m))))
                    :benchmark   :benchmark}

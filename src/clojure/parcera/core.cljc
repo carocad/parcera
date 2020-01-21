@@ -1,14 +1,11 @@
 (ns parcera.core
-  (:require [clojure.core.protocols :as clojure]
-            #?(:clj [parcera.antlr.java :as platform]))
-  ; todo: re-enable once we have javscript support
-  ;:cljs [parcera.antlr.javascript :as platform]))
+  (:require [#?(:clj  parcera.antlr.java
+                :cljs parcera.antlr.javascript) :as platform])
   #?(:cljs (:import goog.string.StringBuffer)))
 
 
 (def default-hidden {:tags     #{:form :collection :literal
-                                 :reader_macro :dispatch :input
-                                 :keyword}
+                                 :reader_macro :dispatch :input}
                      :literals #{"(" ")"
                                  "[" "]"
                                  "{" "}"
@@ -25,14 +22,13 @@
   Yields a lazy sequence to avoid expensive computation whenever
   the user is not interested in the full content."
   [tree rule-names hide-tags hide-literals]
-  (let [node (clojure/datafy tree)]
+  (let [node (platform/datafy tree)]
     (case (:type node)
       ::rule
       (let [rule     (get rule-names (:rule-id node))
-            children (for [child (:content node)
-                           :let [child (hiccup child rule-names hide-tags hide-literals)]
-                           :when (not (nil? child))]
-                       child)]
+            children (sequence (comp (map #(hiccup % rule-names hide-tags hide-literals))
+                                     (remove nil?))
+                               (:content node))]
         (if (contains? hide-tags rule)
           ;; parcera hidden tags are always "or" statements, so just take the single children
           (first children)
@@ -109,7 +105,7 @@
         (. string-builder (append "}")))
 
     (:number :whitespace :comment :symbol :character :string
-      :simple_keyword :macro_keyword)
+      :keyword :macro_keyword)
     (. string-builder (append (second ast)))
 
 
@@ -178,7 +174,7 @@
     (do (. string-builder (append "@"))
         (doseq [child (rest ast)] (code* child string-builder)))
 
-    :function
+    :fn
     (do (. string-builder (append "#"))
         (doseq [child (rest ast)] (code* child string-builder)))
 

@@ -16,7 +16,8 @@ pom.xml.asc
 /node_modules/
 /out/
 /src/java/
-/src/javascript
 /figwheel_server.log
 package*.json
 /.eastwood
+pom.xml
+/src/clojure/parcera/antlr/js/
