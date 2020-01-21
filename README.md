@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.com/carocad/parcera.svg?branch=master)](https://travis-ci.com/carocad/parcera)
 [![Clojars Project](https://img.shields.io/clojars/v/carocad/parcera.svg)](https://clojars.org/carocad/parcera)
 
-Grammar-based Clojure parser.
+Grammar-based Clojure(script) parser.
 
 Parcera can safely read any Clojure file without any code evaluation.
 
@@ -12,8 +12,15 @@ parsing engine and focuses on the grammar definition instead.
 
 ## usage
 
-Add `[org.antlr/antlr4-runtime "4.7.1"]` to your dependencies in addition to parcera. Parcera assumes that
-this dependency will be in the classpath to avoid collisions.
+- Java
+
+Add `[org.antlr/antlr4-runtime "4.7.1"]` to your dependencies in addition to parcera. 
+This is to avoid adding an unnecessary dependency for the JavaScript users.
+
+- Javascript
+
+All necessary files are delivered with parcera. However, currently only Browser support
+has been tested. 
 
 ```clojure
 (ns example.core

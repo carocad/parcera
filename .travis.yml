@@ -46,7 +46,6 @@ jobs:
         - npm init --yes && npm add webpack webpack-cli antlr4
         - npx webpack --config ./resources/webpack.config.js
         - lein do javac, compile, check
-        # todo: include js in out jar
       deploy:
         - provider: script
           script: lein deploy clojars
