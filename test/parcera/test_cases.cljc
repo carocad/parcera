@@ -486,12 +486,12 @@
 
   (testing "parcera should be able to parse clojure core"
     (let [code (parcera/ast clojure)]
-      (is (parcera/failure? code))
+      (is (not (parcera/failure? code)))
       (time (is (= clojure (parcera/code code))))))
 
   (testing "parcera should be able to parse clojurescript core"
     (let [code (parcera/ast clojure$script)]
-      (is (parcera/failure? code))
+      (is (not (parcera/failure? code)))
       (time (is (= clojure$script (parcera/code code)))))))
 
 
