@@ -486,14 +486,13 @@
 
   (testing "parcera should be able to parse clojure core"
     (let [code (parcera/ast clojure)]
-      (is (not (parcera/failure? code)))
-      (time (is (= clojure (parcera/code code))))))
+      (time (is (= clojure (parcera/code code))))
+      (is (not (parcera/failure? code)))))
 
   (testing "parcera should be able to parse clojurescript core"
     (let [code (parcera/ast clojure$script)]
-      (is (not (parcera/failure? code)))
-      (time (is (= clojure$script (parcera/code code)))))))
-
+      (time (is (= clojure$script (parcera/code code))))
+      (is (not (parcera/failure? code))))))
 
 ;; when in doubt enable the test below. I parses clojure reader test suite so, if we
 ;; expect something to work it probably will be tested there.
