@@ -485,11 +485,14 @@
 (deftest clojure$cript-bootstrap
 
   (testing "parcera should be able to parse clojure core"
-    (time (is (= clojure (parcera/code (parcera/ast clojure))))))
+    (let [code (parcera/ast clojure)]
+      (time (is (= clojure (parcera/code code))))
+      (is (not (parcera/failure? code)))))
 
   (testing "parcera should be able to parse clojurescript core"
-    (time (is (= clojure$script (parcera/code (parcera/ast clojure$script)))))))
-
+    (let [code (parcera/ast clojure$script)]
+      (time (is (= clojure$script (parcera/code code))))
+      (is (not (parcera/failure? code))))))
 
 ;; when in doubt enable the test below. I parses clojure reader test suite so, if we
 ;; expect something to work it probably will be tested there.

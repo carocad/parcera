@@ -68,6 +68,8 @@ metadata: ((metadata_entry | deprecated_metadata_entry) whitespace?)+
           | namespaced_map
           | tag
           | fn
+          | unquote
+          | unquote_splicing
           );
 
 metadata_entry: '^' ( map | symbol | string | keyword | macro_keyword );
