@@ -58,7 +58,7 @@ has been tested.
 
 - Babashka
 
-Check out [babashka's pod for parcera](https://github.com/babashka/pod-babashka-parcera). Made by @borkdude 
+Check out [babashka's pod for parcera](https://github.com/babashka/pod-babashka-parcera). Made by [@borkdude](https://github.com/borkdude)
 
 ## contributing
 
