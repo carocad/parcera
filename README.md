@@ -10,6 +10,8 @@ Parcera can safely read any Clojure file without any code evaluation.
 Parcera uses the wonderful [Antlr4](https://github.com/antlr/antlr4/) as its
 parsing engine and focuses on the grammar definition instead.
 
+If you are interested in the grammar definition check [Clojure.g4](./src/Clojure.g4).
+
 ## usage
 
 - Java
@@ -54,7 +56,9 @@ has been tested.
 ;; "ns"
 ```
 
-If you are interested in the grammar definition check [Clojure.g4](./src/Clojure.g4).
+- Babashka
+
+Check out [babashka's pod for parcera](https://github.com/babashka/pod-babashka-parcera). Made by @borkdude 
 
 ## contributing
 
