@@ -12,7 +12,7 @@ parsing engine and focuses on the grammar definition instead.
 
 If you are interested in the grammar definition check [Clojure.g4](./src/Clojure.g4).
 
-## usage
+## setup
 
 - Java
 
@@ -23,6 +23,12 @@ This is to avoid adding an unnecessary dependency for the JavaScript users.
 
 All necessary files are delivered with parcera. However, currently only Browser support
 has been tested. 
+
+- Babashka
+
+Check out [babashka's pod for parcera](https://github.com/babashka/pod-babashka-parcera). Made by [@borkdude](https://github.com/borkdude)
+
+## usage
 
 ```clojure
 (ns example.core
@@ -56,9 +62,7 @@ has been tested.
 ;; "ns"
 ```
 
-- Babashka
-
-Check out [babashka's pod for parcera](https://github.com/babashka/pod-babashka-parcera). Made by [@borkdude](https://github.com/borkdude)
+For more documentation check out [cljdoc](https://cljdoc.org/d/carocad/parcera/0.11.1/doc/readme).
 
 ## contributing
 
