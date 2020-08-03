@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.com/carocad/parcera.svg?branch=master)](https://travis-ci.com/carocad/parcera)
 [![Clojars Project](https://img.shields.io/clojars/v/carocad/parcera.svg)](https://clojars.org/carocad/parcera)
+[![CljDoc](https://cljdoc.org/badge/carocad/parcera)](https://cljdoc.org/badge/carocad/parcera)
 
 Grammar-based Clojure(script) parser.
 
@@ -61,8 +62,6 @@ Check out [babashka's pod for parcera](https://github.com/babashka/pod-babashka-
 (parcera/code [:symbol "ns"])
 ;; "ns"
 ```
-
-For more documentation check out [cljdoc](https://cljdoc.org/d/carocad/parcera/0.11.1/doc/readme).
 
 ## contributing
 
