@@ -279,7 +279,17 @@
     (is (valid? input))
     (is (roundtrip input)))
   (let [input "#_#_ :a"]
-    (is (not (valid? input)))))
+    (is (not (valid? input))))
+  (let [input "#_
+                  ;; hello
+                  #_
+                      ;; world
+                      :hello
+                  true
+              ;; hey
+              \"jo\""]
+    (is (valid? input))
+    (is (roundtrip input))))
 
 
 (deftest regex
@@ -313,6 +323,9 @@
     (is (roundtrip input)))
   (let [input "#! invalid { input '"]
     (is (valid? input))
+    (is (roundtrip input)))
+  (let [input "^{:a true} ;; hello\n #_ :hello [:a]"]
+    (is (valid? input))
     (is (roundtrip input))))
 
 
@@ -322,6 +335,9 @@
     (is (roundtrip input)))
   ;(is (clear input))))
   (let [input "#'/"]
+    (is (valid? input))
+    (is (roundtrip input)))
+  (let [input "#' #_ :hello str"]
     (is (valid? input))
     (is (roundtrip input))))
 
@@ -347,6 +363,9 @@
   ;(is (clear input))))
   (let [input "'/"]
     (is (valid? input))
+    (is (roundtrip input)))
+  (let [input "' #_ :hello (str \"world\")"]
+    (is (valid? input))
     (is (roundtrip input))))
 
 
@@ -360,6 +379,9 @@
     (is (roundtrip input)))
   ;(is (clear input))))
   (let [input "`/"]
+    (is (valid? input))
+    (is (roundtrip input)))
+  (let [input "` #_ :hello (str \"world\")"]
     (is (valid? input))
     (is (roundtrip input))))
 
@@ -415,6 +437,9 @@
   ;(is (clear input))))
   (let [input "#::hello{:a 1 b 3}"]
     (is (valid? input))
+    (is (roundtrip input)))
+  (let [input "::platform #_ :world #_rofl {:hello true}"]
+    (is (valid? input))
     (is (roundtrip input))))
 
 
@@ -439,6 +464,9 @@
     (is (valid? input))
     (is (roundtrip input)))
   (let [input "#=inc"]
+    (is (valid? input))
+    (is (roundtrip input)))
+  (let [input "#= #_true #_ :hello (println 3)"]
     (is (valid? input))
     (is (roundtrip input))))
 
