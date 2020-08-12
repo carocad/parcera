@@ -5,7 +5,8 @@
 
 
 (def default-hidden {:tags     #{:form :collection :literal
-                                 :reader_macro :dispatch :input}
+                                 :reader_macro :dispatch :input
+                                 :ignore}
                      :literals #{"(" ")"
                                  "[" "]"
                                  "{" "}"
