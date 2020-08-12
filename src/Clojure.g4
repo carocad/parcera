@@ -19,7 +19,9 @@ grammar Clojure;
 code: input* EOF;
 
 // useful rule to differentiate actual clojure content from anything else
-input: whitespace | comment | discard | form ;
+input: ignore | form ;
+
+ignore: whitespace | comment | discard;
 
 form: literal | collection | reader_macro;
 
@@ -61,7 +63,7 @@ reader_macro: ( unquote
               | deref
               );
 
-metadata: ((metadata_entry | deprecated_metadata_entry) whitespace?)+
+metadata: ((metadata_entry | deprecated_metadata_entry) ignore*)+
           ( symbol
           | collection
           | set
@@ -83,15 +85,15 @@ metadata_entry: '^' ( map | symbol | string | keyword | macro_keyword );
  */
 deprecated_metadata_entry: '#^' ( map | symbol | string | keyword | macro_keyword );
 
-backtick: '`' whitespace? form;
+backtick: '`' ignore* form;
 
-quote: '\'' whitespace? form;
+quote: '\'' ignore* form;
 
-unquote: '~' whitespace? form;
+unquote: '~' ignore* form;
 
-unquote_splicing: '~@' whitespace? form;
+unquote_splicing: '~@' ignore* form;
 
-deref: '@' whitespace? form;
+deref: '@' ignore* form;
 
 dispatch: ( fn
           | regex
@@ -112,20 +114,20 @@ regex: '#' STRING;
 set: '#{' input* '}'; // no whitespace allowed
 
 namespaced_map: '#' (keyword | macro_keyword | auto_resolve)
-                    whitespace?
+                    ignore*
                     map;
 
 auto_resolve: '::';
 
-var_quote: '#\'' whitespace? form;
+var_quote: '#\'' ignore* form;
 
-discard: '#_' (whitespace? discard)? whitespace? form;
+discard: '#_' ignore* form;
 
-tag: '#' symbol whitespace? (literal | collection | tag);
+tag: '#' symbol ignore* (literal | collection | tag);
 
-conditional: '#?' whitespace? list;
+conditional: '#?' ignore* list;
 
-conditional_splicing: '#?@' whitespace? list;
+conditional_splicing: '#?@' ignore* list;
 
 /* This definition allows arbitrary symbolic values; following
  * on LispReader to just read the form and throw if the symbol
@@ -135,7 +137,7 @@ symbolic: '##' SYMBOL;
 
 // I assume symbol and list from lisp reader, but tools.reader seems to
 // indicate something else
-eval: '#=' whitespace? (symbol | list);
+eval: '#=' ignore* (symbol | list);
 
 whitespace: WHITESPACE;
 
