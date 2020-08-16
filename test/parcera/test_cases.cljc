@@ -282,7 +282,7 @@
     (valid? input)
     (roundtrip input))
   (let [input "#_#_ :a"]
-    (is (not (valid? input))))
+    (is (parcera/failure? (parcera/ast input))))
   (let [input "#_
                   ;; hello
                   #_
@@ -496,7 +496,7 @@
 
 (deftest EOF
   (let [input ":hello \"  "]
-    (is (not (valid? input)))))
+    (is (parcera/failure? (parcera/ast input)))))
 ;(is (clear input))))))
 
 
