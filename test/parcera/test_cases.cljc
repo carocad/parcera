@@ -5,7 +5,7 @@
             [clojure.test.check.properties :as prop]
             [clojure.test.check :as tc]
             [parcera.core :as parcera]
-            #?(:cljs [parcera.macros :refer [slurp]])))
+            [parcera.macros :refer [slurp*]]))
 
 
 (defn- nested?
@@ -503,23 +503,23 @@
 (deftest bootstrap
 
   (testing "parcera should be able to parse itself"
-    (let [input (slurp "./src/clojure/parcera/core.cljc")]
+    (let [input (slurp* "./src/clojure/parcera/core.cljc")]
       (valid? input)
       (roundtrip input)))
 
   (testing "parcera should be able to parse its own test suite"
-    (let [input (slurp "./test/parcera/test_cases.cljc")]
+    (let [input (slurp* "./test/parcera/test_cases.cljc")]
       (valid? input)
       (roundtrip input))
-    (let [input (slurp "./test/parcera/benchmark.clj")]
+    (let [input (slurp* "./test/parcera/benchmark.clj")]
       (valid? input)
       (roundtrip input))
-    (let [input (slurp "./test/parcera/macros.cljc")]
+    (let [input (slurp* "./test/parcera/macros.cljc")]
       (valid? input)
       (roundtrip input))))
 
-(defonce clojure (slurp "https://raw.githubusercontent.com/clojure/clojure/master/src/clj/clojure/core.clj"))
-(defonce clojure$script (slurp "https://raw.githubusercontent.com/clojure/clojurescript/master/src/main/clojure/cljs/core.cljc"))
+(def clojure (slurp* "https://raw.githubusercontent.com/clojure/clojure/master/src/clj/clojure/core.clj"))
+(def clojure$script (slurp* "https://raw.githubusercontent.com/clojure/clojurescript/master/src/main/clojure/cljs/core.cljc"))
 
 (deftest clojure$cript-bootstrap
 
@@ -536,7 +536,7 @@
 ;; when in doubt enable the test below. I parses clojure reader test suite so, if we
 ;; expect something to work it probably will be tested there.
 #_(testing "parcera should be able to parse clojurescript core"
-    (let [core-content (slurp "https://raw.githubusercontent.com/clojure/clojure/master/test/clojure/test_clojure/reader.cljc")]
+    (let [core-content (slurp* "https://raw.githubusercontent.com/clojure/clojure/master/test/clojure/test_clojure/reader.cljc")]
       (for [form (tree-seq seq? seq (parcera/ast core-content :optimize :memory))
             :when (coll? form)
             :when (contains? #{::parcera/failure} (first form))]

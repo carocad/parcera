@@ -3,5 +3,5 @@
   #?(:clj (:refer-clojure :exclude [slurp]))
   #?(:cljs (:require-macros [parcera.macros])))
 
-#?(:clj (defmacro slurp [file]
+#?(:clj (defmacro slurp* [file]
           (clojure.core/slurp file)))
