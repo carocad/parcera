@@ -2,7 +2,8 @@
   "Some of our tests use `slurp`, which ClojureScript lacks"
   #?(:cljs (:require-macros [parcera.macros]))
   (:require [parcera.core :as parcera]
-            [clojure.test :refer [is]]))
+            #?(:clj  [clojure.test :refer [is]]
+               :cljs [cljs.test :refer-macros [is]])))
 
 
 #?(:clj
