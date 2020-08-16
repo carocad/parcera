@@ -5,7 +5,7 @@
             [clojure.test.check.properties :as prop]
             [clojure.test.check :as tc]
             [parcera.core :as parcera]
-            #?(:cljs [parcera.slurp :refer [slurp]])))
+            [parcera.macros :refer [slurp* roundtrip valid?]]))
 
 
 (defn- nested?
@@ -30,17 +30,6 @@
          (<= (:column start) (:column (first starts)))
          (<= (:row end) (:row (last ends)))
          (<= (:column end) (:column (last ends))))))
-
-
-(defmacro roundtrip
-  "checks parcera can parse and write back the exact same input code"
-  [input]
-  `(is (= ~input (parcera/code (parcera/ast ~input)))))
-
-
-(defmacro valid?
-  [input]
-  `(is (not (parcera/failure? (parcera/ast ~input)))))
 
 
 (def validity
@@ -503,23 +492,23 @@
 (deftest bootstrap
 
   (testing "parcera should be able to parse itself"
-    (let [input (slurp "./src/clojure/parcera/core.cljc")]
+    (let [input (slurp* "./src/clojure/parcera/core.cljc")]
       (valid? input)
       (roundtrip input)))
 
   (testing "parcera should be able to parse its own test suite"
-    (let [input (slurp "./test/parcera/test_cases.cljc")]
+    (let [input (slurp* "./test/parcera/test_cases.cljc")]
       (valid? input)
       (roundtrip input))
-    (let [input (slurp "./test/parcera/benchmark.clj")]
+    (let [input (slurp* "./test/parcera/benchmark.clj")]
       (valid? input)
       (roundtrip input))
-    (let [input (slurp "./test/parcera/slurp.cljc")]
+    (let [input (slurp* "./test/parcera/slurp.cljc")]
       (valid? input)
       (roundtrip input))))
 
-(defonce clojure (slurp "https://raw.githubusercontent.com/clojure/clojure/master/src/clj/clojure/core.clj"))
-(defonce clojure$script (slurp "https://raw.githubusercontent.com/clojure/clojurescript/master/src/main/clojure/cljs/core.cljc"))
+(defonce clojure (slurp* "https://raw.githubusercontent.com/clojure/clojure/master/src/clj/clojure/core.clj"))
+(defonce clojure$script (slurp* "https://raw.githubusercontent.com/clojure/clojurescript/master/src/main/clojure/cljs/core.cljc"))
 
 (deftest clojure$cript-bootstrap
 
