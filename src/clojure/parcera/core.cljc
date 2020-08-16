@@ -123,18 +123,15 @@
     (. string-builder (append "::"))
 
     :metadata
-    (do (doseq [child (rest (butlast ast))] (code* child string-builder))
-        (code* (last ast) string-builder))
+    (do (doseq [child (rest ast)] (code* child string-builder)))
 
     :metadata_entry
-    (doseq [child (rest ast)]
-      (. string-builder (append "^"))
-      (code* child string-builder))
+    (do (. string-builder (append "^"))
+        (doseq [child (rest ast)] (code* child string-builder)))
 
     :deprecated_metadata_entry
-    (doseq [child (rest ast)]
-      (. string-builder (append "#^"))
-      (code* child string-builder))
+    (do (. string-builder (append "#^"))
+        (doseq [child (rest ast)] (code* child string-builder)))
 
     :quote
     (do (. string-builder (append "'"))
