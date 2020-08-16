@@ -5,7 +5,7 @@
             [clojure.test.check.properties :as prop]
             [clojure.test.check :as tc]
             [parcera.core :as parcera]
-            [parcera.macros :refer [slurp*]]))
+            [parcera.macros :refer [slurp* roundtrip valid?]]))
 
 
 (defn- nested?
@@ -30,17 +30,6 @@
          (<= (:column start) (:column (first starts)))
          (<= (:row end) (:row (last ends)))
          (<= (:column end) (:column (last ends))))))
-
-
-(defmacro roundtrip
-  "checks parcera can parse and write back the exact same input code"
-  [input]
-  `(is (= ~input (parcera/code (parcera/ast ~input)))))
-
-
-(defmacro valid?
-  [input]
-  `(is (not (parcera/failure? (parcera/ast ~input)))))
 
 
 (def validity
