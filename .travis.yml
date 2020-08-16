@@ -33,6 +33,7 @@ jobs:
         - npm init --yes && npm add webpack webpack-cli antlr4
         - npx webpack --config ./resources/webpack.config.js
         - lein test-runner
+        - git rev-parse --short HEAD # todo: remove me
 
     - stage: Release
       if: tag IS present
