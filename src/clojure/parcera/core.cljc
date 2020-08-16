@@ -112,7 +112,8 @@
 
     :symbolic
     (do (. string-builder (append "##"))
-        (. string-builder (append (second ast))))
+        (doseq [child (rest (butlast ast))] (code* child string-builder))
+        (. string-builder (append (last ast))))
 
     :regex
     (do (. string-builder (append "#"))
