@@ -507,8 +507,8 @@
       (valid? input)
       (roundtrip input))))
 
-(defonce clojure (slurp* "https://raw.githubusercontent.com/clojure/clojure/master/src/clj/clojure/core.clj"))
-(defonce clojure$script (slurp* "https://raw.githubusercontent.com/clojure/clojurescript/master/src/main/clojure/cljs/core.cljc"))
+(def clojure (slurp* "https://raw.githubusercontent.com/clojure/clojure/master/src/clj/clojure/core.clj"))
+(def clojure$script (slurp* "https://raw.githubusercontent.com/clojure/clojurescript/master/src/main/clojure/cljs/core.cljc"))
 
 (deftest clojure$cript-bootstrap
 
