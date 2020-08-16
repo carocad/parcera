@@ -32,15 +32,15 @@
          (<= (:column end) (:column (last ends))))))
 
 
-(defn- roundtrip
+(defmacro roundtrip
   "checks parcera can parse and write back the exact same input code"
   [input]
-  (= input (parcera/code (parcera/ast input))))
+  `(is (= ~input (parcera/code (parcera/ast ~input)))))
 
 
-(defn- valid?
+(defmacro valid?
   [input]
-  (not (parcera/failure? (parcera/ast input))))
+  `(is (not (parcera/failure? (parcera/ast ~input)))))
 
 
 (def validity
@@ -87,42 +87,42 @@
 
 (deftest character-literals
   (let [input "\\t"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;(is (clear input))))
   (let [input "\\n"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;(is (clear input))))
   (let [input "\\r"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;(is (clear input))))
   (let [input "\\a"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;(is (clear input))))
   (let [input "\\é"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;(is (clear input))))
   (let [input "\\ö"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;(is (clear input))))
   (let [input "\\ï"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;(is (clear input))))
   (let [input "\\ϕ"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   (let [input "\ua000"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   (let [input "\u000a"]
-    (is (valid? input))
-    (is (roundtrip input))))
+    (valid? input)
+    (roundtrip input)))
 
 
 (deftest AST-metadata
@@ -138,40 +138,40 @@
 
 (deftest symbols
   (let [input "foo"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;(is (clear input))))
   (let [input "foo-bar"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;(is (clear input))))
   (let [input "foo->bar"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;(is (clear input))))
   (let [input "->"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;(is (clear input))))
   (let [input "->as"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;(is (clear input))))
   (let [input "föl"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;(is (clear input))))
   (let [input "Öl"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;(is (clear input))))
   (let [input "ϕ"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;(is (clear input))))
   (let [input "❤️"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   #_(let [input "hello/world/"]
       (is (not (valid? input))))
   #_(let [input ":hello/world/"]
@@ -183,104 +183,104 @@
 (deftest tag-literals
   ;; nested tag literals
   (let [input "#a #b 1"]
-    (is (valid? input))))
+    (valid? input)))
 
 
 (deftest keywords
   ;; a keyword can be a simple number because its first character is : which is
   ;; NOT a number ;)
   (let [input ":1"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   (let [input ":/"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   (let [input "::/"]
-    (is (not (valid? input))))
+    (is (parcera/failure? (parcera/ast input))))
   (let [input "::hello/world [1 a \"3\"]"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   (let [input "::hello"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   (let [input ":#hello"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;; this is NOT a valid literal keyword but it is "supported" by the current
   ;; reader
   (let [input ":http://www.department0.university0.edu/GraduateCourse52"]
-    (is (valid? input))
-    (is (roundtrip input))))
+    (valid? input)
+    (roundtrip input)))
 
 
 (deftest numbers
   (let [input "0x1f"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   (let [input "2r101010"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   (let [input "8r52"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   (let [input "36r16"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   (let [input "22/7"]
-    (is (valid? input))
-    (is (roundtrip input))))
+    (valid? input)
+    (roundtrip input)))
 
 
 (deftest metadata
   (let [input "^String [a b 2]"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   (let [input "^\"String\" [a b 2]"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   (let [input "^:string [a b 2]"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   (let [input "^{:a 1} [a b 2]"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   (let [input "^:hello ^\"World\" ^{:a 1} [a b 2]"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;; DEPRECATED meta data macro style
   (let [input "(meta #^{:a 10} #^String {})"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   (let [input "^
         #_ :a
         {:a true}
         ;; hello
         #^ #_ hello :world
         [:a]"]
-    (is (valid? input))
-    (is (roundtrip input))))
+    (valid? input)
+    (roundtrip input)))
 
 
 (deftest discard
   (let [input "#_[a b 2]"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;(is (clear input))))
   (let [input "#_(a b 2)"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;(is (clear input))))
   (let [input "#_{:a 1}"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;(is (clear input))))
   (let [input "#_macros"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;; discard statements can be "nested"
   (let [input "#_#_:a :b"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   (let [input "#_#_ :a"]
     (is (not (valid? input))))
   (let [input "#_
@@ -291,206 +291,206 @@
                   true
               ;; hey
               \"jo\""]
-    (is (valid? input))
-    (is (roundtrip input))))
+    (valid? input)
+    (roundtrip input)))
 
 
 (deftest regex
   (let [input "#_\"[a b 2]\""]
-    (is (valid? input))
-    (is (roundtrip input))))
+    (valid? input)
+    (roundtrip input)))
 
 
 (deftest comments
   (let [input "{:hello ;2}
                  2}"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   (let [input ";[a b 2]"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;(is (clear input))))
   (let [input ";; \"[a b 2]\""]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;(is (clear input))))
   (let [input "2 ;[a b 2]"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;(is (clear input))))
   (let [input " :hello ;; \"[a b 2]\""]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   (let [input " :hello #! \"[a b 2]\""]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   (let [input "#! invalid { input '"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   (let [input "^{:a true} ;; hello
                           #_ :hello
                           [:a]"]
-    (is (valid? input))
-    (is (roundtrip input))))
+    (valid? input)
+    (roundtrip input)))
 
 
 (deftest var-quote
   (let [input "#'hello/world"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;(is (clear input))))
   (let [input "#'/"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   (let [input "#' #_ :hello str"]
-    (is (valid? input))
-    (is (roundtrip input))))
+    (valid? input)
+    (roundtrip input)))
 
 
 (deftest tag
   (let [input "#hello/world [1 a \"3\"]"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;(is (clear input))))
   (let [input "#hello/world {1 \"3\"}"]
-    (is (valid? input))
-    (is (roundtrip input))))
+    (valid? input)
+    (roundtrip input)))
 
 
 (deftest quote
   (let [input "'hello/world"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;(is (clear input))))
   (let [input "'hello"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;(is (clear input))))
   (let [input "'/"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   (let [input "' #_ :hello (str \"world\")"]
-    (is (valid? input))
-    (is (roundtrip input))))
+    (valid? input)
+    (roundtrip input)))
 
 
 (deftest backtick
   (let [input "`hello/world"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;(is (clear input))))
   (let [input "`hello"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;(is (clear input))))
   (let [input "`/"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   (let [input "` #_ :hello (str \"world\")"]
-    (is (valid? input))
-    (is (roundtrip input))))
+    (valid? input)
+    (roundtrip input)))
 
 
 (deftest unquote-macro
   (let [input "~hello/world"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;(is (clear input))))
   (let [input "~(hello 2 3)"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;(is (clear input))))
   (let [input "~/"]
-    (is (valid? input))
-    (is (roundtrip input))))
+    (valid? input)
+    (roundtrip input)))
 
 
 (deftest quote-splicing
   (let [input "~@hello/world"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;(is (clear input))))
   (let [input "~@(hello 2 b)"]
-    (is (valid? input))
-    (is (roundtrip input))))
+    (valid? input)
+    (roundtrip input)))
 
 
 (deftest deref-macro
   (let [input "@hello/world"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;(is (clear input))))
   (let [input "@hello"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;(is (clear input))))
   (let [input "@/"]
-    (is (valid? input))
-    (is (roundtrip input))))
+    (valid? input)
+    (roundtrip input)))
 
 
 (deftest anonymous-function
   (let [input "#(= (str %1 %2 %&))"]
-    (is (valid? input))
-    (is (roundtrip input))))
+    (valid? input)
+    (roundtrip input)))
 
 
 (deftest namespaced-map
   (let [input "#::{:a 1 b 3}"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;(is (clear input))))
   (let [input "#::hello{:a 1 b 3}"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   (let [input "::platform #_ :world #_rofl {:hello true}"]
-    (is (valid? input))
-    (is (roundtrip input))))
+    (valid? input)
+    (roundtrip input)))
 
 
 (deftest reader-conditional-macro
   (let [input "#?(:clj Double/NaN :cljs js/NaN :default nil)"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;(is (clear input))))
   (let [input "[1 2 #?@(:clj [3 4] :cljs [5 6])]"]
-    (is (valid? input))
-    (is (roundtrip input))))
+    (valid? input)
+    (roundtrip input)))
 
 
 (deftest whitespace
   (let [input "(defmacro x [a] `   #'  ~  '  a)"]
-    (is (valid? input))
-    (is (roundtrip input))))
+    (valid? input)
+    (roundtrip input)))
 
 
 (deftest eval-macro
   (let [input "#=  (inc 1)"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   (let [input "#=inc"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   (let [input "#= #_true #_ :hello (println 3)"]
-    (is (valid? input))
-    (is (roundtrip input))))
+    (valid? input)
+    (roundtrip input)))
 
 
 (deftest symbolic
   (let [input "##Inf"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   (let [input "##-Inf"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   ;; symbolic names are valid symbols
   (let [input "Inf"]
-    (is (valid? input))
-    (is (roundtrip input)))
+    (valid? input)
+    (roundtrip input))
   (let [input "## #_ hello
                   ;; world
                   Inf"]
-    (is (valid? input))
+    (valid? input)
     (is (= input (parcera/code (parcera/ast input))))))
 
 
@@ -504,19 +504,19 @@
 
   (testing "parcera should be able to parse itself"
     (let [input (slurp "./src/clojure/parcera/core.cljc")]
-      (is (valid? input))
-      (is (roundtrip input))))
+      (valid? input)
+      (roundtrip input)))
 
   (testing "parcera should be able to parse its own test suite"
     (let [input (slurp "./test/parcera/test_cases.cljc")]
-      (is (valid? input))
-      (is (roundtrip input)))
+      (valid? input)
+      (roundtrip input))
     (let [input (slurp "./test/parcera/benchmark.clj")]
-      (is (valid? input))
-      (is (roundtrip input)))
+      (valid? input)
+      (roundtrip input))
     (let [input (slurp "./test/parcera/slurp.cljc")]
-      (is (valid? input))
-      (is (roundtrip input)))))
+      (valid? input)
+      (roundtrip input))))
 
 (defonce clojure (slurp "https://raw.githubusercontent.com/clojure/clojure/master/src/clj/clojure/core.clj"))
 (defonce clojure$script (slurp "https://raw.githubusercontent.com/clojure/clojurescript/master/src/main/clojure/cljs/core.cljc"))
