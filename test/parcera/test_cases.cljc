@@ -514,7 +514,7 @@
     (let [input (slurp "./test/parcera/benchmark.clj")]
       (valid? input)
       (roundtrip input))
-    (let [input (slurp "./test/parcera/slurp.cljc")]
+    (let [input (slurp "./test/parcera/macros.cljc")]
       (valid? input)
       (roundtrip input))))
 
