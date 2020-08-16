@@ -4,9 +4,10 @@
   (:require [parcera.core :as parcera]
             [clojure.test :refer [is]]))
 
+
 #?(:clj
    (defmacro slurp* [file]
-     `(clojure.core/slurp ~file)))
+     (clojure.core/slurp file)))
 
 #?(:clj
    (defmacro roundtrip
