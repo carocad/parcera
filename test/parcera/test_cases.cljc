@@ -235,27 +235,30 @@
   (let [input "^String [a b 2]"]
     (is (valid? input))
     (is (roundtrip input)))
-  ;(is (clear input))))
   (let [input "^\"String\" [a b 2]"]
     (is (valid? input))
     (is (roundtrip input)))
-  ;(is (clear input))))
   (let [input "^:string [a b 2]"]
     (is (valid? input))
     (is (roundtrip input)))
-  ;(is (clear input))))
   (let [input "^{:a 1} [a b 2]"]
     (is (valid? input))
     (is (roundtrip input)))
-  ;(is (clear input))))
   (let [input "^:hello ^\"World\" ^{:a 1} [a b 2]"]
     (is (valid? input))
     (is (roundtrip input)))
   ;; DEPRECATED meta data macro style
   (let [input "(meta #^{:a 10} #^String {})"]
     (is (valid? input))
+    (is (roundtrip input)))
+  (let [input "^
+        #_ :a
+        {:a true}
+        ;; hello
+        #^ #_ hello :world
+        [:a]"]
+    (is (valid? input))
     (is (roundtrip input))))
-;(is (clear input)))))
 
 
 (deftest discard
@@ -324,7 +327,9 @@
   (let [input "#! invalid { input '"]
     (is (valid? input))
     (is (roundtrip input)))
-  (let [input "^{:a true} ;; hello\n #_ :hello [:a]"]
+  (let [input "^{:a true} ;; hello
+                          #_ :hello
+                          [:a]"]
     (is (valid? input))
     (is (roundtrip input))))
 
@@ -481,7 +486,13 @@
   ;; symbolic names are valid symbols
   (let [input "Inf"]
     (is (valid? input))
-    (is (roundtrip input))))
+    (is (roundtrip input)))
+  (let [input "## #_ hello
+                  ;; world
+                  Inf"]
+    (is (valid? input))
+    (is (= input (parcera/code (parcera/ast input))))))
+
 
 (deftest EOF
   (let [input ":hello \"  "]
