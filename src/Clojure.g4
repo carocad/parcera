@@ -125,9 +125,9 @@ discard: '#_' ignore* form;
 
 tag: '#' symbol ignore* (literal | collection | tag);
 
-conditional: '#?' ignore* list;
+conditional: '#?' whitespace* list;
 
-conditional_splicing: '#?@' ignore* list;
+conditional_splicing: '#?@' whitespace* list;
 
 /* This definition allows arbitrary symbolic values; following
  * on LispReader to just read the form and throw if the symbol
