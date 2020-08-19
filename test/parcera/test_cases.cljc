@@ -450,13 +450,21 @@
 
 (deftest reader-conditional-macro
   (let [input "#?(:clj Double/NaN :cljs js/NaN :default nil)"]
-    (valid? input)
-    (roundtrip input))
-  ;(is (clear input))))
+    (is (valid? input))
+    (is (roundtrip input)))
   (let [input "[1 2 #?@(:clj [3 4] :cljs [5 6])]"]
-    (valid? input)
-    (roundtrip input)))
-
+    (is (valid? input))
+    (is (roundtrip input)))
+  (let [input "#? ;; hello
+    (
+     :clj  (println \"hello\")
+     :cljs (println \"world\"))"]
+    (is (parcera/failure? (parcera/ast input))))
+  (let [input "#?   (
+     :clj  (println \"hello\")
+     :cljs (println \"world\"))"]
+    (is (valid? input))
+    (is (roundtrip input))))
 
 (deftest whitespace
   (let [input "(defmacro x [a] `   #'  ~  '  a)"]
