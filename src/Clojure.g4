@@ -73,6 +73,7 @@ metadata: ((metadata_entry | deprecated_metadata_entry) ignore*)+
           | unquote
           | unquote_splicing
           | conditional
+          | conditional_splicing
           | deref
           | quote
           | backtick

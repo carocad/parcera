@@ -258,6 +258,24 @@
         #^ #_ hello :world
         [:a]"]
     (valid? input)
+    (roundtrip input))
+  (let [input "^ ::hello 'world"]
+    (valid? input)
+    (roundtrip input))
+  (let [input "^ ::hello `first"]
+    (valid? input)
+    (roundtrip input))
+  (let [input "^ ::hello #'first"]
+    (valid? input)
+    (roundtrip input))
+  (let [input "(meta ^::hello #?(:clj {}))"]
+    (valid? input)
+    (roundtrip input))
+  (let [input "(meta ^::hello #?@(:clj ({})))"]
+    (valid? input)
+    (roundtrip input))
+  (let [input "(meta ^::hello @(atom {}))"]
+    (valid? input)
     (roundtrip input)))
 
 
