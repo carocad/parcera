@@ -72,6 +72,11 @@ metadata: ((metadata_entry | deprecated_metadata_entry) ignore*)+
           | fn
           | unquote
           | unquote_splicing
+          | conditional
+          | deref
+          | quote
+          | backtick
+          | var_quote
           );
 
 metadata_entry: '^' ignore* ( map | symbol | string | keyword | macro_keyword );
