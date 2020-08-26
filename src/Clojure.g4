@@ -80,7 +80,7 @@ metadata: ((metadata_entry | deprecated_metadata_entry) ignore*)+
           | var_quote
           );
 
-metadata_entry: '^' ignore* ( map | symbol | string | keyword | macro_keyword );
+metadata_entry: '^' ignore* ( map | symbol | string | keyword | macro_keyword | conditional);
 
 /**
  * According to https://github.com/clojure/clojure-site/blob/7493bdb10222719923519bfd6d2699a26677ee82/content/guides/weird_characters.adoc#-and----metadata
@@ -89,7 +89,7 @@ metadata_entry: '^' ignore* ( map | symbol | string | keyword | macro_keyword );
  * In order to support roundtrip of parser rules it is required to exactly identify the
  * character used which would not be possible with something like '#'? '^'
  */
-deprecated_metadata_entry: '#^' ignore* ( map | symbol | string | keyword | macro_keyword );
+deprecated_metadata_entry: '#^' ignore* ( map | symbol | string | keyword | macro_keyword | conditional);
 
 backtick: '`' ignore* form;
 

@@ -276,6 +276,9 @@
     (roundtrip input))
   (let [input "(meta ^::hello @(atom {}))"]
     (valid? input)
+    (roundtrip input))
+  (let [input "(meta ^#?(:clj ::hello :cljs ::world) {})"]
+    (valid? input)
     (roundtrip input)))
 
 
