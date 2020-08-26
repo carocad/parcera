@@ -122,7 +122,22 @@
     (roundtrip input))
   (let [input "\u000a"]
     (valid? input)
-    (roundtrip input)))
+    (roundtrip input))
+  (let [input "\\o123"]
+    (valid? input)
+    (roundtrip input))
+  (let [input "\\o0"]
+    (valid? input)
+    (roundtrip input))
+  (let [input "\\o432"]
+    (is (parcera/failure? (parcera/ast input))))
+  (let [input "\\o387"]
+    (is (parcera/failure? (parcera/ast input)))))
+
+(let [input "\\o432"]
+  (parcera/ast input))
+
+\o 'helo
 
 
 (deftest AST-metadata

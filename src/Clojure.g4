@@ -157,7 +157,7 @@ WHITESPACE: [\r\n\t\f, ]+;
 
 COMMENT: (';' | '#!') ~[\r\n]*;
 
-CHARACTER: '\\' (UNICODE_CHAR | NAMED_CHAR | UNICODE);
+CHARACTER: '\\' (NAMED_CHAR | UNICODE | OCTAL | UNICODE_CHAR);
 
 // note: ::/ is NOT a valid macro keyword, unlike :/
 MACRO_KEYWORD: '::' KEYWORD_HEAD KEYWORD_BODY*;
@@ -187,6 +187,8 @@ fragment UNICODE_CHAR: ~[\u0300-\u036F\u1DC0-\u1DFF\u20D0-\u20FF];
 fragment NAMED_CHAR: 'newline' | 'return' | 'space' | 'tab' | 'formfeed' | 'backspace';
 
 fragment UNICODE: 'u' [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F];
+
+fragment OCTAL: 'o' ([0-7]) | ([0-7] [0-7]) | ([0-3] [0-7] [0-7]);
 
 fragment KEYWORD_BODY: KEYWORD_HEAD | [:/];
 
