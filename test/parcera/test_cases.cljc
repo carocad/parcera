@@ -183,13 +183,12 @@
   (let [input "❤️"]
     (valid? input)
     (roundtrip input))
-  #_(let [input "hello/world/"]
-      (is (not (valid? input))))
-  #_(let [input ":hello/world/"]
-      (is (not (valid? input))))
-  #_(let [input "::hello/world/"]
-      (is (not (valid? input)))))
-;(is (clear input))))))
+  ;; a symbol cannot start with a number
+  (let [input "1#_ 2"
+        ast   (parcera/ast input)]
+    (is (= ast [:code [:number "1"]
+                [:discard [:whitespace " "]
+           [:number "2"]]]))))
 
 (deftest tag-literals
   ;; nested tag literals
