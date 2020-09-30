@@ -143,7 +143,7 @@ symbolic: '##' ignore* SYMBOL;
 
 // I assume symbol and list from lisp reader, but tools.reader seems to
 // indicate something else
-eval: '#=' ignore* (symbol | list);
+eval: '#=' ignore* (symbol | list | conditional);
 
 whitespace: WHITESPACE;
 
