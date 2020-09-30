@@ -49,7 +49,6 @@ character: CHARACTER;
 
 /*
  * rules NOT captured in this statement:
- * - a symbol cannot start with a number "9.5hello"
  * - a symbol cannot be followed by another symbol "hello/world/" -> "hello/world" "/"
  */
 symbol: SYMBOL;
