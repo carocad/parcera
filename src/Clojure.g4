@@ -180,7 +180,7 @@ KEYWORD: ':' ((KEYWORD_HEAD KEYWORD_BODY*) | '/');
  * [:symbol "hello/world"] [:symbol "/"]
  * which is also wrong but more difficult to identify when looking at the AST
  */
-SYMBOL: NAME_HEAD NAME_BODY*;
+SYMBOL: SYMBOL_HEAD SYMBOL_BODY*;
 
 fragment UNICODE_CHAR: ~[\u0300-\u036F\u1DC0-\u1DFF\u20D0-\u20FF];
 
@@ -195,16 +195,16 @@ fragment OCTAL: 'o' ([0-7] | ([0-7] [0-7]) | ([0-3] [0-7] [0-7]));
 
 fragment KEYWORD_BODY: KEYWORD_HEAD | [:/];
 
-fragment KEYWORD_HEAD: ALLOWED_NAME_CHARACTER | [#'];
+fragment KEYWORD_HEAD: ALLOWED_NAME_CHARACTER | [#'0-9];
 
 // symbols can contain : # ' as part of their names
-fragment NAME_BODY: NAME_HEAD | [:#'];
+fragment SYMBOL_BODY: SYMBOL_HEAD | [:#'0-9];
 
-fragment NAME_HEAD: ALLOWED_NAME_CHARACTER | [/];
+fragment SYMBOL_HEAD: ALLOWED_NAME_CHARACTER | [/];
 
 // these is the set of characters that are allowed by all symbols and keywords
 // however, this is more strict that necessary so that we can re-use it for both
-fragment ALLOWED_NAME_CHARACTER: ~[\r\n\t\f ()[\]{}"@~^;`\\,:#'/];
+fragment ALLOWED_NAME_CHARACTER: ~[\r\n\t\f ()[\]{}"@~^;`\\,:#'/0-9];
 
 fragment DOUBLE_SUFFIX: ((('.' DIGIT*)? ([eE][-+]?DIGIT+)?) 'M'?);
 
