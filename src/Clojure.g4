@@ -49,6 +49,9 @@ character: CHARACTER;
 
 /*
  * rules NOT captured in this statement:
+ * - a symbol cannot start with a number "-9.5hello" ... although the lexer
+     prevents things like 97hello, the character '-' is not a number therefore this edge case
+     is not catched
  * - a symbol cannot be followed by another symbol "hello/world/" -> "hello/world" "/"
  */
 symbol: SYMBOL;
