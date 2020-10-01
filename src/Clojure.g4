@@ -191,7 +191,7 @@ fragment UNICODE: 'u' [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F];
 // octal character must be between 0 and 377
 // https://github.com/clojure/clojure/blob/06097b1369c502090be6489be27cc280633cb1bd/src/jvm/clojure/lang/LispReader.java#L604
 // https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html
-fragment OCTAL: 'o' ([0-7]) | ([0-7] [0-7]) | ([0-3] [0-7] [0-7]);
+fragment OCTAL: 'o' ([0-7] | ([0-7] [0-7]) | ([0-3] [0-7] [0-7]));
 
 fragment KEYWORD_BODY: KEYWORD_HEAD | [:/];
 
