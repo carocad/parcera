@@ -125,7 +125,8 @@
     (roundtrip input))
   (let [input "\\o123"]
     (valid? input)
-    (roundtrip input))
+    (roundtrip input)
+    (is (= (parcera/ast input) [:code [:character "\o123"]])))
   (let [input "\\o0"]
     (valid? input)
     (roundtrip input)))
