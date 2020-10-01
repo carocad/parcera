@@ -195,11 +195,11 @@
         ast   (parcera/ast input)]
     (is (= ast [:code [:number "1"]
                 [:discard [:whitespace " "]
-                 [:number "2"]]])))
+                 [:number "2"]]]))))
 
-  (deftest tag-literals
-    ;; nested tag literals
-    (let [input "#a #b 1"]
+(deftest tag-literals
+  ;; nested tag literals
+  (let [input "#a #b 1"]
     (valid? input)))
 
 
