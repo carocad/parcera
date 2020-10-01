@@ -49,9 +49,6 @@ character: CHARACTER;
 
 /*
  * rules NOT captured in this statement:
- * - a symbol cannot start with a number "-9.5hello" ... although the lexer
-     prevents things like 97hello, the character '-' is not a number therefore this edge case
-     is not catched
  * - a symbol cannot be followed by another symbol "hello/world/" -> "hello/world" "/"
  */
 symbol: SYMBOL;
@@ -182,7 +179,10 @@ KEYWORD: ':' ((KEYWORD_HEAD KEYWORD_BODY*) | '/');
  * [:symbol "hello/world"] [:symbol "/"]
  * which is also wrong but more difficult to identify when looking at the AST
  */
-SYMBOL: SYMBOL_HEAD SYMBOL_BODY*;
+SYMBOL: (SYMBOL_HEAD (SYMBOL_HEAD | [#']) SYMBOL_BODY*) // disallow symbols that start with a number like -9hello
+                                                        // but allow those that start with +- like +hello
+        | SYMBOL_HEAD // a single character like + - / etc
+        ;
 
 fragment UNICODE_CHAR: ~[\u0300-\u036F\u1DC0-\u1DFF\u20D0-\u20FF];
 
