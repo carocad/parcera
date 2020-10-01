@@ -179,9 +179,9 @@ KEYWORD: ':' ((KEYWORD_HEAD KEYWORD_BODY*) | '/');
  * [:symbol "hello/world"] [:symbol "/"]
  * which is also wrong but more difficult to identify when looking at the AST
  */
-SYMBOL: (SYMBOL_HEAD (SYMBOL_HEAD | [#']) SYMBOL_BODY*) // disallow symbols that start with a number like -9hello
-                                                        // but allow those that start with +- like +hello
-        | SYMBOL_HEAD // a single character like + - / etc
+SYMBOL: (SYMBOL_FIRST SYMBOL_SECOND SYMBOL_REST*) // disallow symbols that start with a number like -9hello
+                                                  // but allow those that start with +- like +hello
+        | SYMBOL_FIRST // a single character like + - / etc
         ;
 
 fragment UNICODE_CHAR: ~[\u0300-\u036F\u1DC0-\u1DFF\u20D0-\u20FF];
@@ -200,9 +200,11 @@ fragment KEYWORD_BODY: KEYWORD_HEAD | [:/];
 fragment KEYWORD_HEAD: ALLOWED_NAME_CHARACTER | [#'0-9];
 
 // symbols can contain : # ' as part of their names
-fragment SYMBOL_BODY: SYMBOL_HEAD | [:#'0-9];
+fragment SYMBOL_REST: SYMBOL_SECOND | [:#'0-9];
 
-fragment SYMBOL_HEAD: ALLOWED_NAME_CHARACTER | [/];
+fragment SYMBOL_SECOND: SYMBOL_FIRST | [#'];
+
+fragment SYMBOL_FIRST: ALLOWED_NAME_CHARACTER | [/];
 
 // these is the set of characters that are allowed by all symbols and keywords
 // however, this is more strict that necessary so that we can re-use it for both
