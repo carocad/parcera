@@ -198,7 +198,10 @@
   (let [input "-1#_ 2"
         ast   (parcera/ast input)]
     (is (= ast [:code [:number "-1"]
-                [:discard [:whitespace " "] [:number "2"]]]))))
+                [:discard [:whitespace " "] [:number "2"]]])))
+  (let [input "t2#"
+        ast   (parcera/ast input)]
+    (is (= ast [:code [:symbol input]]))))
 
 
 (deftest tag-literals
