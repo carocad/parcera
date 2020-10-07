@@ -210,7 +210,6 @@
   (let [input "#a #b 1"]
     (valid? input)))
 
-
 (deftest keywords
   ;; a keyword can be a simple number because its first character is : which is
   ;; NOT a number ;)
@@ -253,7 +252,14 @@
     (roundtrip input))
   (let [input "22/7"]
     (valid? input)
-    (roundtrip input)))
+    (roundtrip input))
+  (let [inputs ["0" "0.0" "0M" "0N" "0.0e8M" "017" "07" "0x1A" "2r101010" "8r52" "36r16"]]
+    (doseq [input inputs]
+      (valid? input)
+      (roundtrip input)))
+  (let [inputs ["08" "0x1G"]]
+    (doseq [input inputs]
+      (is (parcera/failure? (parcera/ast input))))))
 
 
 (deftest metadata

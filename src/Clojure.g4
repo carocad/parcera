@@ -43,7 +43,7 @@ macro_keyword: MACRO_KEYWORD;
 
 string: STRING;
 
-number: NUMBER;
+number: (OCTAL | HEXADECIMAL | RADIX | RATIO | LONG | DOUBLE);
 
 character: CHARACTER;
 
@@ -148,7 +148,22 @@ whitespace: WHITESPACE;
 
 comment: COMMENT;
 
-NUMBER: SIGN? DIGIT+ (DOUBLE_SUFFIX | LONG_SUFFIX | RATIO_SUFFIX);
+// check LispReader for the patterns used to match numbers
+OCTAL: SIGN? '0' [0-7]+;
+
+HEXADECIMAL: SIGN? '0' [xX][0-9A-Fa-f]+;
+
+RADIX: SIGN? ([2-9] | ([1-2][0-9]) | ('3'[0-6]))
+             [rR]
+             [0-9a-zA-Z]+;
+
+RATIO: SIGN? DIGIT+ '/' DIGIT+;
+
+LONG: SIGN? DECIMAL 'N'?;
+
+DOUBLE: SIGN? DECIMAL ('.' DIGIT*)? ([eE]SIGN?DIGIT+)? 'M'?;
+
+fragment DECIMAL: ('0' | ([1-9] DIGIT*));
 
 STRING: '"' ~["\\]* ('\\' . ~["\\]*)* '"';
 
@@ -156,7 +171,7 @@ WHITESPACE: [\r\n\t\f, ]+;
 
 COMMENT: (';' | '#!') ~[\r\n]*;
 
-CHARACTER: '\\' (NAMED_CHAR | UNICODE | OCTAL | UNICODE_CHAR);
+CHARACTER: '\\' (NAMED_CHAR | UNICODE | OCTAL_CHAR | UNICODE_CHAR);
 
 // note: ::/ is NOT a valid macro keyword, unlike :/
 MACRO_KEYWORD: '::' KEYWORD_HEAD KEYWORD_BODY*;
@@ -203,7 +218,7 @@ fragment UNICODE: 'u' [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F];
 // octal character must be between 0 and 377
 // https://github.com/clojure/clojure/blob/06097b1369c502090be6489be27cc280633cb1bd/src/jvm/clojure/lang/LispReader.java#L604
 // https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html
-fragment OCTAL: 'o' ([0-7] | ([0-7] [0-7]) | ([0-3] [0-7] [0-7]));
+fragment OCTAL_CHAR: 'o' ([0-7] | ([0-7] [0-7]) | ([0-3] [0-7] [0-7]));
 
 fragment KEYWORD_BODY: KEYWORD_HEAD | [:/];
 
@@ -217,16 +232,6 @@ fragment SYMBOL_HEAD: ALLOWED_NAME_CHARACTER | [#'/] | SIGN;
 // these is the set of characters that are allowed by all symbols and keywords
 // however, this is more strict that necessary so that we can re-use it for both
 fragment ALLOWED_NAME_CHARACTER: ~[\r\n\t\f ()[\]{}"@~^;`\\,:#'/0-9+-];
-
-fragment DOUBLE_SUFFIX: ((('.' DIGIT*)? ([eE][-+]?DIGIT+)?) 'M'?);
-
-// check LispReader for the pattern used by Clojure
-fragment LONG_SUFFIX: ( [xX][0-9A-Fa-f]+
-                      | [0-7]+
-                      | [rR][0-9a-zA-Z]+
-                      )? 'N'?;
-
-fragment RATIO_SUFFIX: '/' DIGIT+;
 
 fragment SIGN: [+-];
 
