@@ -148,7 +148,7 @@ whitespace: WHITESPACE;
 
 comment: COMMENT;
 
-NUMBER: [+-]? DIGIT+ (DOUBLE_SUFFIX | LONG_SUFFIX | RATIO_SUFFIX);
+NUMBER: SIGN? DIGIT+ (DOUBLE_SUFFIX | LONG_SUFFIX | RATIO_SUFFIX);
 
 STRING: '"' ~["\\]* ('\\' . ~["\\]*)* '"';
 
@@ -181,9 +181,9 @@ KEYWORD: ':' ((KEYWORD_HEAD KEYWORD_BODY*) | '/');
  */
 SYMBOL: '/' // edge case; / is also the namespace separator
         // a single character like + - / etc
-        | (ALLOWED_NAME_CHARACTER | [+-])
+        | (ALLOWED_NAME_CHARACTER | SIGN)
         // a symbol that starts with +- cannot be followed by a number
-        | ([+-] SYMBOL_HEAD SYMBOL_BODY*)
+        | (SIGN SYMBOL_HEAD SYMBOL_BODY*)
         // a symbol that doesnt start with +- can be followed by a number like 't2#'
         | (ALLOWED_NAME_CHARACTER (SYMBOL_HEAD | DIGIT) SYMBOL_BODY*);
 
@@ -192,7 +192,7 @@ SYMBOL: '/' // edge case; / is also the namespace separator
 // of two valid tokens. Examples:
 // +9hello -> [:number +9] [:symbol hello]
 // \o423 -> [:character \o43] [:number 2]
-SENTINEL: (ALLOWED_NAME_CHARACTER | DIGIT | [+-] | [/\\])+;
+SENTINEL: (ALLOWED_NAME_CHARACTER | DIGIT | SIGN | [/\\])+;
 
 fragment UNICODE_CHAR: ~[\u0300-\u036F\u1DC0-\u1DFF\u20D0-\u20FF];
 
@@ -207,12 +207,12 @@ fragment OCTAL: 'o' ([0-7] | ([0-7] [0-7]) | ([0-3] [0-7] [0-7]));
 
 fragment KEYWORD_BODY: KEYWORD_HEAD | [:/];
 
-fragment KEYWORD_HEAD: ALLOWED_NAME_CHARACTER | DIGIT | [#'+-];
+fragment KEYWORD_HEAD: ALLOWED_NAME_CHARACTER | DIGIT | [#'] | SIGN;
 
 // symbols can contain : # ' as part of their names
 fragment SYMBOL_BODY: SYMBOL_HEAD | DIGIT | ':';
 
-fragment SYMBOL_HEAD: ALLOWED_NAME_CHARACTER | [#'+-/];
+fragment SYMBOL_HEAD: ALLOWED_NAME_CHARACTER | [#'/] | SIGN;
 
 // these is the set of characters that are allowed by all symbols and keywords
 // however, this is more strict that necessary so that we can re-use it for both
@@ -227,5 +227,7 @@ fragment LONG_SUFFIX: ( [xX][0-9A-Fa-f]+
                       )? 'N'?;
 
 fragment RATIO_SUFFIX: '/' DIGIT+;
+
+fragment SIGN: [+-];
 
 fragment DIGIT: [0-9];
