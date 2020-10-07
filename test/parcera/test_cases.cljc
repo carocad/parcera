@@ -210,6 +210,7 @@
   (let [input "#a #b 1"]
     (valid? input)))
 
+
 (deftest keywords
   ;; a keyword can be a simple number because its first character is : which is
   ;; NOT a number ;)
