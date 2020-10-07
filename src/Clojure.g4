@@ -185,7 +185,14 @@ SYMBOL: '/' // edge case; / is also the namespace separator
         // a symbol that starts with +- cannot be followed by a number
         | ([+-] SYMBOL_HEAD SYMBOL_BODY*)
         // a symbol that doesnt start with +- can be followed by a number like 't2#'
-        | (ALLOWED_NAME_CHARACTER (SYMBOL_HEAD | [0-9]) SYMBOL_BODY*);
+        | (ALLOWED_NAME_CHARACTER (SYMBOL_HEAD | DIGIT) SYMBOL_BODY*);
+
+// https://stackoverflow.com/a/15503680
+// used to avoid the parser matching a single invalid token as the composition
+// of two valid tokens. Examples:
+// +9hello -> [:number +9] [:symbol hello]
+// \o423 -> [:character \o43] [:number 2]
+SENTINEL: (ALLOWED_NAME_CHARACTER | DIGIT | [+-] | [/\\])+;
 
 fragment UNICODE_CHAR: ~[\u0300-\u036F\u1DC0-\u1DFF\u20D0-\u20FF];
 
@@ -200,12 +207,12 @@ fragment OCTAL: 'o' ([0-7] | ([0-7] [0-7]) | ([0-3] [0-7] [0-7]));
 
 fragment KEYWORD_BODY: KEYWORD_HEAD | [:/];
 
-fragment KEYWORD_HEAD: ALLOWED_NAME_CHARACTER | [#'0-9+-];
+fragment KEYWORD_HEAD: ALLOWED_NAME_CHARACTER | DIGIT | [#'+-];
 
 // symbols can contain : # ' as part of their names
-fragment SYMBOL_BODY: SYMBOL_HEAD | [:#'0-9];
+fragment SYMBOL_BODY: SYMBOL_HEAD | DIGIT | ':';
 
-fragment SYMBOL_HEAD: ALLOWED_NAME_CHARACTER | [#'/+-];
+fragment SYMBOL_HEAD: ALLOWED_NAME_CHARACTER | [#'+-/];
 
 // these is the set of characters that are allowed by all symbols and keywords
 // however, this is more strict that necessary so that we can re-use it for both
