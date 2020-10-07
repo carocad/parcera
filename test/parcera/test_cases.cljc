@@ -129,12 +129,11 @@
     (is (= (parcera/ast input) [:code [:character input]])))
   (let [input "\\o0"]
     (valid? input)
-    (roundtrip input)))
-; todo: the tests below should fail but currently dont
-;(let [input "\\o432"]
-;  (is (parcera/failure? (parcera/ast input))))
-;(let [input "\\o387"]
-;  (is (parcera/failure? (parcera/ast input)))))
+    (roundtrip input))
+  (let [input "\\o432"]
+    (is (parcera/failure? (parcera/ast input))))
+  (let [input "\\o387"]
+    (is (parcera/failure? (parcera/ast input)))))
 
 (deftest AST-metadata
   (let [input    ":bar"
@@ -201,7 +200,9 @@
                 [:discard [:whitespace " "] [:number "2"]]])))
   (let [input "t2#"
         ast   (parcera/ast input)]
-    (is (= ast [:code [:symbol input]]))))
+    (is (= ast [:code [:symbol input]])))
+  (let [input "+9hello"]
+    (is (parcera/failure? (parcera/ast input)))))
 
 
 (deftest tag-literals
