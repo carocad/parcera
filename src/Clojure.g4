@@ -45,7 +45,7 @@ string: STRING;
 
 number: (OCTAL | HEXADECIMAL | RADIX | RATIO | LONG | DOUBLE);
 
-character: CHARACTER;
+character: (NAMED_CHAR | OCTAL_CHAR | UNICODE_CHAR | UNICODE);
 
 /*
  * rules NOT captured in this statement:
@@ -171,7 +171,22 @@ WHITESPACE: [\r\n\t\f, ]+;
 
 COMMENT: (';' | '#!') ~[\r\n]*;
 
-CHARACTER: '\\' (NAMED_CHAR | UNICODE | OCTAL_CHAR | UNICODE_CHAR);
+NAMED_CHAR: ESCAPE ('newline' | 'return' | 'space' | 'tab' | 'formfeed' | 'backspace');
+
+// This is supposed to be the JavaScript friendly version of #'\P{M}\p{M}*+'
+// mentioned here: https://www.regular-expressions.info/unicode.html
+// It's cooked by this generator: http://kourge.net/projects/regexp-unicode-block
+// ticking all 'Combining Diacritical Marks' boxes *))
+UNICODE_CHAR: ESCAPE ~[\u0300-\u036F\u1DC0-\u1DFF\u20D0-\u20FF];
+
+UNICODE: ESCAPE 'u' [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F];
+
+// octal character must be between 0 and 377
+// https://github.com/clojure/clojure/blob/06097b1369c502090be6489be27cc280633cb1bd/src/jvm/clojure/lang/LispReader.java#L604
+// https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html
+OCTAL_CHAR: ESCAPE 'o' ([0-7] | ([0-7] [0-7]) | ([0-3] [0-7] [0-7]));
+
+fragment ESCAPE: '\\';
 
 // note: ::/ is NOT a valid macro keyword, unlike :/
 MACRO_KEYWORD: '::' KEYWORD_HEAD KEYWORD_BODY*;
@@ -208,17 +223,6 @@ SYMBOL: '/' // edge case; / is also the namespace separator
 // +9hello -> [:number +9] [:symbol hello]
 // \o423 -> [:character \o43] [:number 2]
 SENTINEL: (ALLOWED_NAME_CHARACTER | DIGIT | SIGN | [/\\])+;
-
-fragment UNICODE_CHAR: ~[\u0300-\u036F\u1DC0-\u1DFF\u20D0-\u20FF];
-
-fragment NAMED_CHAR: 'newline' | 'return' | 'space' | 'tab' | 'formfeed' | 'backspace';
-
-fragment UNICODE: 'u' [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F] [0-9a-fA-F];
-
-// octal character must be between 0 and 377
-// https://github.com/clojure/clojure/blob/06097b1369c502090be6489be27cc280633cb1bd/src/jvm/clojure/lang/LispReader.java#L604
-// https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html
-fragment OCTAL_CHAR: 'o' ([0-7] | ([0-7] [0-7]) | ([0-3] [0-7] [0-7]));
 
 fragment KEYWORD_BODY: KEYWORD_HEAD | [:/];
 
