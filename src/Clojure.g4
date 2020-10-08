@@ -167,7 +167,8 @@ fragment DECIMAL: ('0' | ([1-9] DIGIT*));
 
 STRING: '"' ~["\\]* ('\\' . ~["\\]*)* '"';
 
-WHITESPACE: [\r\n\t\f, ]+;
+// any unicode whitespace "character"
+WHITESPACE: [\p{White_Space},]+;
 
 COMMENT: (';' | '#!') ~[\r\n]*;
 
@@ -235,7 +236,7 @@ fragment SYMBOL_HEAD: ALLOWED_NAME_CHARACTER | [#'/] | SIGN;
 
 // these is the set of characters that are allowed by all symbols and keywords
 // however, this is more strict that necessary so that we can re-use it for both
-fragment ALLOWED_NAME_CHARACTER: ~[\r\n\t\f ()[\]{}"@~^;`\\,:#'/0-9+-];
+fragment ALLOWED_NAME_CHARACTER: ~[\p{White_Space},()[\]{}"@~^;`\\:#'/0-9+-];
 
 fragment SIGN: [+-];
 
