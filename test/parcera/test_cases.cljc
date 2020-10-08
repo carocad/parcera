@@ -133,7 +133,11 @@
   (let [input "\\o432"]
     (is (parcera/failure? (parcera/ast input))))
   (let [input "\\o387"]
-    (is (parcera/failure? (parcera/ast input)))))
+    (is (parcera/failure? (parcera/ast input))))
+  ;; edge case unicode THSP "thin space"
+  (let [input "\\‘ (read-until \\’) ;; english single quotes"]
+    (valid? input)
+    (roundtrip input)))
 
 (deftest AST-metadata
   (let [input    ":bar"
