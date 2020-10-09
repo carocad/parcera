@@ -268,7 +268,11 @@
       (roundtrip input)))
   (let [inputs ["08" "0x1G"]]
     (doseq [input inputs]
-      (is (parcera/failure? (parcera/ast input))))))
+      (is (parcera/failure? (parcera/ast input)))))
+  (let [input "0007000321110000334004002007N"]
+    (is (= (parcera/ast input) [:code [:number input]])))
+  (let [input "0x07000321110000334004002007N"]
+    (is (= (parcera/ast input) [:code [:number input]]))))
 
 
 (deftest metadata
