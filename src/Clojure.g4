@@ -149,9 +149,9 @@ whitespace: WHITESPACE;
 comment: COMMENT;
 
 // check LispReader for the patterns used to match numbers
-OCTAL: SIGN? '0' [0-7]+ BIG_INT?;
+OCTAL: SIGN? ZERO [0-7]+ BIG_INT?;
 
-HEXADECIMAL: SIGN? '0' [xX][0-9A-Fa-f]+ BIG_INT?;
+HEXADECIMAL: SIGN? ZERO [xX][0-9A-Fa-f]+ BIG_INT?;
 
 // radix cannot be read as a big int? 🤔 is this a bug in LispReader?
 RADIX: SIGN? ([2-9] | ([1-2][0-9]) | ('3'[0-6]))
@@ -166,7 +166,9 @@ fragment BIG_INT: 'N';
 
 DOUBLE: SIGN? DECIMAL ('.' DIGIT*)? ([eE]SIGN?DIGIT+)? 'M'?;
 
-fragment DECIMAL: ('0' | ([1-9] DIGIT*));
+fragment DECIMAL: (ZERO | ([1-9] DIGIT*));
+
+fragment ZERO: '0';
 
 STRING: '"' ~["\\]* ('\\' . ~["\\]*)* '"';
 
