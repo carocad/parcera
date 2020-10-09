@@ -137,6 +137,10 @@
   ;; edge case unicode THSP "thin space"
   (let [input "\\‘ (read-until \\’) ;; english single quotes"]
     (valid? input)
+    (roundtrip input))
+  ;; edge case, shouldnt be caught by the sentinel
+  (let [input "#{\\*\\?}"]
+    (valid? input)
     (roundtrip input)))
 
 (deftest AST-metadata

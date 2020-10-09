@@ -223,7 +223,7 @@ SYMBOL: '/' // edge case; / is also the namespace separator
 // of two valid tokens. Examples:
 // +9hello -> [:number +9] [:symbol hello]
 // \o423 -> [:character \o43] [:number 2]
-SENTINEL: (ALLOWED_NAME_CHARACTER | DIGIT | SIGN | [/\\])+;
+SENTINEL: ESCAPE? (ALLOWED_NAME_CHARACTER | DIGIT | SIGN | [/])+;
 
 fragment KEYWORD_BODY: KEYWORD_HEAD | [:/];
 
