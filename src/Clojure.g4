@@ -47,10 +47,6 @@ number: (OCTAL | HEXADECIMAL | RADIX | RATIO | LONG | DOUBLE);
 
 character: (NAMED_CHAR | OCTAL_CHAR | UNICODE_CHAR | UNICODE);
 
-/*
- * rules NOT captured in this statement:
- * - a symbol cannot be followed by another symbol "hello/world/" -> "hello/world" "/"
- */
 symbol: SYMBOL;
 
 reader_macro: ( unquote
@@ -194,16 +190,22 @@ OCTAL_CHAR: ESCAPE 'o' ([0-7] | ([0-7] [0-7]) | ([0-3] [0-7] [0-7]));
 
 fragment ESCAPE: '\\';
 
-// note: ::/ is NOT a valid macro keyword, unlike :/
-MACRO_KEYWORD: '::' KEYWORD_HEAD KEYWORD_BODY*;
 
-/*
- * Example -> :http://www.department0.university0.edu/GraduateCourse52
- *
- * technically that is NOT a valid keyword. However in order to maintain
- * backwards compatibility the Clojure team didnt remove it from LispReader
- */
-KEYWORD: ':' ((KEYWORD_HEAD KEYWORD_BODY*) | '/');
+// ::/ is NOT a valid macro keyword, unlike :/
+MACRO_KEYWORD: '::' KEYWORD_WILDCARD;
+
+KEYWORD: ':' ('/' | KEYWORD_WILDCARD);
+
+fragment KEYWORD_WILDCARD: KEYWORD_HEAD // a single character like :+ :>
+                           // a keyword cannot end in : nor /
+                           | (KEYWORD_HEAD KEYWORD_HEAD)
+                           // multiple : and / are allowed inside keywords for backward compatibility
+                           // Example -> :http://www.department0.university0.edu/GraduateCourse52
+                           | (KEYWORD_HEAD KEYWORD_BODY+ KEYWORD_HEAD);
+
+fragment KEYWORD_BODY: KEYWORD_HEAD | ':' | '/';
+
+fragment KEYWORD_HEAD: ALLOWED_NAME_CHARACTER | DIGIT | [#'] | SIGN;
 
 
 SYMBOL: SIMPLE_SYMBOL ('/' SIMPLE_SYMBOL)?;
