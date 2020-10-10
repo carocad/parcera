@@ -166,12 +166,15 @@ fragment DECIMAL: (ZERO | ([1-9] DIGIT*));
 
 fragment ZERO: '0';
 
+
 STRING: '"' ~["\\]* ('\\' . ~["\\]*)* '"';
+
 
 // any unicode whitespace "character"
 WHITESPACE: [\p{White_Space},]+;
 
 COMMENT: (';' | '#!') ~[\r\n]*;
+
 
 NAMED_CHAR: ESCAPE ('newline' | 'return' | 'space' | 'tab' | 'formfeed' | 'backspace');
 
@@ -229,16 +232,10 @@ fragment SYMBOL_HEAD: ALLOWED_NAME_CHARACTER | [#'] | SIGN;
 // of two valid tokens. Examples:
 // +9hello -> [:number +9] [:symbol hello]
 // \o423 -> [:character \o43] [:number 2]
-SENTINEL: ESCAPE? (ALLOWED_NAME_CHARACTER | DIGIT | SIGN | [/])+;
-
-fragment KEYWORD_BODY: KEYWORD_HEAD | [:/];
-
-fragment KEYWORD_HEAD: ALLOWED_NAME_CHARACTER | DIGIT | [#'] | SIGN;
-
-// symbols can contain : # ' as part of their names
-fragment SYMBOL_BODY: SYMBOL_HEAD | DIGIT | ':';
-
-fragment SYMBOL_HEAD: ALLOWED_NAME_CHARACTER | [#'/] | SIGN;
+SENTINEL: (ESCAPE (ALLOWED_NAME_CHARACTER | DIGIT)+) // invalid literal chars
+          | '::/' // invalid macro keyword
+          | (':' (ALLOWED_NAME_CHARACTER | DIGIT | SIGN | ':' | '/')+) // invalid keyword
+          | (ALLOWED_NAME_CHARACTER | DIGIT | SIGN | '/')+; // invalid symbol
 
 // these is the set of characters that are allowed by all symbols and keywords
 // however, this is more strict that necessary so that we can re-use it for both
