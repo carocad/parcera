@@ -190,13 +190,8 @@
   (let [input "❤️"]
     (valid? input)
     (roundtrip input))
-  ;; todo: the following test cases should fail but currently dont
-  #_(let [input "hello/world/"]
-      (is (not (valid? input))))
-  #_(let [input ":hello/world/"]
-      (is (not (valid? input))))
-  #_(let [input "::hello/world/"]
-      (is (not (valid? input))))
+  (let [input "hello/world/"]
+    (is (parcera/failure? (parcera/ast input))))
   ;; a symbol cannot start with a number
   (let [input "1#_ 2"
         ast   (parcera/ast input)]
@@ -210,7 +205,9 @@
         ast   (parcera/ast input)]
     (is (= ast [:code [:symbol input]])))
   (let [input "+9hello"]
-    (is (parcera/failure? (parcera/ast input)))))
+    (is (parcera/failure? (parcera/ast input))))
+  (let [input "A/A:0"]
+    (is (= (parcera/ast input) [:code [:symbol input]]))))
 
 
 (deftest tag-literals
@@ -241,9 +238,18 @@
     (roundtrip input))
   ;; this is NOT a valid literal keyword but it is "supported" by the current
   ;; reader
-  (let [input ":http://www.department0.university0.edu/GraduateCourse52"]
-    (valid? input)
-    (roundtrip input)))
+  (let [inputs [":http://www.department0.university0.edu/GraduateCourse52"
+                "::platform/http://www.department0.university0.edu/GraduateCourse52"
+                ":hello/world/foo"
+                ":hello/world/f:oo"
+                "::platform/foo/bar"
+                ":/"]]
+    (doseq [input inputs]
+      (valid? input)
+      (roundtrip input)))
+  (let [inputs [":hello/world/" "::hello/world/" ":7/" ":8:" "::/"]]
+    (doseq [input inputs]
+      (is (parcera/failure? (parcera/ast input))))))
 
 
 (deftest numbers
