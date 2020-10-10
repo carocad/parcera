@@ -205,23 +205,22 @@ MACRO_KEYWORD: '::' KEYWORD_HEAD KEYWORD_BODY*;
  */
 KEYWORD: ':' ((KEYWORD_HEAD KEYWORD_BODY*) | '/');
 
-/**
- * a symbol must start with a valid character and can be followed
- * by more "relaxed" character restrictions
- *
- * This pattern matches things like: hello, hello/world, /hello/world/
- * that is by design. Parcera's grammar is more permissive than Clojure's
- * since otherwise Antlr would parse hello/world/ as
- * [:symbol "hello/world"] [:symbol "/"]
- * which is also wrong but more difficult to identify when looking at the AST
- */
-SYMBOL: '/' // edge case; / is also the namespace separator
-        // a single character like + - / etc
-        | (ALLOWED_NAME_CHARACTER | SIGN)
-        // a symbol that starts with +- cannot be followed by a number
-        | (SIGN SYMBOL_HEAD SYMBOL_BODY*)
-        // a symbol that doesnt start with +- can be followed by a number like 't2#'
-        | (ALLOWED_NAME_CHARACTER (SYMBOL_HEAD | DIGIT) SYMBOL_BODY*);
+
+SYMBOL: SIMPLE_SYMBOL ('/' SIMPLE_SYMBOL)?;
+
+fragment SIMPLE_SYMBOL: '/' // edge case; / is also the namespace separator
+                        // a single character like + - / etc
+                        | (ALLOWED_NAME_CHARACTER | SIGN)
+                        // a symbol that starts with +- cannot be followed by a number
+                        | (SIGN SYMBOL_HEAD SYMBOL_BODY*)
+                        // a symbol that doesnt start with +- can be followed by a number like 't2#'
+                        | (ALLOWED_NAME_CHARACTER (SYMBOL_HEAD | DIGIT | ':') SYMBOL_BODY*);
+
+// symbols can contain : # ' as part of their names
+fragment SYMBOL_BODY: SYMBOL_HEAD | DIGIT | ':';
+
+fragment SYMBOL_HEAD: ALLOWED_NAME_CHARACTER | [#'] | SIGN;
+
 
 // https://stackoverflow.com/a/15503680
 // used to avoid the parser matching a single invalid token as the composition
