@@ -30,7 +30,7 @@ jobs:
         # generate javascript
         - java -jar antlr-4.7.1-complete.jar -Xexact-output-dir -o src/clojure/parcera/antlr/js -package parcera.antlr -Dlanguage=JavaScript -no-listener -no-visitor src/Clojure.g4
         # pre-bundle javascript
-        - npm init --yes && npm add webpack webpack-cli antlr4
+        - npm init --yes && npm add webpack@4 webpack-cli@3 antlr4@4
         - npx webpack --config ./resources/webpack.config.js
         - lein test-runner
 
@@ -43,7 +43,7 @@ jobs:
         # generate javascript
         - java -jar antlr-4.7.1-complete.jar -Xexact-output-dir -o src/clojure/parcera/antlr/js -package parcera.antlr -Dlanguage=JavaScript -no-listener -no-visitor src/Clojure.g4
         # pre-bundle javascript
-        - npm init --yes && npm add webpack webpack-cli antlr4
+        - npm init --yes && npm add webpack@4 webpack-cli@3 antlr4@4
         - npx webpack --config ./resources/webpack.config.js
         - lein do javac, compile, check
       deploy:
