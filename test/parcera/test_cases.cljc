@@ -242,12 +242,11 @@
                 "::platform/http://www.department0.university0.edu/GraduateCourse52"
                 ":hello/world/foo"
                 ":hello/world/f:oo"
-                "::platform/foo/bar"
-                ":/"]]
+                "::platform/foo/bar"]]
     (doseq [input inputs]
       (valid? input)
       (roundtrip input)))
-  (let [inputs [":hello/world/" "::hello/world/" ":7/" ":8:" "::/"]]
+  (let [inputs [":hello/world/" "::hello/world/" ":7/" ":8:"]]
     (doseq [input inputs]
       (is (parcera/failure? (parcera/ast input))))))
 

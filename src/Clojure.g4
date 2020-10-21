@@ -195,27 +195,20 @@ fragment ESCAPE: '\\';
 
 
 // ::/ is NOT a valid macro keyword, unlike :/
-MACRO_KEYWORD: '::' KEYWORD_WILDCARD;
+MACRO_KEYWORD: '::' (SIMPLE_KEYWORD '/')? SIMPLE_KEYWORD;
 
-KEYWORD: ':' ('/' | KEYWORD_WILDCARD);
+KEYWORD: ':' (SIMPLE_KEYWORD '/')? (SIMPLE_KEYWORD | '/');
 
-fragment KEYWORD_WILDCARD: KEYWORD_HEAD // a single character like :+ :>
-                           // a keyword cannot end in : nor /
-                           | (KEYWORD_HEAD KEYWORD_HEAD)
-                           // multiple : and / are allowed inside keywords for backward compatibility
-                           // Example -> :http://www.department0.university0.edu/GraduateCourse52
-                           | (KEYWORD_HEAD KEYWORD_BODY+ KEYWORD_HEAD);
-
-fragment KEYWORD_BODY: KEYWORD_HEAD | ':' | '/';
+// a keyword name without a namespace
+fragment SIMPLE_KEYWORD: KEYWORD_HEAD | (KEYWORD_HEAD (KEYWORD_HEAD | ':')+);
 
 fragment KEYWORD_HEAD: ALLOWED_NAME_CHARACTER | DIGIT | [#'] | SIGN;
 
 
-SYMBOL: SIMPLE_SYMBOL ('/' SIMPLE_SYMBOL)?;
+SYMBOL: (SIMPLE_SYMBOL '/')? (SIMPLE_SYMBOL | '/');
 
-fragment SIMPLE_SYMBOL: '/' // edge case; / is also the namespace separator
-                        // a single character like + - / etc
-                        | (ALLOWED_NAME_CHARACTER | SIGN)
+fragment SIMPLE_SYMBOL: // a single character like + - / etc
+                        (ALLOWED_NAME_CHARACTER | SIGN)
                         // a symbol that starts with +- cannot be followed by a number
                         | (SIGN SYMBOL_HEAD SYMBOL_BODY*)
                         // a symbol that doesnt start with +- can be followed by a number like 't2#'
