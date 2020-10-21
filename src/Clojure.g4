@@ -195,17 +195,23 @@ fragment ESCAPE: '\\';
 
 
 // ::/ is NOT a valid macro keyword, unlike :/
-MACRO_KEYWORD: '::' (SIMPLE_KEYWORD '/')? SIMPLE_KEYWORD;
+// multiple / are allowed for backward compatibility
+MACRO_KEYWORD: '::' (SIMPLE_KEYWORD '/'+)* SIMPLE_KEYWORD;
 
-KEYWORD: ':' (SIMPLE_KEYWORD '/')? (SIMPLE_KEYWORD | '/');
+// multiple / are allowed for backward compatibility
+KEYWORD: ':' (SIMPLE_KEYWORD '/'+)* (SIMPLE_KEYWORD | '/');
 
-// a keyword name without a namespace
-fragment SIMPLE_KEYWORD: KEYWORD_HEAD | (KEYWORD_HEAD (KEYWORD_HEAD | ':')+);
+fragment SIMPLE_KEYWORD: // a single character like + -
+                        KEYWORD_HEAD
+                        // a keyword can contain : on the body
+                        | (KEYWORD_HEAD KEYWORD_BODY+);
+
+fragment KEYWORD_BODY: KEYWORD_HEAD | ':';
 
 fragment KEYWORD_HEAD: ALLOWED_NAME_CHARACTER | DIGIT | [#'] | SIGN;
 
-
-SYMBOL: (SIMPLE_SYMBOL '/')? (SIMPLE_SYMBOL | '/');
+// multiple / are allowed for backward compatibility
+SYMBOL: (SIMPLE_SYMBOL '/'+)* (SIMPLE_SYMBOL | '/');
 
 fragment SIMPLE_SYMBOL: // a single character like + - / etc
                         (ALLOWED_NAME_CHARACTER | SIGN)

@@ -207,7 +207,12 @@
   (let [input "+9hello"]
     (is (parcera/failure? (parcera/ast input))))
   (let [input "A/A:0"]
-    (is (= (parcera/ast input) [:code [:symbol input]]))))
+    (is (= (parcera/ast input) [:code [:symbol input]])))
+  (let [input "hello//a/"]
+    (is (parcera/failure? (parcera/ast input))))
+  (let [input "hello///"]
+    (valid? input)
+    (roundtrip input)))
 
 
 (deftest tag-literals
@@ -246,7 +251,7 @@
     (doseq [input inputs]
       (valid? input)
       (roundtrip input)))
-  (let [inputs [":hello/world/" "::hello/world/" ":7/" ":8:"]]
+  (let [inputs [":hello/world/" "::hello/world/" ":7/"]]
     (doseq [input inputs]
       (is (parcera/failure? (parcera/ast input))))))
 
