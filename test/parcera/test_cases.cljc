@@ -282,12 +282,18 @@
     (doseq [input inputs]
       (valid? input)
       (roundtrip input)))
-  (let [inputs ["08" "0x1G"]]
+  (let [inputs ["08"                                        ;; invalid octal
+                "0x1G"                                      ;; invalid hexadecimal
+                "0002341349" #_(invalid octal)]]
     (doseq [input inputs]
       (is (parcera/failure? (parcera/ast input)))))
   (let [input "0007000321110000334004002007N"]
     (is (= (parcera/ast input) [:code [:number input]])))
   (let [input "0x07000321110000334004002007N"]
+    (is (= (parcera/ast input) [:code [:number input]])))
+  (let [input "0002341349M"]                                ;; valid big decimal
+    (is (= (parcera/ast input) [:code [:number input]])))
+  (let [input "0002341349.2432"]                            ;; valid double
     (is (= (parcera/ast input) [:code [:number input]]))))
 
 

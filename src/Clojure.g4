@@ -160,9 +160,12 @@ LONG: SIGN? DECIMAL BIG_INT?;
 
 fragment BIG_INT: 'N';
 
-DOUBLE: SIGN? DECIMAL ('.' DIGIT*)? ([eE]SIGN?DIGIT+)? 'M'?;
+// forbids numbers like: 0002341349 (invalid octal) from matching double
+DOUBLE: SIGN? DECIMAL+ ('M' | (FRACTION | EXPONENT | (FRACTION EXPONENT)) 'M'?);
 
-fragment DECIMAL: (ZERO | ([1-9] DIGIT*));
+fragment FRACTION: ('.' DIGIT*);
+fragment EXPONENT: [eE] SIGN? DIGIT+;
+fragment DECIMAL: ZERO | ([1-9] DIGIT*);
 
 fragment ZERO: '0';
 
