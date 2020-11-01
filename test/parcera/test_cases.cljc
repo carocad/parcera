@@ -208,11 +208,14 @@
     (is (parcera/failure? (parcera/ast input))))
   (let [input "A/A:0"]
     (is (= (parcera/ast input) [:code [:symbol input]])))
-  (let [input "hello//a/"]
-    (is (parcera/failure? (parcera/ast input))))
-  (let [input "hello///"]
-    (valid? input)
-    (roundtrip input)))
+  ;; todo: the followings are NOT valid literal symbols but they are
+  ;; "supported" by the current LispReader implementation
+  ;; hopefully in the future it won't; see CLJ-1530
+  #_(let [input "hello//a/"]
+      (is (parcera/failure? (parcera/ast input))))
+  #_(let [input "hello///"]
+      (valid? input)
+      (roundtrip input)))
 
 
 (deftest tag-literals
@@ -241,17 +244,20 @@
   (let [input ":#hello"]
     (valid? input)
     (roundtrip input))
-  ;; this is NOT a valid literal keyword but it is "supported" by the current
-  ;; reader
+  ;; todo: the followings are NOT valid literal keyword but they are
+  ;; "supported" by the current LispReader implementation
+  ;; hopefully in the future it won't; see CLJ-1530
   (let [inputs [":http://www.department0.university0.edu/GraduateCourse52"
                 "::platform/http://www.department0.university0.edu/GraduateCourse52"
                 ":hello/world/foo"
                 ":hello/world/f:oo"
-                "::platform/foo/bar"]]
-    (doseq [input inputs]
-      (valid? input)
-      (roundtrip input)))
-  (let [inputs [":hello/world/" "::hello/world/" ":7/"]]
+                "::platform/foo/bar"
+                #_(doseq [input inputs]
+                    (valid? input)
+                    (roundtrip input))
+                ":hello/world/"
+                "::hello/world/"
+                ":7/"]]
     (doseq [input inputs]
       (is (parcera/failure? (parcera/ast input))))))
 
