@@ -124,7 +124,7 @@ var_quote: '#\'' ignore* form;
 
 discard: '#_' ignore* form;
 
-tag: '#' symbol ignore* (literal | collection | tag);
+tag: '#' symbol ignore* form;
 
 conditional: '#?' whitespace* list;
 
