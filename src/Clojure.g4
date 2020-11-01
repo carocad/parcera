@@ -193,13 +193,14 @@ OCTAL_CHAR: ESCAPE 'o' ([0-7] | ([0-7] [0-7]) | ([0-3] [0-7] [0-7]));
 
 fragment ESCAPE: '\\';
 
+// Parcera currently (01.11.20) doesnt support multiple / inside
+// keywords nor symbols as documented in https://clojure.org/reference/reader#_symbols
+// See https://github.com/carocad/parcera/pull/94 for a more indept discussion.
 
 // ::/ is NOT a valid macro keyword, unlike :/
-// multiple / are allowed for backward compatibility
-MACRO_KEYWORD: '::' (SIMPLE_KEYWORD '/'+)* SIMPLE_KEYWORD;
+MACRO_KEYWORD: '::' (SIMPLE_KEYWORD '/')? SIMPLE_KEYWORD;
 
-// multiple / are allowed for backward compatibility
-KEYWORD: ':' (SIMPLE_KEYWORD '/'+)* (SIMPLE_KEYWORD | '/');
+KEYWORD: ':' (SIMPLE_KEYWORD '/')? (SIMPLE_KEYWORD | '/');
 
 fragment SIMPLE_KEYWORD: // a single character like + -
                         KEYWORD_HEAD
@@ -210,8 +211,7 @@ fragment KEYWORD_BODY: KEYWORD_HEAD | ':';
 
 fragment KEYWORD_HEAD: ALLOWED_NAME_CHARACTER | DIGIT | [#'] | SIGN;
 
-// multiple / are allowed for backward compatibility
-SYMBOL: (SIMPLE_SYMBOL '/'+)* (SIMPLE_SYMBOL | '/');
+SYMBOL: (SIMPLE_SYMBOL '/')? (SIMPLE_SYMBOL | '/');
 
 fragment SIMPLE_SYMBOL: // a single character like + - / etc
                         (ALLOWED_NAME_CHARACTER | SIGN)
