@@ -60,35 +60,42 @@
 ;; start and end are tokens not positions.
 ;; So '(hello/world)' has '(' 'hello/world' and ')' as tokens
 (extend-type ParserRuleContext
-  clojure/Datafiable
-  (datafy [this]
-    (common/->Node (parser-rule-meta this)
-                   :parcera.core/rule
-                   (.getRuleIndex this)
-                   (.-children this))))
+  common/Antlr
+  (ast [this rule-names hide-tags hide-literals]
+    (let [meta     (parser-rule-meta this)
+          rule     (get rule-names (.getRuleIndex this))
+          children (sequence (comp (map #(common/ast % rule-names hide-tags hide-literals))
+                                   (remove nil?))
+                             (.-children this))]
+      (if (contains? hide-tags rule)
+        ;; parcera hidden tags are always "or" statements, so just take the single children
+        (first children)
+        ;; attach meta data ... ala instaparse
+        (with-meta (cons rule children) meta)))))
 
 
 (extend-type ErrorNodeImpl
-  clojure/Datafiable
-  (datafy [this]
+  common/Antlr
+  (ast [this rule-names hide-tags hide-literals]
     (let [token (.-symbol this)]
-      (common/->Node {:parcera.core/start {:row    (.getLine token)
-                                           :column (.getCharPositionInLine token)}}
-                     :parcera.core/failure
-                     nil                                    ; rule id
-                     (str this)))))                         ; content
+      (with-meta (list :parcera.core/failure (:content (str this)))
+                 {:parcera.core/start {:row    (.getLine token)
+                                       :column (.getCharPositionInLine token)}}))))
 
 
 (extend-type TerminalNode
-  clojure/Datafiable
-  (datafy [this] (common/->Node nil                         ; meta
-                                :parcera.core/terminal      ;type
-                                nil                         ; rule id
-                                (str this))))               ; content
+  common/Antlr
+  (ast [this rule-names hide-tags hide-literals]
+    (let [content (str this)]
+      (when-not (contains? hide-literals content)
+        content))))
 
 
-;; just an utility to allow js to use the same code
-(defn datafy [tree] (clojure/datafy tree))
+(defn ast
+  "utility function to allow java and javascript to interoperate"
+  [this rule-names hide-tags hide-literals]
+  (common/ast this rule-names hide-tags hide-literals))
+
 
 (defn parse
   [input]
