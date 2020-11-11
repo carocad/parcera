@@ -16,34 +16,6 @@
                                  ":" "::"
                                  "<EOF>"}})
 
-
-(defn- hiccup
-  "transforms the tree `hiccup-like` ast data structure.
-
-  Yields a lazy sequence to avoid expensive computation whenever
-  the user is not interested in the full content."
-  [tree rule-names hide-tags hide-literals]
-  (let [node (platform/datafy tree)]
-    (case (:type node)
-      ::rule
-      (let [rule     (get rule-names (:rule-id node))
-            children (sequence (comp (map #(hiccup % rule-names hide-tags hide-literals))
-                                     (remove nil?))
-                               (:content node))]
-        (if (contains? hide-tags rule)
-          ;; parcera hidden tags are always "or" statements, so just take the single children
-          (first children)
-          ;; attach meta data ... ala instaparse
-          (with-meta (cons rule children) (:metadata node))))
-
-      ::failure
-      (with-meta (list ::failure (:content node))
-                 (:metadata node))
-
-      ::terminal
-      (if (contains? hide-literals (:content node)) nil (:content node)))))
-
-
 (defn- unhide
   [options]
   (case (:unhide options)
@@ -65,9 +37,9 @@
        however this function returns a lazy sequence in order to expose
        those through Clojure's immutable data structures"
   [input & {:as options}]
-  (let [hidden     (unhide options)
+  (let [hidden (unhide options)
         {:keys [rules tree reports]} (platform/parse input)
-        result     (hiccup tree rules (:tags hidden) (:literals hidden))]
+        result (platform/ast tree rules (:tags hidden) (:literals hidden))]
     (vary-meta result assoc ::errors reports)))
 
 

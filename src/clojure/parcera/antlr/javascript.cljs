@@ -60,28 +60,31 @@
                                        (count (.-text stop)))}})))
 
 
-(defn datafy
-  [tree]
+(defn ast
+  [tree rule-names hide-tags hide-literals]
   (cond
     (some? (.-children tree))
-    (common/->Node (parser-rule-meta tree)
-                   :parcera.core/rule
-                   (.-ruleIndex tree)
-                   (.-children tree))
+    (let [meta     (parser-rule-meta tree)
+          rule     (get rule-names (.-ruleIndex tree))
+          children (sequence (comp (map #(common/ast % rule-names hide-tags hide-literals))
+                                   (remove nil?))
+                             (.-children tree))]
+      (if (contains? hide-tags rule)
+        ;; parcera hidden tags are always "or" statements, so just take the single children
+        (first children)
+        ;; attach meta data ... ala instaparse
+        (with-meta (cons rule children) meta)))
 
     (.-isErrorNode tree)
     (let [token (.-symbol tree)]
-      (common/->Node {:parcera.core/start {:row    (.-line token)
-                                           :column (.-column token)}}
-                     :parcera.core/failure
-                     nil                                    ; rule id
-                     (str tree)))
+      (with-meta (list :parcera.core/failure (:content (str tree)))
+                 {:parcera.core/start {:row    (.getLine token)
+                                       :column (.getCharPositionInLine token)}}))
 
     :else
-    (common/->Node nil                                      ; metadata
-                   :parcera.core/terminal
-                   nil                                      ; rule id
-                   (str tree))))
+    (let [content (str tree)]
+      (when-not (contains? hide-literals content)
+        content))))
 
 
 (defn parse
