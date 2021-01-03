@@ -12,8 +12,11 @@ module.exports = {
     libraryTarget: "commonjs2",
   },
   target: 'web',
-  node: {
-    module: "empty",
-    net: "empty",
-    fs: "empty" }
+  resolve: {
+    fallback: {
+        module: false,
+        net: false,
+        fs: false
+    }
+  }
 }
