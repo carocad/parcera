@@ -15,8 +15,9 @@ jobs:
   include:
     - stage: tests
       name: Java tests
-      script:
+      before_install:
         - curl -O https://www.antlr.org/download/antlr-4.7.1-complete.jar
+      script:
         # generate java
         - java -jar antlr-4.7.1-complete.jar -Xexact-output-dir -o src/java/parcera/antlr -package parcera.antlr -Dlanguage=Java -no-listener -no-visitor src/Clojure.g4
         # now we can actually proceed with clojure code
@@ -25,29 +26,31 @@ jobs:
         - lein trampoline test :benchmark
     # still test stage
     - name: JavaScript tests
-      script:
+      before_install:
         - curl -O https://www.antlr.org/download/antlr-4.7.1-complete.jar
+        - nvm install 14 # otherwise it runs by default on node 8
+        - npm init --yes
+        - npm add webpack@5 webpack-cli antlr4@4.7.1
+      script:
         # generate javascript
         - java -jar antlr-4.7.1-complete.jar -Xexact-output-dir -o src/clojure/parcera/antlr/js -package parcera.antlr -Dlanguage=JavaScript -no-listener -no-visitor src/Clojure.g4
         # pre-bundle javascript
-        - nvm use 10
-        - npm init --yes
-        - npm add webpack@5 webpack-cli antlr4@4.7.1
         - npx webpack --config ./resources/webpack.config.js
         - lein test-runner
 
     - stage: Release
       if: tag IS present
-      script:
+      before_install:
         - curl -O https://www.antlr.org/download/antlr-4.7.1-complete.jar
+        - nvm install 14 # otherwise it runs by default on node 8
+        - npm init --yes
+        - npm add webpack@5 webpack-cli antlr4@4.7.1
+      script:
         # generate java
         - java -jar antlr-4.7.1-complete.jar -Xexact-output-dir -o src/java/parcera/antlr -package parcera.antlr -Dlanguage=Java -no-listener -no-visitor src/Clojure.g4
         # generate javascript
         - java -jar antlr-4.7.1-complete.jar -Xexact-output-dir -o src/clojure/parcera/antlr/js -package parcera.antlr -Dlanguage=JavaScript -no-listener -no-visitor src/Clojure.g4
         # pre-bundle javascript
-        - nvm use 10
-        - npm init --yes
-        - npm add webpack@5 webpack-cli antlr4@4.7.1
         - npx webpack --config ./resources/webpack.config.js
         - lein do javac, compile, check
       deploy:
