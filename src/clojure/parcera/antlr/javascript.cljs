@@ -2,8 +2,7 @@
   ;; It seems that by passing antlr4 through webpack we lost the type
   ;; information. So now we get things like #object[p], #object[h], etc :(
   ;(type (:tree (parse "hello/world")))
-  (:require [parcera.antlr.common :as common]
-            [antlr.clojure.reader :as reader]))
+  (:require [antlr.clojure.reader :refer [ClojureReader]]))
 
 ; todo: enable this once I know how to make it work properly
 #_(set! *warn-on-infer* true)
@@ -66,7 +65,7 @@
     (some? (.-children tree))
     (let [meta     (parser-rule-meta tree)
           rule     (get rule-names (.-ruleIndex tree))
-          children (sequence (comp (map #(common/ast % rule-names hide-tags hide-literals))
+          children (sequence (comp (map #(ast % rule-names hide-tags hide-literals))
                                    (remove nil?))
                              (.-children tree))]
       (if (contains? hide-tags rule)
@@ -90,12 +89,12 @@
 (defn parse
   [input]
   (let [listener (AntlrFailure (volatile! ()))
-        chars    (reader/charStreams input)
-        lexer    (doto (reader/lexer chars)
+        chars    (.charStreams ClojureReader input)
+        lexer    (doto (.lexer ClojureReader chars)
                    (.removeErrorListeners)
                    (.addErrorListener listener))
-        tokens   (reader/tokens lexer)
-        parser   (doto (reader/parser tokens)
+        tokens   (.tokens ClojureReader lexer)
+        parser   (doto (.parser ClojureReader tokens)
                    (.removeErrorListeners)
                    (.addErrorListener listener))]
     (set! (.-buildParseTrees parser) true)

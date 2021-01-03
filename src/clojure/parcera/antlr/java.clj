@@ -1,15 +1,14 @@
 (ns parcera.antlr.java
   "mapping functions between Antlr's Java implementation
   and Parcera AST representation"
-  (:require [parcera.antlr.common :as common]
-            [clojure.core.protocols :as clojure])
   (:import (parcera.antlr ClojureParser ClojureLexer)
            (org.antlr.v4.runtime ParserRuleContext CommonTokenStream
                                  CharStreams ANTLRErrorListener Parser)
            (org.antlr.v4.runtime.tree ErrorNodeImpl TerminalNode)))
 
 
-(set! *warn-on-reflection* true)
+(defprotocol Antlr
+  (->ast [this rule-names hide-tags hide-literals]))
 
 
 ;; A custom Error Listener to avoid Antlr printing the errors on the terminal
@@ -60,11 +59,11 @@
 ;; start and end are tokens not positions.
 ;; So '(hello/world)' has '(' 'hello/world' and ')' as tokens
 (extend-type ParserRuleContext
-  common/Antlr
+  Antlr
   (ast [this rule-names hide-tags hide-literals]
     (let [meta     (parser-rule-meta this)
           rule     (get rule-names (.getRuleIndex this))
-          children (sequence (comp (map #(common/ast % rule-names hide-tags hide-literals))
+          children (sequence (comp (map #(->ast % rule-names hide-tags hide-literals))
                                    (remove nil?))
                              (.-children this))]
       (if (contains? hide-tags rule)
@@ -75,7 +74,7 @@
 
 
 (extend-type ErrorNodeImpl
-  common/Antlr
+  Antlr
   (ast [this rule-names hide-tags hide-literals]
     (let [token (.-symbol this)]
       (with-meta (list :parcera.core/failure (:content (str this)))
@@ -84,7 +83,7 @@
 
 
 (extend-type TerminalNode
-  common/Antlr
+  Antlr
   (ast [this rule-names hide-tags hide-literals]
     (let [content (str this)]
       (when-not (contains? hide-literals content)
@@ -94,7 +93,7 @@
 (defn ast
   "utility function to allow java and javascript to interoperate"
   [this rule-names hide-tags hide-literals]
-  (common/ast this rule-names hide-tags hide-literals))
+  (->ast this rule-names hide-tags hide-literals))
 
 
 (defn parse
