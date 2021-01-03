@@ -50,30 +50,30 @@
           :cljs ^StringBuffer string-builder)]
   (case (first ast)
     :code
-    (reduce (fn [_ child] (code* child string-builder)) nil (rest ast))
+    (run! (fn [child] (code* child string-builder)) (rest ast))
 
     :list
     (do (. string-builder (append "("))
-        (reduce (fn [_ child] (code* child string-builder)) nil (rest ast))
+        (run! (fn [child] (code* child string-builder)) (rest ast))
         (. string-builder (append ")")))
 
     :vector
     (do (. string-builder (append "["))
-        (reduce (fn [_ child] (code* child string-builder)) nil (rest ast))
+        (run! (fn [child] (code* child string-builder)) (rest ast))
         (. string-builder (append "]")))
 
     :namespaced_map
     (do (. string-builder (append "#"))
-        (reduce (fn [_ child] (code* child string-builder)) nil (rest ast)))
+        (run! (fn [child] (code* child string-builder)) (rest ast)))
 
     :map
     (do (. string-builder (append "{"))
-        (reduce (fn [_ child] (code* child string-builder)) nil (rest ast))
+        (run! (fn [child] (code* child string-builder)) (rest ast))
         (. string-builder (append "}")))
 
     :set
     (do (. string-builder (append "#{"))
-        (reduce (fn [_ child] (code* child string-builder)) nil (rest ast))
+        (run! (fn [child] (code* child string-builder)) (rest ast))
         (. string-builder (append "}")))
 
     (:number :whitespace :comment :symbol :character :string
@@ -83,7 +83,7 @@
 
     :symbolic
     (do (. string-builder (append "##"))
-        (doseq [child (rest (butlast ast))] (code* child string-builder))
+        (run! (fn [child] (code* child string-builder)) (rest (butlast ast)))
         (. string-builder (append (last ast))))
 
     :regex
@@ -94,63 +94,63 @@
     (. string-builder (append "::"))
 
     :metadata
-    (do (reduce (fn [_ child] (code* child string-builder)) nil (rest ast)))
+    (do (run! (fn [child] (code* child string-builder)) (rest ast)))
 
     :metadata_entry
     (do (. string-builder (append "^"))
-        (reduce (fn [_ child] (code* child string-builder)) nil (rest ast)))
+        (run! (fn [child] (code* child string-builder)) (rest ast)))
 
     :deprecated_metadata_entry
     (do (. string-builder (append "#^"))
-        (reduce (fn [_ child] (code* child string-builder)) nil (rest ast)))
+        (run! (fn [child] (code* child string-builder)) (rest ast)))
 
     :quote
     (do (. string-builder (append "'"))
-        (reduce (fn [_ child] (code* child string-builder)) nil (rest ast)))
+        (run! (fn [child] (code* child string-builder)) (rest ast)))
 
     :var_quote
     (do (. string-builder (append "#'"))
-        (reduce (fn [_ child] (code* child string-builder)) nil (rest ast)))
+        (run! (fn [child] (code* child string-builder)) (rest ast)))
 
     :discard
     (do (. string-builder (append "#_"))
-        (reduce (fn [_ child] (code* child string-builder)) nil (rest ast)))
+        (run! (fn [child] (code* child string-builder)) (rest ast)))
 
     :tag
     (do (. string-builder (append "#"))
-        (reduce (fn [_ child] (code* child string-builder)) nil (rest ast)))
+        (run! (fn [child] (code* child string-builder)) (rest ast)))
 
     :backtick
     (do (. string-builder (append "`"))
-        (reduce (fn [_ child] (code* child string-builder)) nil (rest ast)))
+        (run! (fn [child] (code* child string-builder)) (rest ast)))
 
     :unquote
     (do (. string-builder (append "~"))
-        (reduce (fn [_ child] (code* child string-builder)) nil (rest ast)))
+        (run! (fn [child] (code* child string-builder)) (rest ast)))
 
     :unquote_splicing
     (do (. string-builder (append "~@"))
-        (reduce (fn [_ child] (code* child string-builder)) nil (rest ast)))
+        (run! (fn [child] (code* child string-builder)) (rest ast)))
 
     :conditional
     (do (. string-builder (append "#?"))
-        (reduce (fn [_ child] (code* child string-builder)) nil (rest ast)))
+        (run! (fn [child] (code* child string-builder)) (rest ast)))
 
     :conditional_splicing
     (do (. string-builder (append "#?@"))
-        (reduce (fn [_ child] (code* child string-builder)) nil (rest ast)))
+        (run! (fn [child] (code* child string-builder)) (rest ast)))
 
     :deref
     (do (. string-builder (append "@"))
-        (reduce (fn [_ child] (code* child string-builder)) nil (rest ast)))
+        (run! (fn [child] (code* child string-builder)) (rest ast)))
 
     :fn
     (do (. string-builder (append "#"))
-        (reduce (fn [_ child] (code* child string-builder)) nil (rest ast)))
+        (run! (fn [child] (code* child string-builder)) (rest ast)))
 
     :eval
     (do (. string-builder (append "#="))
-        (reduce (fn [_ child] (code* child string-builder)) nil (rest ast)))))
+        (run! (fn [child] (code* child string-builder)) (rest ast)))))
 
 
 (defn code
