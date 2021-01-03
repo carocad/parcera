@@ -60,7 +60,7 @@
 ;; So '(hello/world)' has '(' 'hello/world' and ')' as tokens
 (extend-type ParserRuleContext
   Antlr
-  (ast [this rule-names hide-tags hide-literals]
+  (->ast [this rule-names hide-tags hide-literals]
     (let [meta     (parser-rule-meta this)
           rule     (get rule-names (.getRuleIndex this))
           children (sequence (comp (map #(->ast % rule-names hide-tags hide-literals))
@@ -75,7 +75,7 @@
 
 (extend-type ErrorNodeImpl
   Antlr
-  (ast [this rule-names hide-tags hide-literals]
+  (->ast [this rule-names hide-tags hide-literals]
     (let [token (.-symbol this)]
       (with-meta (list :parcera.core/failure (:content (str this)))
                  {:parcera.core/start {:row    (.getLine token)
@@ -84,7 +84,7 @@
 
 (extend-type TerminalNode
   Antlr
-  (ast [this rule-names hide-tags hide-literals]
+  (->ast [this rule-names hide-tags hide-literals]
     (let [content (str this)]
       (when-not (contains? hide-literals content)
         content))))
